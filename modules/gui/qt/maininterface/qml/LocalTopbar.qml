@@ -36,23 +36,12 @@ T.ToolBar {
 
     property bool useAcrylic: true
 
-    // The sidebar toggle and the folder chip only make sense next to the player,
-    // the full library always shows its navigation.
-    property bool showSidebarToggle: false
-    property alias sidebarVisible: sidebarToggle.checked
-
-    property bool showFolder: false
-    property string folderName: MainCtx.hasEmbededVideo ? qsTr("Videos") : qsTr("Music")
-
     property string title: (Player.isStarted && Player.title) ? Player.title
                                                              : qsTr("VLC Media Player")
 
     property bool _showCSD: MainCtx.clientSideDecoration
         && !(MainCtx.intfMainWindow.visibility === Window.FullScreen)
         && !MainCtx.hasToolbarMenu
-
-    signal toggleSidebar()
-    signal folderClicked()
 
     implicitHeight: Math.max(implicitBackgroundHeight + topInset + bottomInset,
                              implicitContentHeight + topPadding + bottomPadding)
@@ -110,132 +99,31 @@ T.ToolBar {
                 }
             }
 
-            Row {
+            Widgets.IconToolButton {
+                id: menuButton
+
                 anchors.verticalCenter: parent.verticalCenter
 
-                spacing: VLCStyle.dp(10, VLCStyle.scale)
-
-                TitleBarButton {
-                    id: menuButton
-
-                    focus: true
-
-                    text: VLCIcons.more
-                    description: qsTr("Menu")
-                    checked: contextMenu.shown
-
-                    AccessibleCompat.id: "menuButton"
-
-                    Navigation.parentItem: startRow
-                    Navigation.rightItem: sidebarToggle
-
-                    onClicked: contextMenu.popup(this.mapToGlobal(0, height))
-
-                    Menus.QmlGlobalMenu {
-                        id: contextMenu
-                        ctx: MainCtx
-                    }
-                }
-
-                TitleBarButton {
-                    id: sidebarToggle
-
-                    visible: root.showSidebarToggle
-
-                    text: VLCIcons.panel_left
-                    description: qsTr("Toggle sidebar")
-
-                    AccessibleCompat.id: "sidebarToggleButton"
-
-                    Navigation.parentItem: startRow
-                    Navigation.leftItem: menuButton
-                    Navigation.rightItem: folderChip
-
-                    onClicked: root.toggleSidebar()
-                }
-            }
-
-            Item {
-                visible: root.showFolder
-
-                width: VLCStyle.icon_normal
+                width: VLCStyle.dp(28, VLCStyle.scale)
                 height: VLCStyle.dp(28, VLCStyle.scale)
 
-                Rectangle {
-                    anchors.centerIn: parent
+                focus: true
 
-                    width: VLCStyle.border
-                    height: VLCStyle.dp(16, VLCStyle.scale)
+                font.pixelSize: VLCStyle.icon_normal
 
-                    color: theme.separator
-                }
-            }
+                text: VLCIcons.more
+                description: qsTr("Menu")
+                checked: contextMenu.shown
 
-            T.AbstractButton {
-                id: folderChip
-
-                visible: root.showFolder
-
-                anchors.verticalCenter: parent.verticalCenter
-
-                implicitWidth: implicitContentWidth + leftPadding + rightPadding
-                implicitHeight: VLCStyle.dp(28, VLCStyle.scale)
-
-                rightPadding: VLCStyle.margin_xxsmall
-
-                text: root.folderName
-
-                Accessible.name: qsTr("Show in library")
-                Accessible.onPressAction: folderChip.clicked()
+                AccessibleCompat.id: "menuButton"
 
                 Navigation.parentItem: startRow
-                Navigation.leftItem: sidebarToggle
 
-                Keys.priority: Keys.AfterItem
-                Keys.onPressed: (event) => Navigation.defaultKeyAction(event)
+                onClicked: contextMenu.popup(this.mapToGlobal(0, height))
 
-                onClicked: root.folderClicked()
-
-                ColorContext {
-                    id: chipTheme
-                    colorSet: ColorContext.ToolButton
-
-                    focused: folderChip.visualFocus
-                    hovered: folderChip.hovered
-                    pressed: folderChip.down
-                }
-
-                background: Rectangle {
-                    radius: VLCStyle.dp(6, VLCStyle.scale)
-                    color: folderChip.hovered ? chipTheme.bg.secondary : "transparent"
-                    border.color: folderChip.visualFocus ? chipTheme.visualFocus : "transparent"
-                }
-
-                contentItem: Row {
-                    spacing: VLCStyle.margin_xxsmall
-
-                    Widgets.IconLabel {
-                        width: VLCStyle.dp(28, VLCStyle.scale)
-                        height: VLCStyle.dp(28, VLCStyle.scale)
-
-                        horizontalAlignment: Text.AlignHCenter
-                        verticalAlignment: Text.AlignVCenter
-
-                        text: VLCIcons.folder
-                        color: chipTheme.fg.primary
-                        font.pixelSize: VLCStyle.icon_normal
-                    }
-
-                    T.Label {
-                        anchors.verticalCenter: parent.verticalCenter
-
-                        width: Math.min(implicitWidth, VLCStyle.dp(160, VLCStyle.scale))
-
-                        text: folderChip.text
-                        elide: Text.ElideRight
-                        color: chipTheme.fg.primary
-                        font.pixelSize: VLCStyle.fontSize_large
-                    }
+                Menus.QmlGlobalMenu {
+                    id: contextMenu
+                    ctx: MainCtx
                 }
             }
         }
@@ -273,12 +161,5 @@ T.ToolBar {
                           : "qrc:///qt/qml/VLC/Widgets/CSDWindowButtonSet.qml"
             }
         }
-    }
-
-    component TitleBarButton: Widgets.IconToolButton {
-        width: VLCStyle.dp(28, VLCStyle.scale)
-        height: VLCStyle.dp(28, VLCStyle.scale)
-
-        font.pixelSize: VLCStyle.icon_normal
     }
 }

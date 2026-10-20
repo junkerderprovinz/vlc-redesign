@@ -1257,7 +1257,6 @@ libqml_module_dialogs_a_QML = \
 	dialogs/dialogs/qml/CustomDialog.qml \
 	dialogs/dialogs/qml/Dialogs.qml \
 	dialogs/dialogs/qml/ModalDialog.qml \
-	dialogs/dialogs/qml/WindowDialog.qml \
 	dialogs/extended/qml/EffectsColorField.qml \
 	dialogs/extended/qml/EffectsColors.qml \
 	dialogs/extended/qml/EffectsComboBox.qml \
@@ -1589,19 +1588,16 @@ libqml_module_widgets_a_QML = \
 	widgets/qml/LabelExt.qml \
 	widgets/qml/ActionButtonOverlay.qml \
 	widgets/qml/ActionButtonPrimary.qml \
-	widgets/qml/BannerTabButton.qml \
 	widgets/qml/BannerCone.qml \
 	widgets/qml/BusyIndicatorExt.qml \
 	widgets/qml/CaptionLabel.qml \
 	widgets/qml/CheckButton.qml \
-	widgets/qml/CheckedDelegate.qml \
 	widgets/qml/ComboBoxExt.qml \
 	widgets/qml/AcrylicBackground.qml \
 	widgets/qml/FloatingNotification.qml \
 	widgets/qml/AnimatedBackground.qml \
 	widgets/qml/CSDThemeButton.qml \
 	widgets/qml/CSDThemeButtonSet.qml \
-	widgets/qml/CSDTitleBar.qml \
 	widgets/qml/CSDWindowButton.qml \
 	widgets/qml/CSDWindowButtonSet.qml \
 	widgets/qml/CSDTitlebarTapNDrapHandler.qml \
@@ -1656,7 +1652,6 @@ libqml_module_widgets_a_QML = \
 	widgets/qml/TrackDelayButton.qml \
 	widgets/qml/VideoProgressBar.qml \
 	widgets/qml/VideoQualityLabels.qml \
-	widgets/qml/ListSubtitleLabel.qml \
 	widgets/qml/PointingTooltip.qml \
 	widgets/qml/FrostedGlassEffect.qml \
 	widgets/qml/ToolTipExt.qml \
