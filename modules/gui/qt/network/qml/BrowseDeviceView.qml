@@ -56,6 +56,9 @@ FocusScope {
 
     readonly property bool hasGridListMode: true
 
+    // The library panel beside the player is too narrow for the grid.
+    readonly property bool gridMode: MainCtx.gridView && !MainCtx.playerView
+
     property bool interactive: true
 
     property bool reuseItems: true
@@ -161,7 +164,7 @@ FocusScope {
 
         focus: (model.count !== 0)
 
-        sourceComponent: (MainCtx.gridView) ? grid : list
+        sourceComponent: root.gridMode ? grid : list
     }
 
     Component {

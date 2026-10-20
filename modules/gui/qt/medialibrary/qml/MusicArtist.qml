@@ -51,7 +51,10 @@ FocusScope {
 
     property bool isSearchable: true
 
-    readonly property MLBaseModel _effectiveModel: MainCtx.gridView ? albumModel : trackModel
+    // The library panel beside the player is too narrow for the grid.
+    readonly property bool gridMode: MainCtx.gridView && !MainCtx.playerView
+
+    readonly property MLBaseModel _effectiveModel: root.gridMode ? albumModel : trackModel
 
     on_EffectiveModelChanged: root._effectiveModel.sortCriteria = root.sort.criteria
 
@@ -106,7 +109,7 @@ FocusScope {
 
         ctx: MainCtx
 
-        sectionsVisible: !MainCtx.gridView
+        sectionsVisible: !root.gridMode
     }
 
     // current index of album model
@@ -184,7 +187,7 @@ FocusScope {
                     }
 
                     Connections {
-                        enabled: !MainCtx.gridView
+                        enabled: !root.gridMode
                         target: root.sort
 
                         function onCriteriaChanged() {
@@ -427,7 +430,7 @@ FocusScope {
             anchors.rightMargin: root.rightPadding
 
             focus: loader.status === Loader.Ready
-            sourceComponent: MainCtx.gridView ? gridComponent : tableComponent
+            sourceComponent: root.gridMode ? gridComponent : tableComponent
         }
     }
 
@@ -452,7 +455,7 @@ FocusScope {
         let initialIndex = root.initialIndex
         if (initialIndex >= albumModel.count)
             initialIndex = 0
-        const albumsListView = MainCtx.gridView ? _currentView : _currentView?.preferredHeaderItem?.albumsListView
+        const albumsListView = root.gridMode ? _currentView : _currentView?.preferredHeaderItem?.albumsListView
         if (albumsListView) {
             albumsListView.currentIndex = initialIndex
             albumsListView.positionViewAtIndex(initialIndex, ItemView.Contain)

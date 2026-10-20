@@ -38,6 +38,9 @@ T.Page {
     //indicates whether the subview support grid/list mode
     property bool hasGridListMode: _firstChild?.hasGridListMode ?? false
 
+    // The library panel beside the player is too narrow for the grid.
+    readonly property bool gridMode: MainCtx.gridView && !MainCtx.playerView
+
     property bool isSearchable: _firstChild?.isSearchable ?? false
 
     property var sortModel: _firstChild?.sortModel ?? null
@@ -218,7 +221,7 @@ T.Page {
         // FIXME: `GridItem`'s background extends beyond its
         //        bounding rect, violating the hypothetical
         //        clip test (see 7e6b23db).
-        bottomInset: (MainCtx.hasGridListMode && MainCtx.gridView) ? VLCStyle.gridItemSelectedBorder : undefined
+        bottomInset: (MainCtx.hasGridListMode && root.gridMode) ? VLCStyle.gridItemSelectedBorder : undefined
 
         // Settings
 

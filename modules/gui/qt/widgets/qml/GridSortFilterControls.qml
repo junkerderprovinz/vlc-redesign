@@ -20,6 +20,9 @@ NavigableRow {
     property bool compact: false
     property bool searchOpen: false
 
+    // Views beside the player always use the list.
+    property bool gridMode: MainCtx.gridView && !MainCtx.playerView
+
     SortControl {
         id: sortControl
 
@@ -59,8 +62,8 @@ NavigableRow {
         width: VLCStyle.icon_normal
         height: VLCStyle.icon_normal
         font.pixelSize: VLCStyle.icon_normal
-        text: MainCtx.gridView ? VLCIcons.grid : VLCIcons.list
-        description: MainCtx.gridView ? qsTr("Grid View") : qsTr("List View")
+        text: root.gridMode ? VLCIcons.grid : VLCIcons.list
+        description: root.gridMode ? qsTr("Grid View") : qsTr("List View")
         onClicked: MainCtx.gridView = !MainCtx.gridView
     }
 

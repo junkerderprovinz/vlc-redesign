@@ -38,7 +38,7 @@ Loader {
       Following are required inputs -
     */
 
-    // components to load depending on MainCtx.gridView
+    // components to load depending on gridMode
     required property Component grid
     required property Component list
 
@@ -90,6 +90,9 @@ Loader {
 
     readonly property bool hasGridListMode: !!grid && !!list
 
+    // The library panel beside the player is too narrow for the grid.
+    readonly property bool gridMode: MainCtx.gridView && !MainCtx.playerView
+
     property bool isSearchable: false
 
     property var sortModel: []
@@ -112,7 +115,7 @@ Loader {
 
     // NOTE: We have to use a Component here. When using a var the onCurrentComponentChanged event
     //       gets called multiple times even when the currentComponent stays the same.
-    property Component currentComponent: MainCtx.gridView ? grid : list
+    property Component currentComponent: gridMode ? grid : list
 
     // ### StackView compat:
     property alias initialItem: root.sourceComponent

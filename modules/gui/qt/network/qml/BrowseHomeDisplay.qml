@@ -39,7 +39,7 @@ Widgets.PageExt {
     property int maximumRows: {
         if (model.searchPattern !== "")
             return -1
-        else if (MainCtx.gridView)
+        else if (root.gridMode)
             return 2
         else
             return 5
@@ -368,7 +368,7 @@ Widgets.PageExt {
         interactive: false
 
         // FIXME: ExpandGridView makes this page completely unusable when `reuseItems` is set (#29084):
-        reuseItems: !MainCtx.gridView
+        reuseItems: !root.gridMode
 
         onBrowse: (tree, reason) => root.browse(tree, reason)
 
