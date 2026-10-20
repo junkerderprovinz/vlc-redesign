@@ -99,6 +99,7 @@ FocusScope {
         width: root.panelWidth
 
         color: theme.bg.primary
+        clip: true
 
         Widgets.PageLoader {
             id: stackView
