@@ -19,7 +19,8 @@ import QtQuick
 
 import VLC.Widgets as Widgets
 
-// An ON/OFF switch that follows `value` and reports what the user picks
+// An ON/OFF switch that shows `value`. A click only reports the new state
+// through switched(), the owner then updates `value`.
 Widgets.CheckButton {
     id: root
 
@@ -27,13 +28,8 @@ Widgets.CheckButton {
 
     signal switched(bool on)
 
-    Binding on checked {
-        value: root.value
-        restoreMode: Binding.RestoreNone
-    }
+    checkable: false
+    checked: value
 
-    onCheckedChanged: {
-        if (checked !== value)
-            root.switched(checked)
-    }
+    onClicked: root.switched(!value)
 }

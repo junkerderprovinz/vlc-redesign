@@ -64,6 +64,7 @@ public:
     Q_ENUM(Type)
 
     explicit ConfigOption(QObject *parent = nullptr);
+    explicit ConfigOption(const QString &name);
 
     QString name() const { return m_name; }
     void setName(const QString &name);
@@ -105,6 +106,8 @@ class SettingsBridge : public QObject
 
     Q_PROPERTY(bool hasDefaultVolume READ hasDefaultVolume NOTIFY optionChanged FINAL)
     Q_PROPERTY(QString configDirectory READ configDirectory CONSTANT FINAL)
+    /// { id, name, preamp, bands } of every built-in equalizer preset
+    Q_PROPERTY(QVariantList equalizerPresets READ equalizerPresets CONSTANT FINAL)
 
 public:
     explicit SettingsBridge(qt_intf_t *intf, QObject *parent = nullptr);
@@ -134,8 +137,14 @@ public:
     Q_INVOKABLE int defaultVolume() const;
     Q_INVOKABLE void setDefaultVolume(int percent);
 
+    /// the labels of the equalizer bands, as "equalizer-vlcfreqs" places them
+    Q_INVOKABLE static QStringList equalizerBandNames(bool vlcFrequencies);
+    QVariantList equalizerPresets() const;
     /// { preamp, bands } of a built-in equalizer preset
     Q_INVOKABLE static QVariantMap equalizerPreset(const QString &name);
+
+    /// the keys of the first combination bound to a hotkey option
+    Q_INVOKABLE static QStringList hotkeyKeys(const QString &option);
 
     QString configDirectory() const;
     Q_INVOKABLE void openConfigDirectory() const;

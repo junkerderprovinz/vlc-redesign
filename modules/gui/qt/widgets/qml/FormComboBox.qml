@@ -23,9 +23,9 @@ import VLC.Style
 import VLC.Util
 import VLC.Widgets as Widgets
 
-// Drop-down list of the player settings panel. With `checkable` the model is
-// one of the player's choice or track models, whose rows carry a `checked`
-// role that selects them.
+// The drop-down list of a setting. With `checkable` the model is one of the
+// player's choice or track models, whose rows carry a `checked` role that
+// selects them; otherwise `selectedIndex` names the entry to show.
 Widgets.ComboBoxExt {
     id: control
 
@@ -37,7 +37,6 @@ Widgets.ComboBoxExt {
     property string imageRole: ""
     property var imageForText: null
 
-    // the entry to show, followed even after the user picked one
     property int selectedIndex: -1
 
     implicitWidth: VLCStyle.dp(220, VLCStyle.scale)
@@ -52,6 +51,9 @@ Widgets.ComboBoxExt {
     onActivated: (index) => {
         if (checkable)
             model.setData(model.index(index, 0), true, Qt.CheckStateRole)
+        else
+            // the owner may refuse the choice, the shown entry stays its own
+            Qt.callLater(() => { control.currentIndex = control.selectedIndex })
     }
 
     function _text(model, modelData) {

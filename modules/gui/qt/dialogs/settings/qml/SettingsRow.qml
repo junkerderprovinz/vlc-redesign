@@ -16,6 +16,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 import QtQuick
+import QtQuick.Layouts
 import QtQuick.Templates as T
 
 import VLC.MainInterface
@@ -40,8 +41,11 @@ FocusScope {
 
     readonly property bool fullWidth: ["equalizer", "addons", "shortcuts"].includes(row.type)
 
-    // bumped whenever an option changes, so bindings that call into the bridge
-    // are evaluated again
+    // Most bindings follow their ConfigOption. The module lists, interfaces
+    // and the startup volume are read through the bridge, so the rows that
+    // show them are evaluated again when an option changes.
+    readonly property bool readsBridge: ["filter", "intf", "startVolume"].includes(row.type)
+                                        || !!row.whenModule || !!row.whenIntf
     property int revision: 0
 
     readonly property string type: {
@@ -53,7 +57,6 @@ FocusScope {
     }
 
     readonly property string _deviceOption: {
-        void revision
         const devices = { alsa: "alsa-audio-device", mmdevice: "mmdevice-audio-device",
                           waveout: "waveout-audio-device", directx: "directx-audio-device",
                           kai: "kai-audio-device" }
@@ -72,7 +75,6 @@ FocusScope {
     }
 
     readonly property bool available: {
-        void revision
         switch (row.type) {
         case "theme":
         case "addons":
@@ -121,6 +123,10 @@ FocusScope {
 
     readonly property real scale: row.scale ?? 1
 
+    readonly property bool textOption: [ConfigOption.TYPE_STRING, ConfigOption.TYPE_PASSWORD,
+                                        ConfigOption.TYPE_FONT, ConfigOption.TYPE_FILE,
+                                        ConfigOption.TYPE_DIRECTORY, ConfigOption.TYPE_MODULE].includes(option.type)
+
     function displayValue() {
         const v = option.value
         if (typeof v !== "number")
@@ -154,28 +160,11 @@ FocusScope {
     }
 
     function cachingPreset() {
-        void revision
         const f = Number(fileCaching.value)
         if (Number(networkCaching.value) === f * 3 && Number(discCaching.value) === f
                 && Number(liveCaching.value) === f && [100, 200, 300, 500, 1000].includes(f))
             return f
         return 0
-    }
-
-    function hexColor(v) {
-        let s = Number(v ?? 0).toString(16).toUpperCase()
-        while (s.length < 6)
-            s = "0" + s
-        return "#" + s
-    }
-
-    function highlighted(text) {
-        const esc = (s) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
-        const at = query ? text.toLowerCase().indexOf(query.toLowerCase()) : -1
-        if (at < 0)
-            return esc(text)
-        return esc(text.slice(0, at)) + "<font color=\"" + t.accent + "\">"
-               + esc(text.slice(at, at + query.length)) + "</font>" + esc(text.slice(at + query.length))
     }
 
     function flash() {
@@ -190,8 +179,7 @@ FocusScope {
     implicitHeight: {
         if (fullWidth)
             return control.implicitHeight
-        const content = Math.max(control.implicitHeight, labelRow.implicitHeight)
-        return content + (row.tall ? t.dp(16) : t.dp(10))
+        return form.implicitHeight + (row.tall ? t.dp(16) : t.dp(10))
     }
 
     activeFocusOnTab: false
@@ -206,13 +194,9 @@ FocusScope {
     ConfigOption { id: discCaching; name: root.row.type === "caching" || root.row.whenCustomCaching ? "disc-caching" : "" }
     ConfigOption { id: liveCaching; name: root.row.type === "caching" || root.row.whenCustomCaching ? "live-caching" : "" }
 
-    ConfigOption { id: loopOption; name: root.row.type === "repeat" ? "loop" : "" }
-    ConfigOption { id: effectOption; name: root.row.type === "visualizer" ? "effect-list" : "" }
-    ConfigOption { id: presetBands; name: root.row.type === "eqPreset" ? "equalizer-bands" : "" }
-    ConfigOption { id: presetPreamp; name: root.row.type === "eqPreset" ? "equalizer-preamp" : "" }
-
     Connections {
         target: SettingsBridge
+        enabled: root.readsBridge
         function onOptionChanged() { root.revision++ }
     }
 
@@ -234,116 +218,87 @@ FocusScope {
         }
     }
 
-    Row {
-        id: labelRow
-
-        readonly property real available: root.width - control.width - t.dp(10)
+    Widgets.FormRow {
+        id: form
 
         anchors.left: parent.left
-        anchors.verticalCenter: parent.verticalCenter
-        spacing: t.dp(10)
-        visible: !root.fullWidth
-
-        Text {
-            id: label
-
-            anchors.verticalCenter: parent.verticalCenter
-            width: Math.min(implicitWidth, labelRow.available - (infoIcon.visible ? t.dp(28) : 0))
-            text: root.highlighted(root.row.label ?? "")
-            textFormat: Text.StyledText
-            color: jumpArea.containsMouse ? t.fg1 : t.fgA2
-            font.pixelSize: t.fontNormal
-            elide: Text.ElideRight
-
-            MouseArea {
-                id: jumpArea
-
-                anchors.fill: parent
-                enabled: root.query.length > 0
-                hoverEnabled: enabled
-                cursorShape: enabled ? Qt.PointingHandCursor : Qt.ArrowCursor
-                onClicked: root.jumpRequested()
-            }
-        }
-
-        Widgets.IconLabel {
-            id: infoIcon
-
-            anchors.verticalCenter: parent.verticalCenter
-            visible: (root.row.info ?? "").length > 0
-            text: VLCIcons.info
-            color: infoHover.hovered ? t.fgA2 : t.fgA4
-            font.pixelSize: t.dp(18)
-
-            HoverHandler { id: infoHover }
-
-            Widgets.ToolTipExt {
-                visible: infoHover.hovered
-                text: root.row.info ?? ""
-                delay: VLCStyle.delayToolTipAppear
-            }
-        }
-    }
-
-    Loader {
-        id: control
-
         anchors.right: parent.right
-        anchors.left: root.fullWidth ? parent.left : undefined
         anchors.verticalCenter: parent.verticalCenter
 
-        focus: true
+        labelVisible: !root.fullWidth
+        label: root.row.label ?? ""
+        highlight: root.query
+        labelColor: t.fgA2
+        info: root.row.info ?? ""
+        linked: root.query.length > 0
 
-        sourceComponent: {
-            switch (root.type) {
-            case "toggle":
-            case "filter":
-            case "intf":
-            case "skin":
-            case "opacityToggle":
-                return toggleComponent
-            case "select":
-            case "screen":
-            case "repeat":
-            case "visualizer":
-            case "eqPreset":
-            case "device":
-            case "caching":
-            case "opacitySelect":
-                return selectComponent
-            case "text":
-                return textComponent
-            case "file":
-            case "folder":
-                return fileComponent
-            case "range":
-                return rangeComponent
-            case "color":
-                return colorComponent
-            case "action":
-                return actionComponent
-            case "theme":
-                return themeComponent
-            case "accent":
-                return accentComponent
-            case "startVolume":
-                return startVolumeComponent
-            case "equalizer":
-                return equalizerComponent
-            case "addons":
-                return addonsComponent
-            case "shortcuts":
-                return shortcutsComponent
+        onLabelClicked: root.jumpRequested()
+
+        Item {
+            Layout.fillWidth: root.fullWidth
+            implicitWidth: control.width
+            implicitHeight: control.height
+
+            Loader {
+                id: control
+
+                anchors.left: root.fullWidth ? parent.left : undefined
+                anchors.right: root.fullWidth ? parent.right : undefined
+
+                focus: true
+
+                sourceComponent: {
+                    switch (root.type) {
+                    case "toggle":
+                    case "filter":
+                    case "intf":
+                    case "skin":
+                    case "opacityToggle":
+                        return toggleComponent
+                    case "select":
+                    case "screen":
+                    case "repeat":
+                    case "visualizer":
+                    case "eqPreset":
+                    case "device":
+                    case "caching":
+                    case "opacitySelect":
+                        return selectComponent
+                    case "text":
+                        return textComponent
+                    case "file":
+                    case "folder":
+                        return fileComponent
+                    case "range":
+                        return rangeComponent
+                    case "color":
+                        return colorComponent
+                    case "action":
+                        return actionComponent
+                    case "theme":
+                        return themeComponent
+                    case "accent":
+                        return accentComponent
+                    case "startVolume":
+                        return startVolumeComponent
+                    case "equalizer":
+                        return equalizerComponent
+                    case "addons":
+                        return addonsComponent
+                    case "shortcuts":
+                        return shortcutsComponent
+                    }
+                    return null
+                }
             }
-            return null
         }
     }
 
     Component {
         id: toggleComponent
 
-        Widgets.CheckButton {
-            readonly property bool state: {
+        Widgets.FormSwitch {
+            value: {
                 void root.revision
                 switch (root.type) {
                 case "filter":
@@ -359,14 +314,9 @@ FocusScope {
                 }
             }
 
-            // the option is the state; clicking writes it and the binding follows
-            checkable: false
-            checked: state
-
             Accessible.name: root.row.label
 
-            onClicked: {
-                const on = !state
+            onSwitched: (on) => {
                 switch (root.type) {
                 case "filter":
                     SettingsBridge.setModule(root.row.option, root.row.module, on)
@@ -390,11 +340,10 @@ FocusScope {
     Component {
         id: selectComponent
 
-        Widgets.ComboBoxExt {
+        Widgets.FormComboBox {
             id: combo
 
             readonly property var choices: {
-                void root.revision
                 switch (root.type) {
                 case "screen": {
                     const list = [{ value: -1, text: qsTr("Current screen") }]
@@ -438,7 +387,6 @@ FocusScope {
             }
 
             readonly property var current: {
-                void root.revision
                 switch (root.type) {
                 case "repeat":
                     return option.value ? "one" : (loopOption.value ? "all" : "off")
@@ -472,16 +420,20 @@ FocusScope {
 
             implicitWidth: t.controlWidth
             implicitHeight: t.dp(36)
-            font.pixelSize: t.fontNormal
 
             model: choices
             textRole: "text"
             valueRole: "value"
-            currentIndex: matchingIndex
+            selectedIndex: matchingIndex
             displayText: matchingIndex >= 0 ? choices[matchingIndex].text
                                             : (root.formatNumber(current ?? "") || qsTr("Default"))
 
             Accessible.name: root.row.label
+
+            ConfigOption { id: loopOption; name: root.row.type === "repeat" ? "loop" : "" }
+            ConfigOption { id: effectOption; name: root.row.type === "visualizer" ? "effect-list" : "" }
+            ConfigOption { id: presetBands; name: root.row.type === "eqPreset" ? "equalizer-bands" : "" }
+            ConfigOption { id: presetPreamp; name: root.row.type === "eqPreset" ? "equalizer-preamp" : "" }
 
             onActivated: (index) => {
                 const v = choices[index].value
@@ -525,7 +477,6 @@ FocusScope {
                     option.value = v
                     root.afterWrite()
                 }
-                currentIndex = Qt.binding(() => matchingIndex)
             }
         }
     }
@@ -533,32 +484,23 @@ FocusScope {
     Component {
         id: textComponent
 
-        SettingsTextField {
-            id: field
-
-            compact: root.row.compact ?? false
+        Widgets.FormTextField {
+            implicitWidth: t.controlWidth
+            implicitHeight: (root.row.compact ?? false) ? t.dp(32) : t.dp(36)
             unit: root.row.unit ?? ""
             placeholderText: root.row.placeholder ?? ""
             echoMode: option.type === ConfigOption.TYPE_PASSWORD ? TextInput.Password : TextInput.Normal
-            value: {
-                void root.revision
-                return root.formatNumber(root.displayValue())
-            }
+            value: root.formatNumber(root.displayValue())
 
             Accessible.name: root.row.label
 
             onCommitted: (text) => {
-                if (option.type === ConfigOption.TYPE_STRING || option.type === ConfigOption.TYPE_PASSWORD
-                        || option.type === ConfigOption.TYPE_FONT || option.type === ConfigOption.TYPE_FILE
-                        || option.type === ConfigOption.TYPE_DIRECTORY || option.type === ConfigOption.TYPE_MODULE) {
+                if (root.textOption)
                     option.value = text.trim()
-                    return
-                }
-                const v = parseFloat(text.replace(",", "."))
-                if (Number.isFinite(v))
-                    root.writeDisplayValue(v)
-                else
-                    field.text = field.value
+            }
+            onNumberCommitted: (number) => {
+                if (!root.textOption)
+                    root.writeDisplayValue(number)
             }
         }
     }
@@ -569,11 +511,11 @@ FocusScope {
         Row {
             spacing: t.dp(10)
 
-            SettingsTextField {
+            Widgets.FormTextField {
                 id: path
 
                 width: t.dp(210)
-                compact: root.row.compact ?? false
+                implicitHeight: (root.row.compact ?? false) ? t.dp(32) : t.dp(36)
                 value: String(option.value ?? "")
                 Accessible.name: root.row.label
                 onCommitted: (text) => option.value = text.trim()
@@ -607,10 +549,7 @@ FocusScope {
                 to: root.row.to
                 stepSize: root.row.step
                 snapMode: T.Slider.SnapAlways
-                modelValue: {
-                    void root.revision
-                    return Number(root.displayValue())
-                }
+                modelValue: Number(root.displayValue())
                 toolTipTextProvider: (v) => root.formatNumber(Math.round(v / stepSize) * stepSize)
                                             + (root.row.unit ? " " + root.row.unit : "")
 
@@ -648,67 +587,31 @@ FocusScope {
     Component {
         id: colorComponent
 
-        Rectangle {
+        Widgets.ColorField {
+            id: colorField
+
             implicitWidth: t.controlWidth
             implicitHeight: t.dp(32)
-            radius: t.dp(6)
-            color: t.bgB2
+            backgroundColor: t.bgB2
+            borderWidth: 0
+            pickable: true
+            rgb: Number(option.value ?? 0)
 
-            SettingsTextField {
-                id: hexField
+            Accessible.name: root.row.label
 
-                anchors.left: parent.left
-                anchors.right: chip.left
-                anchors.verticalCenter: parent.verticalCenter
-                compact: true
-                borderWidth: 0
-                backgroundColor: "transparent"
-                value: {
-                    void root.revision
-                    return root.hexColor(option.value)
-                }
-                Accessible.name: root.row.label
-
-                onCommitted: (text) => {
-                    const m = /^#?([0-9a-fA-F]{6})$/.exec(text.trim())
-                    if (m)
-                        option.value = parseInt(m[1], 16)
-                    else
-                        hexField.text = hexField.value
-                }
+            onPicked: (rgb) => option.value = rgb
+            onSwatchClicked: {
+                picker.setColor(hex(rgb))
+                picker.open()
             }
 
-            T.AbstractButton {
-                id: chip
+            SettingsColorPicker {
+                id: picker
 
-                anchors.right: parent.right
-                anchors.rightMargin: t.dp(5)
-                anchors.verticalCenter: parent.verticalCenter
-                width: t.dp(22)
-                height: t.dp(22)
+                x: colorField.width - width - t.dp(5)
+                y: colorField.swatch.y + colorField.swatch.height + t.dp(6)
 
-                Accessible.name: qsTr("Pick a color")
-
-                onClicked: {
-                    picker.setColor(hexField.value)
-                    picker.open()
-                }
-
-                background: Rectangle {
-                    radius: t.dp(2)
-                    color: hexField.value
-                    border.width: t.dp(1.5)
-                    border.color: Qt.rgba(1, 1, 1, 0.21)
-                }
-
-                SettingsColorPicker {
-                    id: picker
-
-                    x: chip.width - width
-                    y: chip.height + t.dp(6)
-
-                    onPicked: (c) => option.value = parseInt(c.toString().slice(1, 7), 16)
-                }
+                onPicked: (c) => option.value = parseInt(c.toString().slice(1, 7), 16)
             }
         }
     }
@@ -759,14 +662,14 @@ FocusScope {
         id: themeComponent
 
         Widgets.SegmentedControl {
-            // schemes in the order of the design, as rows of MainCtx.colorScheme
-            readonly property var schemes: [2, 1, 0]
+            // the rows of MainCtx.colorScheme are in the order of the enum
+            readonly property var schemes: [ColorSchemeModel.Day, ColorSchemeModel.Night, ColorSchemeModel.System]
 
             implicitWidth: t.controlWidth
             segmentHeight: t.dp(32)
             font.pixelSize: t.fontNormal
 
-            model: [qsTr("Dark"), qsTr("Light"), qsTr("System")]
+            model: [qsTr("Light"), qsTr("Dark"), qsTr("System")]
             currentIndex: schemes.indexOf(MainCtx.colorScheme.scheme)
 
             Accessible.name: root.row.label
@@ -826,10 +729,7 @@ FocusScope {
         Rectangle {
             id: choices
 
-            readonly property bool remember: {
-                void root.revision
-                return !!option.value
-            }
+            readonly property bool remember: !!option.value
 
             implicitWidth: t.controlWidth
             implicitHeight: column.implicitHeight + t.dp(4)
@@ -893,13 +793,13 @@ FocusScope {
                         font.pixelSize: t.fontNormal
                     }
 
-                    SettingsTextField {
+                    Widgets.FormTextField {
                         anchors.left: fixedLabel.right
                         anchors.leftMargin: t.dp(10)
                         anchors.right: parent.right
                         anchors.rightMargin: t.dp(2)
                         anchors.verticalCenter: parent.verticalCenter
-                        compact: true
+                        implicitHeight: t.dp(32)
                         borderWidth: 0
                         radius: t.dp(2)
                         unit: "%"
@@ -915,10 +815,8 @@ FocusScope {
                             if (activeFocus)
                                 option.value = false
                         }
-                        onCommitted: (text) => {
-                            const v = parseInt(text)
-                            if (Number.isFinite(v))
-                                SettingsBridge.setDefaultVolume(Math.max(0, Math.min(v, 300)))
+                        onNumberCommitted: (number) => {
+                            SettingsBridge.setDefaultVolume(Math.max(0, Math.min(Math.round(number), 300)))
                         }
                     }
                 }
@@ -967,8 +865,7 @@ FocusScope {
                         spacing: t.dp(6)
 
                         Repeater {
-                            // several bindings are separated by tabs, show the first one
-                            model: String(key.value ?? "").split("\t")[0].split("+").filter((k) => k.length > 0)
+                            model: (key.value, SettingsBridge.hotkeyKeys(modelData.option))
 
                             delegate: Rectangle {
                                 required property string modelData

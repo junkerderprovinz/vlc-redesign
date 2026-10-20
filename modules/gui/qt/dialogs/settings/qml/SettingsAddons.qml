@@ -132,11 +132,15 @@ Column {
         width: parent.width
         height: t.dp(42)
 
-        SettingsTextField {
+        Widgets.TextFieldExt {
             id: search
 
             anchors.verticalCenter: parent.verticalCenter
             width: t.dp(210)
+            height: t.dp(36)
+            rightPadding: t.dp(18)
+            font.pixelSize: t.fontNormal
+            selectByMouse: true
             placeholderText: qsTr("Search")
             onTextChanged: root.selected = -1
         }

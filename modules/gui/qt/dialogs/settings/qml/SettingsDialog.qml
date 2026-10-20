@@ -16,7 +16,6 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 import QtQuick
-import QtQuick.Window
 import QtQuick.Templates as T
 
 import VLC.MainInterface
@@ -29,7 +28,7 @@ import VLC.Dialogs
 // The Global Settings dialog: a category list on the left, one page of
 // settings on the right, and a search across every page. Options are written
 // as they change and saved when the dialog closes.
-Window {
+FramelessDialog {
     id: root
 
     readonly property var t: SettingsTheme
@@ -41,16 +40,15 @@ Window {
     // pages whose advanced options are shown
     property var expanded: ({})
 
-    transientParent: MainCtx.intfMainWindow
-    flags: Qt.Dialog | Qt.FramelessWindowHint
-    modality: Qt.ApplicationModal
-
     title: qsTr("Global Settings")
+    heading: query.length > 0 ? qsTr("Search Results") : page.title
 
-    width: Math.min(t.dp(1048), Screen.desktopAvailableWidth - t.dp(32))
-    height: Math.min(t.dp(865), Screen.desktopAvailableHeight - t.dp(32))
+    baseWidth: t.dp(1048)
+    baseHeight: t.dp(865)
 
-    color: t.bgB1
+    backgroundColor: t.bgB1
+    headerColor: t.bgB2
+    footerVisible: false
 
     function open(pageName) {
         if (pageName)
@@ -205,152 +203,37 @@ Window {
         }
     }
 
-    Rectangle {
-        id: frame
+    leadingData: DialogToolbarField {
+        id: searchField
 
-        anchors.fill: parent
-        color: t.bgB1
-        border.width: t.dp(1)
-        border.color: t.dark ? Qt.rgba(1, 1, 1, 0.06) : Qt.rgba(0, 0, 0, 0.08)
+        anchors.verticalCenter: parent.verticalCenter
+        width: t.dp(200)
+        height: t.dp(34)
 
-        readonly property ColorContext colorContext: ColorContext {
-            palette: VLCStyle.palette
-            colorSet: ColorContext.Window
+        iconText: VLCIcons.search
+        placeholderText: qsTr("Search")
+
+        Keys.onReturnPressed: {
+            if (root.results.length > 0)
+                root.jumpTo(root.results[0].page, root.results[0].rows[0])
         }
+    }
 
-        focus: true
+    Item {
+        anchors.fill: parent
 
         Keys.onEscapePressed: (event) => {
-            if (searchField.text.length > 0)
-                searchField.text = ""
-            else
-                root.close()
-        }
-
-        Rectangle {
-            id: header
-
-            anchors.left: parent.left
-            anchors.right: parent.right
-            anchors.top: parent.top
-            anchors.margins: frame.border.width
-            height: t.dp(50)
-            color: t.bgB2
-
-            DragHandler {
-                target: null
-                onActiveChanged: {
-                    if (active)
-                        root.startSystemMove()
-                }
-            }
-
-            Rectangle {
-                id: searchBox
-
-                anchors.left: parent.left
-                anchors.leftMargin: t.dp(8)
-                anchors.verticalCenter: parent.verticalCenter
-                width: t.dp(200)
-                height: t.dp(34)
-                radius: t.dp(6)
-                color: t.bgA5
-
-                Widgets.IconLabel {
-                    id: searchIcon
-
-                    anchors.left: parent.left
-                    anchors.leftMargin: t.dp(8)
-                    anchors.verticalCenter: parent.verticalCenter
-                    text: VLCIcons.search
-                    color: t.fgA2
-                    font.pixelSize: t.dp(24)
-                }
-
-                TextInput {
-                    id: searchField
-
-                    anchors.left: searchIcon.right
-                    anchors.leftMargin: t.dp(10)
-                    anchors.right: parent.right
-                    anchors.rightMargin: t.dp(8)
-                    anchors.verticalCenter: parent.verticalCenter
-                    color: t.fgA2
-                    selectionColor: t.accentBgBright
-                    selectByMouse: true
-                    clip: true
-                    font.pixelSize: t.fontNormal
-
-                    Accessible.role: Accessible.EditableText
-                    Accessible.name: qsTr("Search settings")
-
-                    Keys.onReturnPressed: {
-                        if (root.results.length > 0)
-                            root.jumpTo(root.results[0].page, root.results[0].rows[0])
-                    }
-
-                    Text {
-                        anchors.fill: parent
-                        verticalAlignment: Text.AlignVCenter
-                        visible: searchField.text.length === 0
-                        text: qsTr("Search")
-                        color: t.fgA4
-                        font.pixelSize: t.fontNormal
-                    }
-                }
-            }
-
-            Text {
-                anchors.left: searchBox.right
-                anchors.leftMargin: t.dp(32)
-                anchors.right: closeButton.left
-                anchors.rightMargin: t.dp(32)
-                anchors.verticalCenter: parent.verticalCenter
-                text: root.query.length > 0 ? qsTr("Search Results") : root.page.title
-                color: t.fgA1
-                font.pixelSize: t.fontLarge
-                elide: Text.ElideRight
-
-                Accessible.role: Accessible.Heading
-            }
-
-            T.AbstractButton {
-                id: closeButton
-
-                anchors.right: parent.right
-                anchors.rightMargin: t.dp(14)
-                anchors.verticalCenter: parent.verticalCenter
-                width: t.dp(32)
-                height: t.dp(32)
-                focusPolicy: Qt.StrongFocus
-
-                Accessible.name: qsTr("Close")
-
-                onClicked: root.close()
-
-                background: Rectangle {
-                    radius: t.dp(4)
-                    color: closeButton.hovered ? t.bgA2 : "transparent"
-                    border.width: closeButton.visualFocus ? t.dp(1) : 0
-                    border.color: t.accentDim
-                }
-
-                contentItem: Widgets.IconLabel {
-                    text: VLCIcons.close
-                    color: closeButton.hovered ? t.fg1 : t.fgA2
-                    font.pixelSize: t.dp(24)
-                }
-            }
+            event.accepted = searchField.text.length > 0
+            searchField.text = ""
         }
 
         Rectangle {
             id: navigation
 
             anchors.left: parent.left
-            anchors.top: header.bottom
+            anchors.top: parent.top
             anchors.bottom: parent.bottom
             anchors.margins: t.dp(8)
-            anchors.leftMargin: t.dp(8) + frame.border.width
             width: t.dp(200)
             radius: t.dp(6)
             color: t.bgA3Glass
@@ -476,10 +359,8 @@ Window {
 
             anchors.left: navigation.right
             anchors.right: parent.right
-            anchors.top: header.bottom
+            anchors.top: parent.top
             anchors.bottom: parent.bottom
-            anchors.bottomMargin: frame.border.width
-            anchors.rightMargin: frame.border.width
 
             contentHeight: pageColumn.height + t.dp(60)
             clip: true

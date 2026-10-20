@@ -25,7 +25,9 @@
 #include "dialogs/dialogs/dialogmodel.hpp"
 #include "dialogs/dialogs_provider.hpp"
 #include "maininterface/mainctx.hpp"
+#include "util/vlchotkeyconverter.hpp"
 
+#include <vlc_actions.h>
 #include <vlc_configuration.h>
 #include <vlc_modules.h>
 #include <vlc_plugin.h>
@@ -70,8 +72,11 @@ QString configString(const char *name)
 ConfigOption::ConfigOption(QObject *parent)
     : QObject(parent)
 {
-    if (s_bridge)
-        connect(s_bridge, &SettingsBridge::optionChanged, this, &ConfigOption::onOptionChanged);
+}
+
+ConfigOption::ConfigOption(const QString &name)
+{
+    setName(name);
 }
 
 void ConfigOption::setName(const QString &name)
@@ -81,6 +86,9 @@ void ConfigOption::setName(const QString &name)
     m_name = name;
     m_key = name.toUtf8();
     m_config = name.isEmpty() ? nullptr : config_FindConfig(m_key.constData());
+    if (m_config && s_bridge)
+        connect(s_bridge, &SettingsBridge::optionChanged, this, &ConfigOption::onOptionChanged,
+                Qt::UniqueConnection);
     emit nameChanged();
     emit valueChanged();
 }
@@ -345,9 +353,7 @@ void SettingsBridge::setInterface(const QString &intf, bool enabled)
 void SettingsBridge::syncFilter(const QString &chain, const QString &module, const QStringList &options)
 {
     const bool modified = std::any_of(options.cbegin(), options.cend(), [](const QString &name) {
-        ConfigOption option;
-        option.setName(name);
-        return option.modified();
+        return ConfigOption(name).modified();
     });
     setModule(chain, module, modified);
 }
@@ -355,11 +361,7 @@ void SettingsBridge::syncFilter(const QString &chain, const QString &module, con
 void SettingsBridge::resetOptions(const QStringList &options)
 {
     for (const QString &name : options)
-    {
-        ConfigOption option;
-        option.setName(name);
-        option.reset();
-    }
+        ConfigOption(name).reset();
 }
 
 QString SettingsBridge::browseFile(const QString &current, bool save)
@@ -445,6 +447,29 @@ void SettingsBridge::setDefaultVolume(int percent)
     emit optionChanged(QStringLiteral("aout"));
 }
 
+QStringList SettingsBridge::equalizerBandNames(bool vlcFrequencies)
+{
+    if (vlcFrequencies)
+        return { qtr("60 Hz"), qtr("170 Hz"), qtr("310 Hz"), qtr("600 Hz"), qtr("1 KHz"),
+                 qtr("3 KHz"), qtr("6 KHz"), qtr("12 KHz"), qtr("14 KHz"), qtr("16 KHz") };
+
+    return { qtr("31 Hz"), qtr("63 Hz"), qtr("125 Hz"), qtr("250 Hz"), qtr("500 Hz"),
+             qtr("1 KHz"), qtr("2 KHz"), qtr("4 KHz"), qtr("8 KHz"), qtr("16 KHz") };
+}
+
+QVariantList SettingsBridge::equalizerPresets() const
+{
+    QVariantList presets;
+    for (int i = 0; i < NB_PRESETS; i++)
+    {
+        QVariantMap preset = equalizerPreset(qfu(preset_list[i]));
+        preset.insert(QStringLiteral("id"), qfu(preset_list[i]));
+        preset.insert(QStringLiteral("name"), qfut(preset_list_text[i]));
+        presets.append(preset);
+    }
+    return presets;
+}
+
 QVariantMap SettingsBridge::equalizerPreset(const QString &name)
 {
     for (const eqz_preset_t &preset : eqz_preset_10b)
@@ -461,6 +486,18 @@ QVariantMap SettingsBridge::equalizerPreset(const QString &name)
         };
     }
     return {};
+}
+
+QStringList SettingsBridge::hotkeyKeys(const QString &option)
+{
+    const QByteArray key = option.toUtf8();
+    if (!config_FindConfig(key.constData()))
+        return {};
+
+    const QString first = configString(key.constData()).section(QLatin1Char('\t'), 0, 0);
+    if (first.isEmpty())
+        return {};
+    return VLCKeyToStringList(vlc_str2keycode(qtu(first)));
 }
 
 QString SettingsBridge::configDirectory() const

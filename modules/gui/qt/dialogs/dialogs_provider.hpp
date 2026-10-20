@@ -103,6 +103,15 @@ public:
     };
     Q_ENUM(Mode)
 
+    /// tabs of the Effects and Filters window
+    enum ExtendedTab
+    {
+        ExtendedAudioTab,
+        ExtendedVideoTab,
+        ExtendedSynchroTab
+    };
+    Q_ENUM(ExtendedTab)
+
     Q_PROPERTY(bool openDialogVisible READ openDialogVisible NOTIFY openDialogVisibleChanged FINAL)
     Q_PROPERTY(bool firstRunDialogVisible READ firstRunDialogVisible WRITE setFirstRunDialogVisible NOTIFY firstRunDialogVisibleChanged FINAL)
     Q_PROPERTY(bool extendedDialogVisible READ extendedDialogVisible NOTIFY extendedDialogVisibleChanged FINAL)
@@ -112,6 +121,8 @@ public:
     Q_PROPERTY(bool helpDialogVisible READ helpDialogVisible NOTIFY helpDialogVisibleChanged FINAL)
     Q_PROPERTY(bool aboutDialogVisible READ aboutDialogVisible NOTIFY aboutDialogVisibleChanged FINAL)
     Q_PROPERTY(bool mediaInfoDialogVisible READ mediaInfoDialogVisible NOTIFY mediaInfoDialogVisibleChanged FINAL)
+    /// the media information window is shown on its statistics tab
+    Q_PROPERTY(bool mediaStatsVisible READ mediaStatsVisible WRITE setMediaStatsVisible NOTIFY mediaStatsVisibleChanged FINAL)
     Q_PROPERTY(bool bookmarkDialogVisible READ bookmarkDialogVisible NOTIFY bookmarkDialogVisibleChanged FINAL)
     Q_PROPERTY(bool podcastDialogVisible READ podcastDialogVisible NOTIFY podcastDialogVisibleChanged FINAL)
     Q_PROPERTY(bool pluginDialogVisible READ pluginDialogVisible NOTIFY pluginDialogVisibleChanged FINAL)
@@ -285,6 +296,8 @@ public:
     bool helpDialogVisible() const;
     bool aboutDialogVisible() const;
     bool mediaInfoDialogVisible() const;
+    bool mediaStatsVisible() const;
+    void setMediaStatsVisible(bool visible);
     bool bookmarkDialogVisible() const;
     bool podcastDialogVisible() const;
     bool pluginDialogVisible() const;
@@ -316,6 +329,7 @@ signals:
     void helpDialogVisibleChanged();
     void aboutDialogVisibleChanged();
     void mediaInfoDialogVisibleChanged();
+    void mediaStatsVisibleChanged();
     void bookmarkDialogVisibleChanged();
     void podcastDialogVisibleChanged();
     void pluginDialogVisibleChanged();

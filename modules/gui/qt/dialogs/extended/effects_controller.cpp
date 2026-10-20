@@ -28,10 +28,12 @@
 #include <QSettings>
 
 #include "effects_controller.hpp"
+#include "dialogs/settings/settings_bridge.hpp"
 #include "player/player_controller.hpp"
 #include "util/renderer_manager.hpp"
 
 #include "../../../../audio_filter/equalizer_presets.h"
+#include <vlc_actions.h>
 #include <vlc_configuration.h>
 #include <vlc_modules.h>
 #include <vlc_player.h>
@@ -128,28 +130,6 @@ static QVariant VarToVariant( vlc_object_t *p_obj, const char *psz_name, int i_t
     }
 }
 
-static QVariant ConfigToVariant( const char *psz_name )
-{
-    switch( config_GetType( psz_name ) )
-    {
-        case VLC_VAR_BOOL:
-            return QVariant( config_GetInt( psz_name ) != 0 );
-        case VLC_VAR_INTEGER:
-            return QVariant( qlonglong( config_GetInt( psz_name ) ) );
-        case VLC_VAR_FLOAT:
-            return QVariant( double( config_GetFloat( psz_name ) ) );
-        case VLC_VAR_STRING:
-        {
-            char *psz = config_GetPsz( psz_name );
-            QString value = qfu( psz );
-            free( psz );
-            return QVariant( value );
-        }
-        default:
-            return {};
-    }
-}
-
 static int VariantToValue( const QVariant &value, int i_type, vlc_value_t *val, QByteArray &storage )
 {
     switch( i_type & VLC_VAR_CLASS )
@@ -172,10 +152,32 @@ static int VariantToValue( const QVariant &value, int i_type, vlc_value_t *val, 
     }
 }
 
+/* The text scale is a variable of the player, which has no event for it, so
+ * the hotkeys that change it are followed instead */
+static int KeyActionCallback( vlc_object_t *, const char *, vlc_value_t,
+                              vlc_value_t newval, void *data )
+{
+    switch( newval.i_int )
+    {
+        case ACTIONID_SUBTITLE_TEXT_SCALE_NORMAL:
+        case ACTIONID_SUBTITLE_TEXT_SCALE_UP:
+        case ACTIONID_SUBTITLE_TEXT_SCALE_DOWN:
+            QMetaObject::invokeMethod( static_cast<EffectsController *>( data ),
+                                       &EffectsController::subtitleTextScaleChanged,
+                                       Qt::QueuedConnection );
+            break;
+        default:
+            break;
+    }
+    return VLC_SUCCESS;
+}
+
 EffectsController::EffectsController( qt_intf_t *_p_intf, QObject *parent )
     : QObject( parent )
     , p_intf( _p_intf )
 {
+    var_AddCallback( vlc_object_instance( p_intf ), "key-action", KeyActionCallback, this );
+
     m_sleepTimer.setSingleShot( true );
     connect( &m_sleepTimer, &QTimer::timeout, this, [this]() {
         {
@@ -188,6 +190,11 @@ EffectsController::EffectsController( qt_intf_t *_p_intf, QObject *parent )
 
     connect( THEMIM, &PlayerController::voutListChanged, this, &EffectsController::bump );
     connect( THEMIM, &PlayerController::inputChanged, this, &EffectsController::bump );
+}
+
+EffectsController::~EffectsController()
+{
+    var_DelCallback( vlc_object_instance( p_intf ), "key-action", KeyActionCallback, this );
 }
 
 bool EffectsController::isFilterEnabled( const QString &module ) const
@@ -278,29 +285,12 @@ QVariant EffectsController::option( const QString &name ) const
             return VarToVariant( VLC_OBJECT( p_vout.get() ), psz_name.constData(), i_type );
     }
 
-    return ConfigToVariant( psz_name.constData() );
+    return ConfigOption( name ).value();
 }
 
 QVariant EffectsController::defaultOption( const QString &name ) const
 {
-    const QByteArray psz_name = name.toUtf8();
-    const module_config_t *p_item = config_FindConfig( psz_name.constData() );
-    if( p_item == NULL )
-        return {};
-
-    switch( config_GetType( psz_name.constData() ) )
-    {
-        case VLC_VAR_BOOL:
-            return QVariant( p_item->orig.i != 0 );
-        case VLC_VAR_INTEGER:
-            return QVariant( qlonglong( p_item->orig.i ) );
-        case VLC_VAR_FLOAT:
-            return QVariant( double( p_item->orig.f ) );
-        case VLC_VAR_STRING:
-            return QVariant( qfu( p_item->orig.psz ) );
-        default:
-            return {};
-    }
+    return ConfigOption( name ).defaultValue();
 }
 
 void EffectsController::setOption( const QString &name, const QVariant &value )
@@ -333,75 +323,13 @@ void EffectsController::setOption( const QString &name, const QVariant &value )
         if( var_Type( p_vout.get(), psz ) != 0 )
             var_SetChecked( p_vout.get(), psz, i_type, val );
 
-    if( config_FindConfig( psz ) )
-    {
-        switch( i_type )
-        {
-            case VLC_VAR_BOOL:
-                config_PutInt( psz, val.b_bool );
-                break;
-            case VLC_VAR_INTEGER:
-                config_PutInt( psz, val.i_int );
-                break;
-            case VLC_VAR_FLOAT:
-                config_PutFloat( psz, val.f_float );
-                break;
-            case VLC_VAR_STRING:
-                config_PutPsz( psz, val.psz_string );
-                break;
-        }
-    }
+    ConfigOption( name ).setValue( value );
     bump();
 }
 
 QVariantList EffectsController::optionChoices( const QString &name ) const
 {
-    QVariantList choices;
-    const QByteArray psz_name = name.toUtf8();
-
-    switch( config_GetType( psz_name.constData() ) )
-    {
-        case VLC_VAR_INTEGER:
-        {
-            int64_t *values;
-            char **texts;
-            const ssize_t count = config_GetIntChoices( psz_name.constData(), &values, &texts );
-            for( ssize_t i = 0; i < count; i++ )
-            {
-                choices.append( QVariantMap{ { "value", qlonglong( values[i] ) },
-                                             { "text", qfut( texts[i] ) } } );
-                free( texts[i] );
-            }
-            if( count > 0 )
-            {
-                free( texts );
-                free( values );
-            }
-            break;
-        }
-        case VLC_VAR_STRING:
-        {
-            char **values;
-            char **texts;
-            const ssize_t count = config_GetPszChoices( psz_name.constData(), &values, &texts );
-            for( ssize_t i = 0; i < count; i++ )
-            {
-                choices.append( QVariantMap{ { "value", qfu( values[i] ) },
-                                             { "text", qfut( texts[i] ) } } );
-                free( texts[i] );
-                free( values[i] );
-            }
-            if( count > 0 )
-            {
-                free( texts );
-                free( values );
-            }
-            break;
-        }
-        default:
-            break;
-    }
-    return choices;
+    return ConfigOption( name ).choices();
 }
 
 QStringList EffectsController::bandsFromOutput() const
@@ -410,16 +338,11 @@ QStringList EffectsController::bandsFromOutput() const
     if( bands.count() >= EQZ_BANDS_MAX )
         return bands;
 
-    const QByteArray preset = option( "equalizer-preset" ).toString().toUtf8();
-    const auto it = std::find_if( std::begin( eqz_preset_10b ), std::end( eqz_preset_10b ),
-                                  [&preset]( const eqz_preset_t &p ) { return preset == p.psz_name; } );
-
+    const QVariantList preset = SettingsBridge::equalizerPreset( option( "equalizer-preset" ).toString() )
+                                    .value( "bands" ).toList();
     bands.clear();
     for( int i = 0; i < EQZ_BANDS_MAX; i++ )
-    {
-        const float f = ( it != std::end( eqz_preset_10b ) ) ? it->f_amp[i] : 0.f;
-        bands << QLocale( QLocale::C ).toString( f );
-    }
+        bands << QLocale( QLocale::C ).toString( preset.value( i, 0.f ).toFloat() );
     return bands;
 }
 
@@ -457,48 +380,19 @@ void EffectsController::setEqualizerPreset( const QString &preset )
         return;
     }
 
-    const QByteArray name = preset.toUtf8();
-    const auto it = std::find_if( std::begin( eqz_preset_10b ), std::end( eqz_preset_10b ),
-                                  [&name]( const eqz_preset_t &p ) { return name == p.psz_name; } );
-    if( it == std::end( eqz_preset_10b ) )
+    const QVariantMap values = SettingsBridge::equalizerPreset( preset );
+    if( values.isEmpty() )
         return;
 
     QStringList bands;
-    for( int i = 0; i < it->i_band; i++ )
-        bands << QLocale( QLocale::C ).toString( it->f_amp[i] );
+    for( const QVariant &band : values.value( "bands" ).toList() )
+        bands << QLocale( QLocale::C ).toString( band.toFloat() );
 
     setOption( "equalizer-preset", preset );
-    setOption( "equalizer-preamp", double( it->f_preamp ) );
+    setOption( "equalizer-preamp", values.value( "preamp" ) );
     setOption( "equalizer-bands", bands.join( " " ) );
     setFilterEnabled( "equalizer", true );
     bump();
-}
-
-QStringList EffectsController::getEqualizerBandNames() const
-{
-    if( var_InheritBool( p_intf, "equalizer-vlcfreqs" ) )
-        return { qtr( "60 Hz" ), qtr( "170 Hz" ), qtr( "310 Hz" ), qtr( "600 Hz" ), qtr( "1 KHz" ),
-                 qtr( "3 KHz" ), qtr( "6 KHz" ), qtr( "12 KHz" ), qtr( "14 KHz" ), qtr( "16 KHz" ) };
-
-    return { qtr( "31 Hz" ), qtr( "63 Hz" ), qtr( "125 Hz" ), qtr( "250 Hz" ), qtr( "500 Hz" ),
-             qtr( "1 KHz" ), qtr( "2 KHz" ), qtr( "4 KHz" ), qtr( "8 KHz" ), qtr( "16 KHz" ) };
-}
-
-QVariantList EffectsController::getEqualizerPresets() const
-{
-    QVariantList presets;
-    for( int i = 0; i < NB_PRESETS; i++ )
-    {
-        QVariantList bands;
-        for( int j = 0; j < eqz_preset_10b[i].i_band; j++ )
-            bands << double( eqz_preset_10b[i].f_amp[j] );
-
-        presets.append( QVariantMap{ { "id", qfu( preset_list[i] ) },
-                                     { "name", qfut( preset_list_text[i] ) },
-                                     { "preamp", double( eqz_preset_10b[i].f_preamp ) },
-                                     { "bands", bands } } );
-    }
-    return presets;
 }
 
 QVariantList EffectsController::crop() const

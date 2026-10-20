@@ -31,7 +31,7 @@ FramelessDialog {
 
     title: qsTr("Open Network Stream")
 
-    designHeight: VLCStyle.dp(631, VLCStyle.scale)
+    baseHeight: VLCStyle.dp(631, VLCStyle.scale)
 
     acceptEnabled: _urls.length > 0
 

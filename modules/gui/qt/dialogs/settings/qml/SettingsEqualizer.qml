@@ -30,10 +30,7 @@ Rectangle {
 
     property bool open: false
 
-    readonly property var _vlcLabels: [qsTr("60 Hz"), qsTr("170 Hz"), qsTr("310 Hz"), qsTr("600 Hz"), qsTr("1 KHz"),
-                                       qsTr("3 KHz"), qsTr("6 KHz"), qsTr("12 KHz"), qsTr("14 KHz"), qsTr("16 KHz")]
-    readonly property var _isoLabels: [qsTr("31 Hz"), qsTr("63 Hz"), qsTr("125 Hz"), qsTr("250 Hz"), qsTr("500 Hz"),
-                                       qsTr("1 KHz"), qsTr("2 KHz"), qsTr("4 KHz"), qsTr("8 KHz"), qsTr("16 KHz")]
+    readonly property var _bandNames: SettingsBridge.equalizerBandNames(!!frequencies.value)
 
     readonly property var gains: {
         const list = String(bandsOption.value ?? "").trim().split(/\s+/).map(parseFloat)
@@ -150,17 +147,14 @@ Rectangle {
                         id: bandLabel
 
                         anchors.horizontalCenter: parent.horizontalCenter
-                        text: band.preamp ? qsTr("Preamp")
-                                          : (frequencies.value === false ? root._isoLabels : root._vlcLabels)[band.index - 1]
+                        text: band.preamp ? qsTr("Preamp") : root._bandNames[band.index - 1]
                         color: t.fgA3
                         font.pixelSize: t.fontNormal
                     }
 
-                    SettingsTextField {
-                        id: readout
-
+                    Widgets.FormTextField {
                         width: t.dp(60)
-                        compact: true
+                        implicitHeight: t.dp(32)
                         horizontalAlignment: TextInput.AlignHCenter
                         leftPadding: t.dp(4)
                         rightPadding: t.dp(4)
@@ -168,13 +162,8 @@ Rectangle {
                         value: root.format(band.gain)
                         borderWidth: activeFocus ? t.dp(1) : 0
 
-                        onCommitted: (text) => {
-                            const v = parseFloat(text.replace(",", "."))
-                            if (!Number.isFinite(v)) {
-                                readout.text = readout.value
-                                return
-                            }
-                            const clamped = Math.max(-20, Math.min(20, v))
+                        onNumberCommitted: (number) => {
+                            const clamped = Math.max(-20, Math.min(20, number))
                             if (band.preamp)
                                 preampOption.value = Math.round(clamped * 10) / 10
                             else

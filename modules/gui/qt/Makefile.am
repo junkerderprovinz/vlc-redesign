@@ -1083,6 +1083,7 @@ libqt_plugin_la_RES = \
 	pixmaps/icons/figma/subtitles.svg \
 	pixmaps/icons/figma/swap-duo.svg \
 	pixmaps/icons/figma/swap.svg \
+	pixmaps/icons/figma/theme-system.svg \
 	pixmaps/icons/figma/thumbnail-high.svg \
 	pixmaps/icons/figma/thumbnail-low.svg \
 	pixmaps/icons/figma/thumbnail-medium.svg \
@@ -1256,15 +1257,9 @@ libqml_module_dialogs_a_QML = \
 	dialogs/dialogs/qml/CustomDialog.qml \
 	dialogs/dialogs/qml/Dialogs.qml \
 	dialogs/dialogs/qml/ModalDialog.qml \
-	dialogs/extended/qml/EffectsColorField.qml \
 	dialogs/extended/qml/EffectsColors.qml \
-	dialogs/extended/qml/EffectsComboBox.qml \
 	dialogs/extended/qml/EffectsExpander.qml \
-	dialogs/extended/qml/EffectsRow.qml \
-	dialogs/extended/qml/EffectsSection.qml \
 	dialogs/extended/qml/EffectsSlider.qml \
-	dialogs/extended/qml/EffectsSwitch.qml \
-	dialogs/extended/qml/EffectsValueField.qml \
 	dialogs/extended/qml/PlayerSettingsAudio.qml \
 	dialogs/extended/qml/PlayerSettingsPanel.qml \
 	dialogs/extended/qml/PlayerSettingsPlayback.qml \
@@ -1307,8 +1302,7 @@ libqml_module_dialogs_a_QML = \
 	dialogs/settings/qml/SettingsRow.qml \
 	dialogs/settings/qml/SettingsSection.qml \
 	dialogs/settings/qml/SettingsSlider.qml \
-	dialogs/settings/qml/SettingsSwatches.qml \
-	dialogs/settings/qml/SettingsTextField.qml
+	dialogs/settings/qml/SettingsSwatches.qml
 libqml_module_dialogs_a_Singleton_QML = \
 	dialogs/settings/qml/SettingsTheme.qml
 libqml_module_dialogs_a_SOURCES = $(QML_MODULE_dialogs_SRC)
@@ -1681,7 +1675,13 @@ libqml_module_widgets_a_QML = \
 	widgets/qml/MenuExt.qml \
 	widgets/qml/MenuItemExt.qml \
 	widgets/qml/MenuSeparatorExt.qml \
-	widgets/qml/DialogButton.qml
+	widgets/qml/DialogButton.qml \
+	widgets/qml/ColorField.qml \
+	widgets/qml/FormComboBox.qml \
+	widgets/qml/FormRow.qml \
+	widgets/qml/FormSection.qml \
+	widgets/qml/FormSwitch.qml \
+	widgets/qml/FormTextField.qml
 libqml_module_widgets_a_Singleton_QML =
 libqml_module_widgets_a_SOURCES = $(QML_MODULE_widgets_SRC)
 nodist_libqml_module_widgets_a_SOURCES = widgets/qmlassets.cpp $(QML_MODULE_widgets_NODIST_EXTRA)

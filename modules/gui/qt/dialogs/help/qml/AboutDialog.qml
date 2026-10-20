@@ -30,8 +30,8 @@ FramelessDialog {
 
     title: qsTr("About VLC")
 
-    designWidth: VLCStyle.dp(713, VLCStyle.scale)
-    designHeight: VLCStyle.dp(589, VLCStyle.scale)
+    baseWidth: VLCStyle.dp(713, VLCStyle.scale)
+    baseHeight: VLCStyle.dp(589, VLCStyle.scale)
 
     acceptText: qsTr("OK")
     cancelVisible: false

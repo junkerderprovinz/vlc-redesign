@@ -17,35 +17,43 @@
  *****************************************************************************/
 import QtQuick
 
+import VLC.Style
 import VLC.Widgets as Widgets
-import VLC.Dialogs
 
-// A text field that shows `value` and reports an edit once it is finished,
-// with an optional unit after the text.
+// A text field that shows `value` while it is not edited and reports a
+// finished edit through committed(), and through numberCommitted() when the
+// text is a number. Escape restores the value.
 Widgets.TextFieldExt {
     id: root
 
-    readonly property var t: SettingsTheme
-
     property string value
+    // shown after the text
     property string unit
-    property bool compact: false
 
     signal committed(string text)
+    signal numberCommitted(real number)
 
-    implicitWidth: t.controlWidth
-    implicitHeight: compact ? t.dp(32) : t.dp(36)
+    implicitWidth: VLCStyle.dp(140, VLCStyle.scale)
+    implicitHeight: VLCStyle.dp(36, VLCStyle.scale)
 
-    rightPadding: unitLabel.visible ? unitLabel.width + t.dp(18) : t.dp(18)
+    topPadding: 0
+    bottomPadding: 0
+    rightPadding: unitLabel.visible ? unitLabel.width + VLCStyle.dp(18, VLCStyle.scale)
+                                    : VLCStyle.dp(18, VLCStyle.scale)
 
-    font.pixelSize: t.fontNormal
+    font.pixelSize: VLCStyle.fontSize_normal
     selectByMouse: true
 
     text: value
 
     onEditingFinished: {
-        if (text !== value)
+        if (text !== value) {
             committed(text)
+            const number = parseFloat(text.replace(",", "."))
+            if (Number.isFinite(number))
+                numberCommitted(number)
+        }
+        text = value
     }
 
     onValueChanged: {
@@ -54,27 +62,26 @@ Widgets.TextFieldExt {
     }
 
     onActiveFocusChanged: {
-        if (!activeFocus)
+        if (activeFocus)
+            selectAll()
+        else
             text = value
     }
 
     Keys.onEscapePressed: (event) => {
-        if (text !== value) {
-            text = value
-            event.accepted = true
-        } else {
-            event.accepted = false
-        }
+        event.accepted = text !== value
+        text = value
     }
 
     Text {
         id: unitLabel
 
-        x: Math.min(root.leftPadding + root.contentWidth + t.dp(4), root.width - width - t.dp(14))
+        x: Math.min(root.leftPadding + root.contentWidth + VLCStyle.dp(4, VLCStyle.scale),
+                    root.width - width - VLCStyle.dp(14, VLCStyle.scale))
         anchors.verticalCenter: parent.verticalCenter
         visible: root.unit.length > 0 && root.text.length > 0
         text: root.unit
-        color: t.fgA3
-        font.pixelSize: t.fontNormal
+        color: root.colorContext.tokens.fgA3
+        font.pixelSize: root.font.pixelSize
     }
 }

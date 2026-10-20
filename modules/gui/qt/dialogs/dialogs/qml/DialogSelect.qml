@@ -23,8 +23,11 @@ import VLC.Widgets as Widgets
 import VLC.Style
 
 // The compact dropdown of a dialog toolbar, model entries are { text, value }.
-Widgets.ComboBoxExt {
+Widgets.FormComboBox {
     id: control
+
+    selectedIndex: 0
+    onActivated: (index) => selectedIndex = index
 
     Layout.preferredWidth: VLCStyle.dp(200, VLCStyle.scale)
     Layout.fillHeight: true

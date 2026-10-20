@@ -16,43 +16,43 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 import QtQuick
+import QtQuick.Templates as T
 
 import VLC.Style
+import VLC.Widgets as Widgets
 
-// A hexadecimal colour box with a swatch; VLC keeps these colours as 0xRRGGBB
-EffectsValueField {
+// A hexadecimal color box with a swatch. VLC keeps colors as 0xRRGGBB, so
+// `rgb` is that number; picked() reports a valid typed color.
+Widgets.FormTextField {
     id: root
 
     property int rgb: 0
+    // the swatch is a button, swatchClicked() asks for a color picker
+    property bool pickable: false
+
+    readonly property alias swatch: swatchButton
 
     signal picked(int rgb)
+    signal swatchClicked()
 
-    numeric: false
-    implicitWidth: VLCStyle.dp(116, VLCStyle.scale)
-    implicitHeight: VLCStyle.dp(32, VLCStyle.scale)
-    rightPadding: swatch.width + VLCStyle.dp(10, VLCStyle.scale)
-
-    function _hex(value) {
+    function hex(value) {
         return "#" + (value & 0xFFFFFF).toString(16).toUpperCase().padStart(6, "0")
     }
 
-    function _show() {
-        text = _hex(rgb)
-    }
+    implicitWidth: VLCStyle.dp(116, VLCStyle.scale)
+    implicitHeight: VLCStyle.dp(32, VLCStyle.scale)
+    rightPadding: swatchButton.width + VLCStyle.dp(10, VLCStyle.scale)
 
-    onRgbChanged: if (!activeFocus) _show()
-    Component.onCompleted: _show()
-    onActiveFocusChanged: if (!activeFocus) _show()
+    value: hex(rgb)
 
-    onEditingFinished: {
+    onCommitted: (text) => {
         const typed = text.trim().replace(/^#/, "")
         if (/^[0-9a-fA-F]{6}$/.test(typed))
             root.picked(parseInt(typed, 16))
-        _show()
     }
 
-    Rectangle {
-        id: swatch
+    T.AbstractButton {
+        id: swatchButton
 
         anchors.right: parent.right
         anchors.rightMargin: VLCStyle.dp(5, VLCStyle.scale)
@@ -60,10 +60,19 @@ EffectsValueField {
 
         width: VLCStyle.dp(22, VLCStyle.scale)
         height: width
-        radius: VLCStyle.dp(2, VLCStyle.scale)
 
-        color: root._hex(root.rgb)
-        border.width: VLCStyle.dp(1.5, VLCStyle.scale)
-        border.color: Qt.rgba(1, 1, 1, 0.21)
+        enabled: root.pickable
+        focusPolicy: Qt.NoFocus
+
+        Accessible.name: qsTr("Pick a color")
+
+        onClicked: root.swatchClicked()
+
+        background: Rectangle {
+            radius: VLCStyle.dp(2, VLCStyle.scale)
+            color: root.hex(root.rgb)
+            border.width: VLCStyle.dp(1.5, VLCStyle.scale)
+            border.color: Qt.rgba(1, 1, 1, 0.21)
+        }
     }
 }

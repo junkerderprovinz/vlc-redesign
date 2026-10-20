@@ -20,8 +20,8 @@ import QtQuick.Templates as T
 
 import VLC.Dialogs
 
-// A row of colour swatches; `swatches` holds { color, text } entries, an entry
-// without a color is drawn as a rainbow and stands for "any other colour".
+// A row of color swatches; `swatches` holds { color, text } entries, an entry
+// without a color is drawn as a rainbow and stands for "any other color".
 Rectangle {
     id: root
 

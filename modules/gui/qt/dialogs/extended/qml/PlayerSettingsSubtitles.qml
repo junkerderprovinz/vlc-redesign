@@ -21,6 +21,7 @@ import QtQuick.Layouts
 import VLC.Dialogs
 import VLC.Player
 import VLC.Style
+import VLC.Widgets as Widgets
 
 // The subtitle tracks are picked from the tracks popup of the control bar,
 // this tab holds their timing and look.
@@ -49,26 +50,25 @@ ColumnLayout {
         return best
     }
 
-    EffectsSection {
+    Widgets.FormSection {
         title: qsTr("Defaults")
         separator: false
         bodySpacing: 0
 
-        EffectsRow {
+        Widgets.FormRow {
             Layout.bottomMargin: VLCStyle.dp(10, VLCStyle.scale)
             label: qsTr("Subtitle Language")
             minimumHeight: VLCStyle.dp(52, VLCStyle.scale)
 
-            EffectsValueField {
-                numeric: false
-                text: root.opt("sub-language")
+            Widgets.FormTextField {
+                value: root.opt("sub-language")
                 Accessible.name: qsTr("Subtitle Language")
-                onEditingFinished: EffectsController.setOption("sub-language", text.trim())
+                onCommitted: (text) => EffectsController.setOption("sub-language", text.trim())
             }
         }
     }
 
-    EffectsSection {
+    Widgets.FormSection {
         title: qsTr("Synchronization")
 
         EffectsSlider {
@@ -104,38 +104,37 @@ ColumnLayout {
         }
     }
 
-    EffectsSection {
+    Widgets.FormSection {
         title: qsTr("Appearance")
         bodySpacing: 0
 
-        EffectsRow {
+        Widgets.FormRow {
             label: qsTr("Embedded Sub Format")
             minimumHeight: VLCStyle.dp(52, VLCStyle.scale)
 
-            EffectsSwitch {
+            Widgets.FormSwitch {
                 value: !!root.opt("subsdec-formatting")
                 onSwitched: (on) => EffectsController.setOption("subsdec-formatting", on)
                 Accessible.name: qsTr("Embedded Sub Format")
             }
         }
 
-        EffectsRow {
+        Widgets.FormRow {
             label: qsTr("Subtitle Font")
             minimumHeight: VLCStyle.dp(52, VLCStyle.scale)
 
-            EffectsValueField {
-                numeric: false
-                text: root.opt("freetype-font")
+            Widgets.FormTextField {
+                value: root.opt("freetype-font")
                 Accessible.name: qsTr("Subtitle Font")
-                onEditingFinished: EffectsController.setOption("freetype-font", text.trim())
+                onCommitted: (text) => EffectsController.setOption("freetype-font", text.trim())
             }
         }
 
-        EffectsRow {
+        Widgets.FormRow {
             label: qsTr("Text Color")
             minimumHeight: VLCStyle.dp(52, VLCStyle.scale)
 
-            EffectsColorField {
+            Widgets.ColorField {
                 implicitWidth: VLCStyle.dp(140, VLCStyle.scale)
                 implicitHeight: VLCStyle.dp(36, VLCStyle.scale)
                 rgb: root.opt("freetype-color")
@@ -144,11 +143,11 @@ ColumnLayout {
             }
         }
 
-        EffectsRow {
+        Widgets.FormRow {
             label: qsTr("Outline Color")
             minimumHeight: VLCStyle.dp(52, VLCStyle.scale)
 
-            EffectsColorField {
+            Widgets.ColorField {
                 implicitWidth: VLCStyle.dp(140, VLCStyle.scale)
                 implicitHeight: VLCStyle.dp(36, VLCStyle.scale)
                 rgb: root.opt("freetype-outline-color")
@@ -157,15 +156,14 @@ ColumnLayout {
             }
         }
 
-        EffectsRow {
+        Widgets.FormRow {
             label: qsTr("Subtitle Offset")
             minimumHeight: VLCStyle.dp(52, VLCStyle.scale)
 
-            EffectsValueField {
-                value: root.opt("sub-margin")
-                format: (v) => Math.round(v) + "px"
+            Widgets.FormTextField {
+                value: Math.round(root.opt("sub-margin")) + "px"
                 Accessible.name: qsTr("Subtitle Offset")
-                onEdited: (v) => EffectsController.setOption("sub-margin", Math.round(v))
+                onNumberCommitted: (number) => EffectsController.setOption("sub-margin", Math.round(number))
             }
         }
 

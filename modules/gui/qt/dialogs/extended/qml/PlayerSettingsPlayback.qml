@@ -22,6 +22,7 @@ import VLC.Dialogs
 import VLC.Player
 import VLC.Style
 import VLC.Util
+import VLC.Widgets as Widgets
 
 ColumnLayout {
     id: root
@@ -38,36 +39,36 @@ ColumnLayout {
         [qsTr("VU meter")]: "waveform-duo"
     })
 
-    EffectsSection {
+    Widgets.FormSection {
         separator: false
         bodySpacing: 0
 
-        EffectsRow {
+        Widgets.FormRow {
             label: qsTr("Show Statistics")
             minimumHeight: VLCStyle.dp(52, VLCStyle.scale)
 
-            EffectsSwitch {
-                value: DialogsProvider.mediaInfoDialogVisible
-                onSwitched: DialogsProvider.mediaStatsDialog()
+            Widgets.FormSwitch {
+                value: DialogsProvider.mediaStatsVisible
+                onSwitched: (on) => DialogsProvider.mediaStatsVisible = on
             }
         }
 
-        EffectsRow {
+        Widgets.FormRow {
             label: qsTr("Reverse")
             minimumHeight: VLCStyle.dp(52, VLCStyle.scale)
             enabled: Player.rewindable
 
-            EffectsSwitch {
+            Widgets.FormSwitch {
                 value: Player.rate < 0
                 onSwitched: Player.reverse()
             }
         }
 
-        EffectsRow {
+        Widgets.FormRow {
             Layout.topMargin: VLCStyle.dp(20, VLCStyle.scale)
             label: qsTr("Sleep Timer")
 
-            EffectsComboBox {
+            Widgets.FormComboBox {
                 id: sleepTimer
 
                 readonly property var _minutes: [0, 15, 30, 45, 60, 120]
@@ -80,11 +81,11 @@ ColumnLayout {
             }
         }
 
-        EffectsRow {
+        Widgets.FormRow {
             Layout.topMargin: VLCStyle.dp(20, VLCStyle.scale)
             label: qsTr("Audio Visualizer")
 
-            EffectsComboBox {
+            Widgets.FormComboBox {
                 model: Player.audioVisualization
                 textRole: "display"
                 checkable: true

@@ -33,7 +33,7 @@ T.Popup {
 
     readonly property color color: Qt.hsva(hue, saturation, brightness, 1)
 
-    // emitted for every change, while the user is still picking
+    // emitted for every change the user makes, while still picking
     signal picked(color color)
 
     function setColor(c) {
@@ -44,8 +44,11 @@ T.Popup {
         brightness = value.hsvValue
     }
 
-    function hex(c) {
-        return Qt.color(c).toString().toUpperCase()
+    function _pick(h, s, v) {
+        hue = h
+        saturation = s
+        brightness = v
+        picked(color)
     }
 
     implicitWidth: implicitContentWidth + leftPadding + rightPadding
@@ -55,11 +58,6 @@ T.Popup {
     modal: false
     focus: true
     closePolicy: T.Popup.CloseOnEscape | T.Popup.CloseOnPressOutside
-
-    onColorChanged: {
-        if (visible)
-            picked(color)
-    }
 
     background: Rectangle {
         radius: t.dp(6)
@@ -78,7 +76,7 @@ T.Popup {
     contentItem: Column {
         spacing: t.dp(10)
 
-        // the popup lives in the window overlay, outside the dialog's colour context
+        // the popup lives in the window overlay, outside the dialog's color context
         readonly property ColorContext colorContext: ColorContext {
             palette: VLCStyle.palette
             colorSet: ColorContext.Window
@@ -126,8 +124,8 @@ T.Popup {
                 anchors.fill: parent
 
                 function pick(mouse) {
-                    root.saturation = Math.max(0, Math.min(1, mouse.x / width))
-                    root.brightness = 1 - Math.max(0, Math.min(1, mouse.y / height))
+                    root._pick(root.hue, Math.max(0, Math.min(1, mouse.x / width)),
+                               1 - Math.max(0, Math.min(1, mouse.y / height)))
                 }
 
                 onPressed: (mouse) => pick(mouse)
@@ -168,7 +166,7 @@ T.Popup {
                 anchors.fill: parent
 
                 function pick(mouse) {
-                    root.hue = Math.max(0, Math.min(0.999, mouse.x / width))
+                    root._pick(Math.max(0, Math.min(0.999, mouse.x / width)), root.saturation, root.brightness)
                 }
 
                 onPressed: (mouse) => pick(mouse)
@@ -176,30 +174,13 @@ T.Popup {
             }
         }
 
-        Row {
-            spacing: t.dp(10)
+        Widgets.ColorField {
+            width: field.width
+            rgb: parseInt(root.color.toString().slice(1, 7), 16)
 
-            Rectangle {
-                width: t.dp(32)
-                height: t.dp(32)
-                radius: t.dp(4)
-                color: root.color
-            }
-
-            SettingsTextField {
-                id: hexField
-
-                width: field.width - t.dp(42)
-                compact: true
-                value: root.hex(root.color)
-
-                onCommitted: (text) => {
-                    const c = text.startsWith("#") ? text : "#" + text
-                    if (/^#[0-9a-fA-F]{6}$/.test(c))
-                        root.setColor(c)
-                    else
-                        hexField.text = hexField.value
-                }
+            onPicked: (rgb) => {
+                const c = Qt.color(hex(rgb))
+                root._pick(c.hsvHue >= 0 ? c.hsvHue : root.hue, c.hsvSaturation, c.hsvValue)
             }
         }
     }

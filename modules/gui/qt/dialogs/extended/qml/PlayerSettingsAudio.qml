@@ -39,6 +39,8 @@ ColumnLayout {
 
     readonly property EffectsColors colors: EffectsColors { }
 
+    ConfigOption { id: vlcFrequencies; name: "equalizer-vlcfreqs" }
+
     // icon files of the equalizer presets
     readonly property var _equalizerIcons: ({
         "classical": "eq-classical", "club": "eq-club", "dance": "eq-dance",
@@ -62,8 +64,7 @@ ColumnLayout {
         return EffectsController.isFilterEnabled(module)
     }
 
-
-    component FilterHead : EffectsRow {
+    component FilterHead : Widgets.FormRow {
         id: filterHead
 
         // the filter switched on and off from the head, if any
@@ -71,7 +72,7 @@ ColumnLayout {
 
         minimumHeight: VLCStyle.dp(37, VLCStyle.scale)
 
-        EffectsSwitch {
+        Widgets.FormSwitch {
             visible: filterHead.module !== ""
             value: EffectsController.revision, (filterHead.module !== "" && EffectsController.isFilterEnabled(filterHead.module))
             onSwitched: (on) => EffectsController.setFilterEnabled(filterHead.module, on)
@@ -95,16 +96,16 @@ ColumnLayout {
 
     readonly property var _decibels: (v) => v.toFixed(1) + " " + qsTr("dB")
 
-    EffectsSection {
+    Widgets.FormSection {
         title: qsTr("Defaults")
         separator: false
         bodySpacing: 0
 
-        EffectsRow {
+        Widgets.FormRow {
             label: qsTr("Audio Track")
             minimumHeight: VLCStyle.dp(52, VLCStyle.scale)
 
-            EffectsComboBox {
+            Widgets.FormComboBox {
                 implicitWidth: VLCStyle.dp(140, VLCStyle.scale)
                 implicitHeight: VLCStyle.dp(36, VLCStyle.scale)
                 model: Player.audioTracks
@@ -114,24 +115,23 @@ ColumnLayout {
             }
         }
 
-        EffectsRow {
+        Widgets.FormRow {
             label: qsTr("Audio Language")
             minimumHeight: VLCStyle.dp(52, VLCStyle.scale)
 
-            EffectsValueField {
-                numeric: false
-                text: root.opt("audio-language")
+            Widgets.FormTextField {
+                value: root.opt("audio-language")
                 Accessible.name: qsTr("Audio Language")
-                onEditingFinished: EffectsController.setOption("audio-language", text.trim())
+                onCommitted: (text) => EffectsController.setOption("audio-language", text.trim())
             }
         }
 
-        EffectsRow {
+        Widgets.FormRow {
             label: (EffectsController.revision, Player.audioMixMode.rowCount() > 0) ? qsTr("Mix Mode") : qsTr("Stereo Mode")
             minimumHeight: VLCStyle.dp(52, VLCStyle.scale)
         }
 
-        EffectsComboBox {
+        Widgets.FormComboBox {
             Layout.fillWidth: true
             Layout.bottomMargin: VLCStyle.dp(10, VLCStyle.scale)
 
@@ -142,7 +142,7 @@ ColumnLayout {
         }
     }
 
-    EffectsSection {
+    Widgets.FormSection {
         title: qsTr("Synchronization")
 
         EffectsSlider {
@@ -163,16 +163,16 @@ ColumnLayout {
         }
     }
 
-    EffectsSection {
+    Widgets.FormSection {
         title: qsTr("Filters")
         bodySpacing: VLCStyle.dp(10, VLCStyle.scale)
 
         FilterHead { label: qsTr("Equalizer") }
 
-        EffectsComboBox {
-            // the flat preset has a single colour glyph, the others two-tone images
+        Widgets.FormComboBox {
+            // the flat preset has a single color glyph, the others two-tone images
             readonly property var _presets: [{ id: "", name: qsTr("None"), icon: "", image: "" }].concat(
-                EffectsController.equalizerPresets.map((p) => ({
+                SettingsBridge.equalizerPresets.map((p) => ({
                     id: p.id,
                     name: p.name,
                     icon: p.id === "flat" ? VLCIcons.eq : "",
@@ -207,7 +207,7 @@ ColumnLayout {
             }
 
             Repeater {
-                model: EffectsController.equalizerBandNames
+                model: SettingsBridge.equalizerBandNames(!!vlcFrequencies.value)
 
                 delegate: EffectsSlider {
                     Layout.fillWidth: true
@@ -223,10 +223,10 @@ ColumnLayout {
             }
         }
 
-        EffectsRow {
+        Widgets.FormRow {
             label: qsTr("2 Pass")
 
-            EffectsSwitch {
+            Widgets.FormSwitch {
                 value: !!root.opt("equalizer-2pass")
                 onSwitched: (on) => EffectsController.setOption("equalizer-2pass", on)
                 Accessible.name: qsTr("2 Pass")
@@ -234,7 +234,7 @@ ColumnLayout {
         }
     }
 
-    EffectsSection {
+    Widgets.FormSection {
         bodySpacing: VLCStyle.dp(10, VLCStyle.scale)
         bodyTopMargin: VLCStyle.dp(20, VLCStyle.scale)
 
@@ -283,7 +283,7 @@ ColumnLayout {
         }
     }
 
-    EffectsSection {
+    Widgets.FormSection {
         bodySpacing: VLCStyle.dp(10, VLCStyle.scale)
         bodyTopMargin: VLCStyle.dp(20, VLCStyle.scale)
 
@@ -322,7 +322,7 @@ ColumnLayout {
         }
     }
 
-    EffectsSection {
+    Widgets.FormSection {
         bodySpacing: VLCStyle.dp(10, VLCStyle.scale)
         bodyTopMargin: VLCStyle.dp(20, VLCStyle.scale)
 
@@ -356,7 +356,7 @@ ColumnLayout {
         }
     }
 
-    EffectsSection {
+    Widgets.FormSection {
         EffectsSlider {
             Layout.fillWidth: true
 

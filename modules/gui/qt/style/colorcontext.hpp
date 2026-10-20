@@ -148,7 +148,7 @@ public:
     Q_PROPERTY(QColor accent READ accent NOTIFY colorsChanged FINAL)
 
     //raw colors of the palette, for the places no role describes
-    Q_PROPERTY(DesignTokens tokens READ tokens NOTIFY colorsChanged)
+    Q_PROPERTY(DesignTokens tokens READ tokens NOTIFY colorsChanged FINAL)
 
     Q_PROPERTY(bool initialized READ initialized NOTIFY initializedChanged FINAL)
 public:

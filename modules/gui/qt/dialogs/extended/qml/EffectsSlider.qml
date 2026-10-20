@@ -81,14 +81,15 @@ ColumnLayout {
             font.pixelSize: VLCStyle.fontSize_normal
         }
 
-        EffectsValueField {
+        Widgets.FormTextField {
+            readonly property real _shown: slider.pressed ? slider.value : root.value
+
             visible: root.editable
 
-            value: slider.pressed ? slider.value : root.value
-            format: root.format
+            value: root.format ? root.format(_shown) : String(_shown)
             Accessible.name: root.label
 
-            onEdited: (v) => root._commit(v)
+            onNumberCommitted: (number) => root._commit(number)
         }
     }
 

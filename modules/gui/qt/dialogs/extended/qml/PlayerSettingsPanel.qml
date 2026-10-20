@@ -27,29 +27,31 @@ import VLC.Widgets as Widgets
 
 // Floating panel of the player with the playback settings and the audio,
 // video and subtitle effects.
-T.Pane {
+Widgets.FloatingPanel {
     id: root
-
-    enum Tab {
-        Playback,
-        Video,
-        Audio,
-        Subtitles
-    }
-
-    property int currentTab: MainCtx.playerSettingsTab
 
     signal closeRequested()
 
     implicitWidth: VLCStyle.dp(400, VLCStyle.scale)
-    implicitHeight: Math.max(implicitBackgroundHeight + topInset + bottomInset,
-                             implicitContentHeight + topPadding + bottomPadding)
 
-    padding: 0
+    tabs: [
+        { text: qsTr("Playback"), iconTxt: VLCIcons.playback, checkedIconSource: _tabIcon("playback") },
+        { text: qsTr("Video"), iconTxt: VLCIcons.video, checkedIconSource: _tabIcon("video") },
+        { text: qsTr("Audio"), iconTxt: VLCIcons.audio, checkedIconSource: _tabIcon("audio") },
+        { text: qsTr("Subtitles"), iconTxt: VLCIcons.subtitles, checkedIconSource: _tabIcon("subtitles") }
+    ]
+    currentTab: MainCtx.playerSettingsTab
 
-    focusPolicy: Qt.NoFocus
+    onTabClicked: (index) => MainCtx.playerSettingsTab = index
 
     Keys.onEscapePressed: root.closeRequested()
+
+    function _tabIcon(slug) {
+        return SVGColorImage.colorize("qrc:///icons/figma/" + slug + "-duo.svg")
+                            .color1(colors.text)
+                            .color2(colors.accent)
+                            .accent(colors.accent).uri()
+    }
 
     readonly property EffectsColors colors: EffectsColors { }
 
@@ -145,81 +147,10 @@ T.Pane {
         _chosenPresets = chosen
     }
 
-    background: Rectangle {
-        radius: VLCStyle.dp(10, VLCStyle.scale)
-        color: root.colors.panel
+    ColumnLayout {
+        anchors.fill: parent
 
-        Widgets.RoundedRectangleShadow {
-            z: -1
-            color: Qt.rgba(0, 0, 0, root.colors.tokens.isDark ? 0.46 : 0.18)
-            yOffset: VLCStyle.dp(8, VLCStyle.scale)
-            blurRadius: VLCStyle.dp(15, VLCStyle.scale)
-        }
-    }
-
-    contentItem: ColumnLayout {
         spacing: 0
-
-        Rectangle {
-            Layout.fillWidth: true
-            Layout.preferredHeight: VLCStyle.dp(50, VLCStyle.scale)
-
-            radius: VLCStyle.dp(10, VLCStyle.scale)
-            color: root.colors.field
-
-            // square off the bottom corners
-            Rectangle {
-                anchors.left: parent.left
-                anchors.right: parent.right
-                anchors.bottom: parent.bottom
-
-                height: parent.radius
-                color: parent.color
-            }
-
-            RowLayout {
-                anchors.fill: parent
-                anchors.leftMargin: VLCStyle.dp(6, VLCStyle.scale)
-                anchors.rightMargin: VLCStyle.dp(6, VLCStyle.scale)
-
-                spacing: 0
-
-                Repeater {
-                    model: [
-                        { tab: PlayerSettingsPanel.Tab.Playback, text: qsTr("Playback"), glyph: VLCIcons.playback, slug: "playback" },
-                        { tab: PlayerSettingsPanel.Tab.Video, text: qsTr("Video"), glyph: VLCIcons.video, slug: "video" },
-                        { tab: PlayerSettingsPanel.Tab.Audio, text: qsTr("Audio"), glyph: VLCIcons.audio, slug: "audio" },
-                        { tab: PlayerSettingsPanel.Tab.Subtitles, text: qsTr("Subtitles"), glyph: VLCIcons.subtitles, slug: "subtitles" }
-                    ]
-
-                    delegate: Widgets.TabButtonExt {
-                        required property var modelData
-                        required property int index
-
-                        readonly property bool _outer: (index === 0 || index === 3)
-
-                        Layout.fillHeight: true
-                        Layout.fillWidth: _outer
-                        Layout.preferredWidth: _outer ? -1 : VLCStyle.dp(85, VLCStyle.scale)
-
-                        indicatorMargin: _outer ? VLCStyle.margin_xsmall : VLCStyle.margin_small
-
-                        text: modelData.text
-                        font.pixelSize: VLCStyle.fontSize_small
-                        checked: root.currentTab === modelData.tab
-                        iconTxt: checked ? "" : modelData.glyph
-                        checkedIconSource: SVGColorImage.colorize("qrc:///icons/figma/" + modelData.slug + "-duo.svg")
-                                                        .color1(root.colors.text)
-                                                        .color2(root.colors.accent)
-                                                        .accent(root.colors.accent).uri()
-
-                        Accessible.role: Accessible.PageTab
-
-                        onClicked: MainCtx.playerSettingsTab = modelData.tab
-                    }
-                }
-            }
-        }
 
         Flickable {
             id: flickable
@@ -246,7 +177,7 @@ T.Pane {
         }
 
         Rectangle {
-            visible: root.currentTab !== PlayerSettingsPanel.Tab.Playback
+            visible: root.currentTab !== MainCtx.PLAYER_SETTINGS_PLAYBACK
 
             Layout.fillWidth: true
             Layout.preferredHeight: VLCStyle.border
@@ -255,7 +186,7 @@ T.Pane {
         }
 
         ColumnLayout {
-            visible: root.currentTab !== PlayerSettingsPanel.Tab.Playback
+            visible: root.currentTab !== MainCtx.PLAYER_SETTINGS_PLAYBACK
 
             Layout.fillWidth: true
             Layout.margins: VLCStyle.dp(20, VLCStyle.scale)
@@ -309,14 +240,14 @@ T.Pane {
 
                 text: qsTr("Open Advanced Settings")
 
-                // the extended dialog keeps every filter of the panel and more
+                // Effects and Filters keeps every filter of the panel and more
                 onClicked: {
-                    if (root.currentTab === PlayerSettingsPanel.Tab.Audio)
-                        DialogsProvider.extendedDialogTab(0)
-                    else if (root.currentTab === PlayerSettingsPanel.Tab.Video)
-                        DialogsProvider.extendedDialogTab(1)
+                    if (root.currentTab === MainCtx.PLAYER_SETTINGS_AUDIO)
+                        DialogsProvider.extendedDialogTab(DialogsProvider.ExtendedAudioTab)
+                    else if (root.currentTab === MainCtx.PLAYER_SETTINGS_VIDEO)
+                        DialogsProvider.extendedDialogTab(DialogsProvider.ExtendedVideoTab)
                     else
-                        DialogsProvider.prefsDialog()
+                        DialogsProvider.extendedDialogTab(DialogsProvider.ExtendedSynchroTab)
                 }
 
                 background: Rectangle {

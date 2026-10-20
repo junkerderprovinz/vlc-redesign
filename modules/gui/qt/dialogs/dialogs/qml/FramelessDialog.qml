@@ -30,18 +30,25 @@ import VLC.Style
 Window {
     id: root
 
-    property real designWidth: VLCStyle.dp(1048, VLCStyle.scale)
-    property real designHeight: VLCStyle.dp(800, VLCStyle.scale)
+    // the size the dialog takes when the screen has room for it
+    property real baseWidth: VLCStyle.dp(1048, VLCStyle.scale)
+    property real baseHeight: VLCStyle.dp(800, VLCStyle.scale)
 
+    // the text of the title bar
+    property string heading: title
+    // items placed in the title bar before the heading
+    property alias leadingData: leadingItem.data
     property alias toolbarData: toolbarItem.data
     default property alias contentData: content.data
 
     property string acceptText: qsTr("Save")
     property bool acceptEnabled: true
     property bool cancelVisible: true
+    property bool footerVisible: true
     property alias footerData: footerExtra.data
 
     property color backgroundColor: theme.palette.bgA3
+    property color headerColor: theme.palette.isDark ? theme.palette.bgB2 : theme.palette.bgA3
 
     readonly property ColorContext colorContext: frame.colorContext
 
@@ -53,8 +60,8 @@ Window {
     flags: Qt.Dialog | Qt.FramelessWindowHint
     modality: Qt.ApplicationModal
 
-    width: Math.min(designWidth, Screen.desktopAvailableWidth - VLCStyle.margin_xlarge)
-    height: Math.min(designHeight, Screen.desktopAvailableHeight - VLCStyle.margin_xlarge)
+    width: Math.min(baseWidth, Screen.desktopAvailableWidth - VLCStyle.margin_xlarge)
+    height: Math.min(baseHeight, Screen.desktopAvailableHeight - VLCStyle.margin_xlarge)
 
     color: "transparent"
 
@@ -118,7 +125,7 @@ Window {
                     Layout.preferredHeight: headerLayout.implicitHeight + 2 * headerLayout.anchors.margins
 
                     radius: frame.radius
-                    color: theme.palette.isDark ? theme.palette.bgB2 : theme.palette.bgA3
+                    color: root.headerColor
 
                     // square off the lower corners
                     Rectangle {
@@ -152,14 +159,24 @@ Window {
 
                             spacing: 0
 
+                            Item {
+                                id: leadingItem
+
+                                Layout.fillHeight: true
+                                Layout.preferredWidth: childrenRect.width
+
+                                visible: children.length > 0
+                            }
+
                             Widgets.LabelExt {
                                 Layout.fillWidth: true
-                                Layout.leftMargin: VLCStyle.dp(10, VLCStyle.scale)
+                                Layout.leftMargin: leadingItem.visible ? VLCStyle.dp(32, VLCStyle.scale)
+                                                                       : VLCStyle.dp(10, VLCStyle.scale)
 
-                                text: root.title
+                                text: root.heading
                                 elide: Text.ElideRight
                                 color: theme.palette.fgA2
-                                font.pixelSize: VLCStyle.fontSize_large
+                                font.pixelSize: VLCStyle.fontSize_normal
                                 textFormat: Text.PlainText
                             }
 
@@ -199,6 +216,8 @@ Window {
                 }
 
                 RowLayout {
+                    visible: root.footerVisible
+
                     Layout.fillWidth: true
                     Layout.margins: VLCStyle.dp(20, VLCStyle.scale)
 

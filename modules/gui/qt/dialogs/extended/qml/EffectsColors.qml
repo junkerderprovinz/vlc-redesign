@@ -19,11 +19,9 @@ import QtQuick
 
 import VLC.Style
 
-// The design tokens of the palette the player settings panel is drawn with
+// The colors of the palette the player settings panel is drawn with
 ColorContext {
     colorSet: ColorContext.Window
-
-    readonly property var tokens: palette ?? VLCStyle.palette
 
     readonly property color panel: tokens.bgB1Glass
     readonly property color field: tokens.bgB2

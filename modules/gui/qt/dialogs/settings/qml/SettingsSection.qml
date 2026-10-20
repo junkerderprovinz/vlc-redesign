@@ -16,14 +16,13 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 import QtQuick
-import QtQuick.Templates as T
+import QtQuick.Layouts
 
-import VLC.Style
 import VLC.Widgets as Widgets
 import VLC.Dialogs
 
-// A titled group of settings rows
-Column {
+// The rows of one section of a settings page
+Widgets.FormSection {
     id: root
 
     readonly property var t: SettingsTheme
@@ -48,42 +47,19 @@ Column {
 
     visible: hasVisibleRows
 
-    T.AbstractButton {
-        id: heading
+    title: modelData.title ?? ""
+    linked: linkPage !== null
+    separator: false
+    padding: 0
+    headingIndent: 0
+    headingTopMargin: 0
+    headingHeight: t.dp(39)
+    bodyTopMargin: 0
+    bodyBottomMargin: 0
+    bodySpacing: 0
+    headingColor: t.fg2
 
-        visible: (root.modelData.title ?? "").length > 0
-        width: implicitContentWidth
-        height: t.dp(39)
-        enabled: root.linkPage !== null
-        focusPolicy: root.linkPage ? Qt.StrongFocus : Qt.NoFocus
-        text: root.modelData.title ?? ""
-
-        Accessible.role: root.linkPage ? Accessible.Link : Accessible.Heading
-
-        onClicked: root.jumpRequested(null)
-
-        background: null
-
-        contentItem: Row {
-            spacing: t.dp(4)
-
-            Text {
-                anchors.verticalCenter: parent.verticalCenter
-                text: heading.text
-                color: heading.hovered ? t.fg1 : t.fg2
-                font.pixelSize: t.fontLarge
-                font.weight: Font.Medium
-            }
-
-            Widgets.IconLabel {
-                anchors.verticalCenter: parent.verticalCenter
-                visible: root.linkPage !== null
-                text: VLCIcons.chevron_right
-                color: t.fgA2
-                font.pixelSize: t.dp(24)
-            }
-        }
-    }
+    onHeadingClicked: root.jumpRequested(null)
 
     Repeater {
         id: rows
@@ -93,7 +69,7 @@ Column {
         delegate: SettingsRow {
             required property var modelData
 
-            width: root.width
+            Layout.fillWidth: true
             row: modelData
             query: root.query
 

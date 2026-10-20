@@ -100,6 +100,9 @@ DialogsProvider::DialogsProvider( qt_intf_t *_p_intf )
 
 {
     b_isDying = false;
+
+    connect( this, &DialogsProvider::mediaInfoDialogVisibleChanged,
+             this, &DialogsProvider::mediaStatsVisibleChanged );
 }
 
 DialogsProvider::~DialogsProvider()
@@ -383,6 +386,29 @@ void DialogsProvider::playerSettingsPanel( int tab )
         mi->setPlayerSettingsTab( tab );
     mi->setPlayerView( true );
     mi->setPlayerSettingsVisible( true );
+}
+
+static_assert( int( DialogsProvider::ExtendedAudioTab ) == int( ExtendedDialog::AUDIO_TAB )
+               && int( DialogsProvider::ExtendedVideoTab ) == int( ExtendedDialog::VIDEO_TAB )
+               && int( DialogsProvider::ExtendedSynchroTab ) == int( ExtendedDialog::SYNCHRO_TAB ) );
+
+bool DialogsProvider::mediaStatsVisible() const
+{
+    return mediaInfoDialogVisible()
+        && m_mediaInfoDialog->currentTab() == MediaInfoDialog::INPUTSTATS_PANEL;
+}
+
+void DialogsProvider::setMediaStatsVisible( bool visible )
+{
+    if( visible == mediaStatsVisible() )
+        return;
+
+    ensureDialog(m_mediaInfoDialog);
+    if( visible )
+        m_mediaInfoDialog->showTab( MediaInfoDialog::INPUTSTATS_PANEL );
+    else
+        m_mediaInfoDialog->hide();
+    emit mediaStatsVisibleChanged();
 }
 
 void DialogsProvider::mediaStatsDialog()

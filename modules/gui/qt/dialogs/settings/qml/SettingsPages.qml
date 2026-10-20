@@ -321,7 +321,7 @@ QtObject {
         {
             id: "playback",
             name: qsTr("Playback"),
-            title: qsTr("Playback Preferences"),
+            title: qsTr("Playback Settings"),
             group: 1,
             icon: "playback",
             sections: [
@@ -394,7 +394,7 @@ QtObject {
         {
             id: "video",
             name: qsTr("Video"),
-            title: qsTr("Video Defaults"),
+            title: qsTr("Video Settings"),
             group: 1,
             icon: "video",
             sections: [
@@ -484,7 +484,7 @@ QtObject {
         {
             id: "audio",
             name: qsTr("Audio"),
-            title: qsTr("Audio Defaults"),
+            title: qsTr("Audio Settings"),
             group: 1,
             icon: "audio",
             sections: [
@@ -572,7 +572,7 @@ QtObject {
         {
             id: "subtitles",
             name: qsTr("Subtitles"),
-            title: qsTr("Subtitle Defaults"),
+            title: qsTr("Subtitle Settings"),
             group: 1,
             icon: "subtitles",
             sections: [

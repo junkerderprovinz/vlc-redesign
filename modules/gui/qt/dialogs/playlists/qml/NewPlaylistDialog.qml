@@ -29,8 +29,8 @@ FramelessDialog {
 
     title: qsTr("New Playlist")
 
-    designWidth: VLCStyle.dp(713, VLCStyle.scale)
-    designHeight: VLCStyle.dp(589, VLCStyle.scale)
+    baseWidth: VLCStyle.dp(713, VLCStyle.scale)
+    baseHeight: VLCStyle.dp(589, VLCStyle.scale)
 
     acceptEnabled: titleField.text.trim().length > 0
 

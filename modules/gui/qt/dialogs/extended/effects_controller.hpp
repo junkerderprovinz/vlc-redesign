@@ -49,8 +49,6 @@ class EffectsController : public QObject
 {
     Q_OBJECT
 
-    Q_PROPERTY(QStringList equalizerBandNames READ getEqualizerBandNames CONSTANT FINAL)
-    Q_PROPERTY(QVariantList equalizerPresets READ getEqualizerPresets CONSTANT FINAL)
     Q_PROPERTY(int subtitleTextScale READ getSubtitleTextScale WRITE setSubtitleTextScale NOTIFY subtitleTextScaleChanged FINAL)
     Q_PROPERTY(int sleepTimer READ getSleepTimer WRITE setSleepTimer NOTIFY sleepTimerChanged FINAL)
     Q_PROPERTY(QVariantList presets READ getPresets NOTIFY presetsChanged FINAL)
@@ -59,6 +57,7 @@ class EffectsController : public QObject
 
 public:
     explicit EffectsController( qt_intf_t *p_intf, QObject *parent = nullptr );
+    ~EffectsController() override;
 
     Q_INVOKABLE bool isFilterEnabled( const QString &module ) const;
     Q_INVOKABLE void setFilterEnabled( const QString &module, bool enable );
@@ -84,8 +83,6 @@ public:
     Q_INVOKABLE void savePreset( const QString &name, const QVariantMap &values );
     Q_INVOKABLE void removePreset( const QString &name );
 
-    QStringList getEqualizerBandNames() const;
-    QVariantList getEqualizerPresets() const;
     int getSubtitleTextScale() const;
     void setSubtitleTextScale( int scale );
     int getSleepTimer() const;

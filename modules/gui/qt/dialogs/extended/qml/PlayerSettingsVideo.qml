@@ -22,6 +22,7 @@ import QtQuick.Templates as T
 import VLC.Dialogs
 import VLC.Player
 import VLC.Style
+import VLC.Util
 import VLC.Widgets as Widgets
 
 ColumnLayout {
@@ -75,11 +76,11 @@ ColumnLayout {
         EffectsController.setFilterEnabled(module, value > off)
     }
 
-    component FilterHead : EffectsRow {
+    component FilterHead : Widgets.FormRow {
         minimumHeight: VLCStyle.dp(37, VLCStyle.scale)
     }
 
-    component FilterSwitch : EffectsRow {
+    component FilterSwitch : Widgets.FormRow {
         id: filterSwitch
 
         property string module
@@ -87,14 +88,14 @@ ColumnLayout {
         minimumHeight: VLCStyle.dp(44, VLCStyle.scale)
         Layout.leftMargin: 0
 
-        EffectsSwitch {
+        Widgets.FormSwitch {
             value: EffectsController.revision, EffectsController.isFilterEnabled(filterSwitch.module)
             onSwitched: (on) => EffectsController.setFilterEnabled(filterSwitch.module, on)
             Accessible.name: filterSwitch.label
         }
     }
 
-    component ColorRow : EffectsRow {
+    component ColorRow : Widgets.FormRow {
         id: colorRow
 
         property string module
@@ -103,13 +104,13 @@ ColumnLayout {
         Layout.leftMargin: 0
         minimumHeight: VLCStyle.dp(32, VLCStyle.scale)
 
-        EffectsColorField {
+        Widgets.ColorField {
             rgb: EffectsController.revision, EffectsController.option(colorRow.option)
             Accessible.name: colorRow.label
             onPicked: (rgb) => EffectsController.setOption(colorRow.option, rgb)
         }
 
-        EffectsSwitch {
+        Widgets.FormSwitch {
             value: EffectsController.revision, EffectsController.isFilterEnabled(colorRow.module)
             onSwitched: (on) => EffectsController.setFilterEnabled(colorRow.module, on)
             Accessible.name: colorRow.label
@@ -125,14 +126,28 @@ ColumnLayout {
 
         readonly property EffectsColors colors: EffectsColors { }
 
-        contentItem: Widgets.IconLabel {
-            text: link.checked ? VLCIcons.link_active : VLCIcons.link
-            color: link.checked ? link.colors.accent : link.colors.label
-            font.pixelSize: VLCStyle.dp(20, VLCStyle.scale)
+        contentItem: Item {
+            Widgets.IconLabel {
+                anchors.centerIn: parent
+                visible: !link.checked
+                text: VLCIcons.link
+                color: link.colors.label
+                font.pixelSize: VLCStyle.dp(20, VLCStyle.scale)
+            }
+
+            Image {
+                anchors.centerIn: parent
+                visible: link.checked
+                width: VLCStyle.dp(20, VLCStyle.scale)
+                height: width
+                sourceSize: Qt.size(width, height)
+                source: SVGColorImage.colorize("qrc:///icons/figma/link-active.svg")
+                                     .accent(link.colors.accent).uri()
+            }
         }
     }
 
-    EffectsSection {
+    Widgets.FormSection {
         title: qsTr("Defaults")
         separator: false
 
@@ -167,16 +182,15 @@ ColumnLayout {
             }
         }
 
-        EffectsRow {
+        Widgets.FormRow {
             label: qsTr("Rotate")
 
-            EffectsValueField {
-                value: root.on("rotate") ? root.opt("rotate-angle") : 0
-                format: (v) => Math.round(v) + " " + qsTr("deg")
+            Widgets.FormTextField {
+                value: Math.round(root.on("rotate") ? root.opt("rotate-angle") : 0) + " " + qsTr("deg")
                 Accessible.name: qsTr("Rotate")
 
-                onEdited: (v) => {
-                    const angle = ((Math.round(v) % 360) + 360) % 360
+                onNumberCommitted: (number) => {
+                    const angle = ((Math.round(number) % 360) + 360) % 360
                     if (angle !== 0)
                         EffectsController.setOption("rotate-angle", angle)
                     EffectsController.setFilterEnabled("rotate", angle !== 0)
@@ -184,11 +198,11 @@ ColumnLayout {
             }
         }
 
-        EffectsRow {
+        Widgets.FormRow {
             Layout.topMargin: VLCStyle.dp(15, VLCStyle.scale)
             label: qsTr("Zoom")
 
-            EffectsComboBox {
+            Widgets.FormComboBox {
                 model: Player.zoom
                 textRole: "display"
                 checkable: true
@@ -197,11 +211,11 @@ ColumnLayout {
             }
         }
 
-        EffectsRow {
+        Widgets.FormRow {
             Layout.topMargin: VLCStyle.dp(15, VLCStyle.scale)
             label: qsTr("Resolution")
 
-            EffectsComboBox {
+            Widgets.FormComboBox {
                 readonly property var _choices: EffectsController.optionChoices("preferred-resolution")
 
                 model: _choices
@@ -215,11 +229,11 @@ ColumnLayout {
             }
         }
 
-        EffectsRow {
+        Widgets.FormRow {
             Layout.topMargin: VLCStyle.dp(15, VLCStyle.scale)
             label: qsTr("Aspect Ratio")
 
-            EffectsComboBox {
+            Widgets.FormComboBox {
                 model: Player.aspectRatio
                 textRole: "display"
                 checkable: true
@@ -228,11 +242,11 @@ ColumnLayout {
             }
         }
 
-        EffectsRow {
+        Widgets.FormRow {
             Layout.topMargin: VLCStyle.dp(15, VLCStyle.scale)
             label: qsTr("Crop")
 
-            EffectsComboBox {
+            Widgets.FormComboBox {
                 model: Player.crop
                 textRole: "display"
                 checkable: true
@@ -241,11 +255,11 @@ ColumnLayout {
             }
         }
 
-        EffectsRow {
+        Widgets.FormRow {
             Layout.topMargin: VLCStyle.dp(15, VLCStyle.scale)
             label: qsTr("Render")
 
-            EffectsComboBox {
+            Widgets.FormComboBox {
                 id: render
 
                 property var _renderers: []
@@ -285,7 +299,7 @@ ColumnLayout {
         }
     }
 
-    EffectsSection {
+    Widgets.FormSection {
         title: qsTr("Filters")
         bodySpacing: VLCStyle.dp(10, VLCStyle.scale)
 
@@ -355,7 +369,7 @@ ColumnLayout {
         }
     }
 
-    EffectsSection {
+    Widgets.FormSection {
         bodySpacing: VLCStyle.dp(10, VLCStyle.scale)
         bodyTopMargin: VLCStyle.dp(20, VLCStyle.scale)
 
@@ -408,9 +422,7 @@ ColumnLayout {
                         Repeater {
                             model: cropRow.modelData.edges
 
-                            delegate: EffectsValueField {
-                                id: edgeField
-
+                            delegate: Widgets.FormTextField {
                                 readonly property int edge: cropRow.modelData.first + index
 
                                 Layout.fillWidth: true
@@ -418,11 +430,10 @@ ColumnLayout {
                                 implicitHeight: VLCStyle.dp(33, VLCStyle.scale)
 
                                 leftPadding: VLCStyle.dp(72, VLCStyle.scale)
-                                value: cropEdges._crop[edge]
-                                format: (v) => v + " " + qsTr("px")
+                                value: cropEdges._crop[edge] + " " + qsTr("px")
                                 Accessible.name: modelData
 
-                                onEdited: (v) => cropEdges.setEdge(edge, v)
+                                onNumberCommitted: (number) => cropEdges.setEdge(edge, number)
 
                                 Widgets.LabelExt {
                                     anchors.left: parent.left
@@ -430,7 +441,7 @@ ColumnLayout {
                                     anchors.verticalCenter: parent.verticalCenter
 
                                     text: modelData
-                                    color: edgeField.colors.label
+                                    color: root.colors.label
                                     font.pixelSize: VLCStyle.fontSize_normal
                                 }
                             }
@@ -454,7 +465,7 @@ ColumnLayout {
         }
     }
 
-    EffectsSection {
+    Widgets.FormSection {
         bodySpacing: VLCStyle.dp(10, VLCStyle.scale)
         bodyTopMargin: VLCStyle.dp(20, VLCStyle.scale)
 
@@ -509,7 +520,7 @@ ColumnLayout {
                 module: "gradient"
             }
 
-            EffectsComboBox {
+            Widgets.FormComboBox {
                 readonly property var _choices: EffectsController.optionChoices("gradient-mode")
 
                 Layout.fillWidth: true
@@ -523,24 +534,24 @@ ColumnLayout {
                 Accessible.name: qsTr("Gradient mode")
             }
 
-            EffectsRow {
+            Widgets.FormRow {
                 Layout.leftMargin: 0
                 minimumHeight: VLCStyle.dp(44, VLCStyle.scale)
                 label: qsTr("Color")
 
-                EffectsSwitch {
+                Widgets.FormSwitch {
                     value: !!root.opt("gradient-color")
                     onSwitched: (on) => EffectsController.setOption("gradient-color", on)
                     Accessible.name: qsTr("Gradient color")
                 }
             }
 
-            EffectsRow {
+            Widgets.FormRow {
                 Layout.leftMargin: 0
                 minimumHeight: VLCStyle.dp(44, VLCStyle.scale)
                 label: qsTr("Cartoon")
 
-                EffectsSwitch {
+                Widgets.FormSwitch {
                     value: !!root.opt("gradient-cartoon")
                     onSwitched: (on) => EffectsController.setOption("gradient-cartoon", on)
                     Accessible.name: qsTr("Cartoon")
@@ -559,7 +570,7 @@ ColumnLayout {
         }
     }
 
-    EffectsSection {
+    Widgets.FormSection {
         bodySpacing: VLCStyle.dp(10, VLCStyle.scale)
         bodyTopMargin: VLCStyle.dp(20, VLCStyle.scale)
 
@@ -576,7 +587,7 @@ ColumnLayout {
         }
     }
 
-    EffectsSection {
+    Widgets.FormSection {
         bodySpacing: VLCStyle.dp(10, VLCStyle.scale)
         bodyTopMargin: VLCStyle.dp(20, VLCStyle.scale)
 
@@ -588,37 +599,35 @@ ColumnLayout {
 
             FilterSwitch { label: qsTr("Show text"); module: "marq" }
 
-            EffectsRow {
+            Widgets.FormRow {
                 Layout.leftMargin: 0
                 minimumHeight: VLCStyle.dp(44, VLCStyle.scale)
                 label: qsTr("Text")
 
-                EffectsValueField {
-                    numeric: false
-                    text: root.opt("marq-marquee")
+                Widgets.FormTextField {
+                    value: root.opt("marq-marquee")
                     Accessible.name: qsTr("Overlay text")
-                    onEditingFinished: EffectsController.setOption("marq-marquee", text)
+                    onCommitted: (text) => EffectsController.setOption("marq-marquee", text)
                 }
             }
 
             FilterSwitch { label: qsTr("Show logo"); module: "logo" }
 
-            EffectsRow {
+            Widgets.FormRow {
                 Layout.leftMargin: 0
                 minimumHeight: VLCStyle.dp(44, VLCStyle.scale)
                 label: qsTr("Logo file")
 
-                EffectsValueField {
-                    numeric: false
-                    text: root.opt("logo-file")
+                Widgets.FormTextField {
+                    value: root.opt("logo-file")
                     Accessible.name: qsTr("Logo file")
-                    onEditingFinished: EffectsController.setOption("logo-file", text)
+                    onCommitted: (text) => EffectsController.setOption("logo-file", text)
                 }
             }
         }
     }
 
-    EffectsSection {
+    Widgets.FormSection {
         bodySpacing: VLCStyle.dp(10, VLCStyle.scale)
         bodyTopMargin: VLCStyle.dp(20, VLCStyle.scale)
 
@@ -628,11 +637,11 @@ ColumnLayout {
             store: root.expanded
             key: "advanced"
 
-            EffectsRow {
+            Widgets.FormRow {
                 Layout.leftMargin: 0
                 label: qsTr("Deinterlace")
 
-                EffectsComboBox {
+                Widgets.FormComboBox {
                     implicitWidth: VLCStyle.dp(160, VLCStyle.scale)
                     model: Player.deinterlace
                     textRole: "display"
@@ -641,11 +650,11 @@ ColumnLayout {
                 }
             }
 
-            EffectsRow {
+            Widgets.FormRow {
                 Layout.leftMargin: 0
                 label: qsTr("Mode")
 
-                EffectsComboBox {
+                Widgets.FormComboBox {
                     implicitWidth: VLCStyle.dp(160, VLCStyle.scale)
                     model: Player.deinterlaceMode
                     textRole: "display"
