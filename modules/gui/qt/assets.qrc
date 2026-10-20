@@ -116,6 +116,7 @@
         <file alias="videos-active.svg">pixmaps/icons/figma/videos-active.svg</file>
         <file alias="view-active.svg">pixmaps/icons/figma/view-active.svg</file>
         <file alias="vlc.svg">pixmaps/icons/figma/vlc.svg</file>
+        <file alias="volume-wedge.svg">pixmaps/icons/figma/volume-wedge.svg</file>
         <file alias="waveform-duo.svg">pixmaps/icons/figma/waveform-duo.svg</file>
         <file alias="window-duo.svg">pixmaps/icons/figma/window-duo.svg</file>
     </qresource>

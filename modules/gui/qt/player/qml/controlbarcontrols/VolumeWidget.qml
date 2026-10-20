@@ -254,7 +254,7 @@ T.Pane {
 
             handle: null
 
-            background: Canvas {
+            background: Item {
                 id: wedge
 
                 implicitWidth: volControl.implicitWidth
@@ -264,61 +264,36 @@ T.Pane {
 
                 readonly property color trackColor: theme.tokens.isDark ? theme.tokens.bgB2 : theme.tokens.bgA4
 
+                readonly property string _source: "qrc:///icons/figma/volume-wedge.svg"
+
                 opacity: _player.muted ? 0.5 : 1.0
 
-                onFillChanged: requestPaint()
-                onTrackColorChanged: requestPaint()
+                // the level is painted in the track color, so only the track shows
+                Image {
+                    anchors.fill: parent
 
-                // Paths of the wedge, in a 88 x 28 box.
-                onPaint: {
-                    const ctx = getContext("2d")
-                    ctx.reset()
-                    ctx.scale(width / 88, height / 28)
+                    sourceSize: Qt.size(width, height)
+                    source: SVGColorImage.colorize(wedge._source)
+                                         .color1(wedge.trackColor)
+                                         .any({ "url(#level)": wedge.trackColor })
+                                         .uri()
+                }
 
-                    ctx.beginPath()
-                    ctx.moveTo(3.6, 19.36)
-                    ctx.bezierCurveTo(1.55, 19.16, 0, 17.44, 0, 15.38)
-                    ctx.lineTo(0, 12.62)
-                    ctx.bezierCurveTo(0, 10.56, 1.55, 8.84, 3.6, 8.64)
-                    ctx.lineTo(84.7, 0.33)
-                    ctx.bezierCurveTo(86.47, 0.16, 88, 1.54, 88, 3.32)
-                    ctx.lineTo(88, 24.68)
-                    ctx.bezierCurveTo(88, 26.46, 86.47, 27.84, 84.7, 27.67)
-                    ctx.closePath()
-                    ctx.fillStyle = trackColor
-                    ctx.fill()
+                Item {
+                    width: wedge.fill * parent.width
+                    height: parent.height
 
-                    if (fill <= 0)
-                        return
+                    clip: true
 
-                    ctx.save()
-                    ctx.beginPath()
-                    ctx.rect(0, 0, fill * 88, 28)
-                    ctx.clip()
+                    Image {
+                        width: wedge.width
+                        height: wedge.height
 
-                    ctx.beginPath()
-                    ctx.moveTo(3.29, 17.69)
-                    ctx.bezierCurveTo(2.27, 17.58, 1.5, 16.72, 1.5, 15.7)
-                    ctx.lineTo(1.5, 12.3)
-                    ctx.bezierCurveTo(1.5, 11.28, 2.27, 10.42, 3.29, 10.31)
-                    ctx.lineTo(85.29, 1.73)
-                    ctx.bezierCurveTo(86.47, 1.61, 87.5, 2.53, 87.5, 3.72)
-                    ctx.lineTo(87.5, 24.28)
-                    ctx.bezierCurveTo(87.5, 25.47, 86.47, 26.39, 85.29, 26.27)
-                    ctx.closePath()
-
-                    const gradient = ctx.createLinearGradient(-2.5, 0, 87.5, 0)
-                    gradient.addColorStop(0, "#95d318")
-                    gradient.addColorStop(0.58, "#b2a918")
-                    gradient.addColorStop(0.79, "#d37918")
-                    gradient.addColorStop(1, "#ff3737")
-                    ctx.fillStyle = gradient
-                    ctx.fill()
-
-                    ctx.fillStyle = Qt.rgba(0, 0, 0, 0.2)
-                    ctx.fill()
-
-                    ctx.restore()
+                        sourceSize: Qt.size(width, height)
+                        source: SVGColorImage.colorize(wedge._source)
+                                             .color1(wedge.trackColor)
+                                             .uri()
+                    }
                 }
             }
 

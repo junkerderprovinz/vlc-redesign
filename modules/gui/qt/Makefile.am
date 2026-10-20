@@ -1108,6 +1108,7 @@ libqt_plugin_la_RES = \
 	pixmaps/icons/figma/volume-low.svg \
 	pixmaps/icons/figma/volume-medium.svg \
 	pixmaps/icons/figma/volume-none.svg \
+	pixmaps/icons/figma/volume-wedge.svg \
 	pixmaps/icons/figma/waveform-duo.svg \
 	pixmaps/icons/figma/window-duo.svg \
 	pixmaps/icons/figma/window.svg \
