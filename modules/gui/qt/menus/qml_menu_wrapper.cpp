@@ -29,6 +29,7 @@
 #include "dialogs/dialogs_provider.hpp"
 #include "util/colorizedsvgicon.hpp"
 #include "maininterface/navigationmodel.hpp"
+#include "menu_style.hpp"
 
 // Qt includes
 #include <QPainter>
@@ -39,11 +40,10 @@
 
 namespace
 {
-    // two-tone icon drawn in the text and accent colors
     QIcon libraryIcon(const QMenu *menu, const MainCtx *ctx, const QString &name)
     {
-        return ColorizedSvgIcon(QStringLiteral(":/icons/figma/%1.svg").arg(name),
-                                menu->palette().text().color(), ctx->accentColor());
+        return MenuStyle::icon(QStringLiteral(":/icons/figma/%1.svg").arg(name),
+                               menu->palette().text().color(), ctx->accentColor());
     }
 
     QIcon sortIcon(QWidget *widget, int order)
@@ -109,7 +109,7 @@ void StringListMenu::popup(const QPoint &point, const QVariantList &stringList)
         if (!icon.isEmpty())
         {
             assert(action);
-            action->setIcon(ColorizedSvgIcon(icon, m->palette().text().color(), m_ctx->accentColor()));
+            action->setIcon(MenuStyle::icon(icon, m->palette().text().color(), m_ctx->accentColor()));
         }
     }
 
@@ -852,7 +852,7 @@ void PlaylistListContextMenu::popup(const QModelIndexList & selected, QPoint pos
 
     if (ids.count() == 1)
     {
-        action = menu->addAction(qtr("Rename"));
+        action = menu->addAction(libraryIcon(menu, m_ctx, "edit"), qtr("Rename"));
 
         QModelIndex index = selected.first();
 
@@ -861,7 +861,7 @@ void PlaylistListContextMenu::popup(const QModelIndexList & selected, QPoint pos
         });
     }
 
-    action = menu->addAction(qtr("Delete"));
+    action = menu->addAction(libraryIcon(menu, m_ctx, "remove"), qtr("Delete"));
 
     connect(action, &QAction::triggered, this, &PlaylistListContextMenu::requestDeleteSelectedPlaylists);
 
@@ -896,7 +896,7 @@ void PlaylistMediaContextMenu::popup(const QModelIndexList & selected, QPoint po
         ml->addAndPlay(ids);
     });
 
-    action = menu->addAction(qtr("Play as Audio"));
+    action = menu->addAction(libraryIcon(menu, m_ctx, "audio-duo"), qtr("Play as Audio"));
 
     connect(action, &QAction::triggered, [ml, ids]() {
         ml->addAndPlay(ids, {":no-video"});
@@ -928,9 +928,7 @@ void PlaylistMediaContextMenu::popup(const QModelIndexList & selected, QPoint po
 
     menu->addSeparator();
 
-    action = menu->addAction(qtr("Remove from Playlist"));
-
-    action->setIcon(QIcon(":/menu/remove.svg"));
+    action = menu->addAction(libraryIcon(menu, m_ctx, "remove"), qtr("Remove from Playlist"));
 
     connect(action, &QAction::triggered, [this, selected]() {
         m_model->remove(selected);
@@ -980,9 +978,9 @@ void NetworkMediaContextMenu::popup(const QModelIndexList& selected, QPoint pos)
     if (canBeIndexed)
     {
         bool removeFromML = countIndexed > 0;
-        action = menu->addAction(removeFromML
-            ? qtr("Remove from Media Library")
-            : qtr("Add to Media Library"));
+        action = menu->addAction(libraryIcon(menu, m_ctx, removeFromML ? "remove" : "add"),
+                                 removeFromML ? qtr("Remove from Media Library")
+                                              : qtr("Add to Media Library"));
 
         connect(action, &QAction::triggered, [this, selected, removeFromML]( ) {
             for (const QModelIndex& idx : selected) {

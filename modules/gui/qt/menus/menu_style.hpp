@@ -46,6 +46,12 @@ public:
     using QProxyStyle::polish;
     using QProxyStyle::unpolish;
 
+    /**
+     * Icon of a menu entry: two-tone icons are drawn in @a text and @a accent,
+     * single color icons in @a text.
+     */
+    static QIcon icon(const QString &file, const QColor &text, const QColor &accent);
+
     int pixelMetric(PixelMetric metric, const QStyleOption *option = nullptr,
                     const QWidget *widget = nullptr) const override;
     int styleHint(StyleHint hint, const QStyleOption *option = nullptr,

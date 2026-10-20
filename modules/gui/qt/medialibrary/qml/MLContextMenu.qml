@@ -59,10 +59,12 @@ NativeMenu {
             "action": addAndPlay
         }, {
             "text": qsTr("Play as Audio"),
+            "icon": ":/icons/figma/audio-duo.svg",
             "action": playAsAudio,
             "visible": root.showPlayAsAudioAction
         }, {
             "text": qsTr("Play as Album"),
+            "icon": ":/icons/figma/album.svg",
             "action": playAsAlbum,
             "visible": root.showPlayAsAlbumAction &&
                        (root.model instanceof MLAudioModel)
@@ -102,6 +104,7 @@ NativeMenu {
             "action": enqueue
         }, {
             "text": qsTr("Add Album to Queue"),
+            "icon": ":/icons/figma/queue-duo.svg",
             "action": enqueueAsAlbum,
             "visible": root.showPlayAsAlbumAction &&
                        (root.model instanceof MLAudioModel)
@@ -111,6 +114,7 @@ NativeMenu {
             "action": addToAPlaylist
         }, {
             "text": (root.showPlayAsAudioAction ? qsTr("Add to Video Playlist") : qsTr("Add to Audio Playlist")),
+            "icon": (root.showPlayAsAudioAction ? ":/icons/figma/video-duo.svg" : ":/icons/figma/audio-duo.svg"),
             "action": (root.showPlayAsAudioAction ? root.addToVideoOnlyPlaylist : root.addToAudioOnlyPlaylist)
         }, {
             "text": qsTr("Show in File Explorer"),
@@ -119,6 +123,7 @@ NativeMenu {
             "visible": _openContainingFolder
         }, {
             "text": qsTr("Info"),
+            "icon": ":/icons/figma/window-duo.svg",
             "action": _signalShowInformation,
             "visible": showInformationAvailable
         }, {
@@ -133,10 +138,12 @@ NativeMenu {
             }
         }, {
             "text": qsTr("Delete"),
+            "icon": ":/icons/figma/remove.svg",
             "action": deleteStream,
             "visible": _deleteStream
         }, {
             "text": qsTr("Delete File From System"),
+            "icon": ":/icons/figma/remove.svg",
             "action": deleteFileFromSource,
             "visible": _deleteFileFromSource
         }

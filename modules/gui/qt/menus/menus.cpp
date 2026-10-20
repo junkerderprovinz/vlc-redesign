@@ -37,6 +37,7 @@
 #include <vlc_actions.h>
 
 #include "menus.hpp"
+#include "menu_style.hpp"
 
 #include "maininterface/mainctx.hpp"                     /* View modifications */
 #include "maininterface/mainctx_submodels.hpp"
@@ -171,8 +172,8 @@ static QIcon entryIcon( qt_intf_t *p_intf, const QMenu *menu, const char *name,
     return QIcon();
 #else
     if( p_intf->p_mi )
-        return ColorizedSvgIcon( QStringLiteral( ":/icons/figma/%1.svg" ).arg( QLatin1String( name ) ),
-                                 menu->palette().text().color(), p_intf->p_mi->accentColor() );
+        return MenuStyle::icon( QStringLiteral( ":/icons/figma/%1.svg" ).arg( QLatin1String( name ) ),
+                                menu->palette().text().color(), p_intf->p_mi->accentColor() );
     if( !EMPTY_STR( legacyIcon ) )
         return ColorizedSvgIcon::colorizedIconForWidget( legacyIcon, menu );
     return QIcon();
@@ -889,7 +890,7 @@ void VLCMenuBar::AppMenu( qt_intf_t *p_intf, QMenu *menu )
         }
         profileMenu->addSeparator();
         addDPStaticEntry( profileMenu, qtr( "New" ), "", &DialogsProvider::showToolbarEditorDialog )
-            ->setIcon( ColorizedSvgIcon::colorizedIconForWidget( ":/menu/add.svg", profileMenu ) );
+            ->setIcon( entryIcon( p_intf, profileMenu, "add", ":/menu/add.svg" ) );
         action = menu->addMenu( profileMenu );
         action->setIcon( entryIcon( p_intf, menu, "profile-duo" ) );
     }

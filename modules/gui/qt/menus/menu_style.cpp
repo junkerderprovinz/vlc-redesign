@@ -25,6 +25,7 @@
 #include "maininterface/mainctx.hpp"
 #include "style/systempalette.hpp"
 #include "util/color_scheme_model.hpp"
+#include "util/colorizedsvgicon.hpp"
 
 #include <QApplication>
 #include <QEvent>
@@ -91,6 +92,15 @@ void drawChevron(QPainter *painter, const QRect &box, const QColor &color)
     strokeInBox(painter, box, path, color, 1.5);
 }
 
+}
+
+QIcon MenuStyle::icon(const QString &file, const QColor &text, const QColor &accent)
+{
+    /* single color icons have no color key, they inherit a fill set on the root element */
+    static const QString root = QStringLiteral("xmlns=\"http://www.w3.org/2000/svg\">");
+    return ColorizedSvgIcon(file, text, accent, {},
+                            { { root, QStringLiteral("xmlns=\"http://www.w3.org/2000/svg\" fill=\"%1\">")
+                                          .arg(text.name(QColor::HexRgb)) } });
 }
 
 MenuStyle::MenuStyle(MainCtx *ctx, QObject *parent)
@@ -245,8 +255,9 @@ QSize MenuStyle::sizeFromContents(ContentsType type, const QStyleOption *option,
     if (item->menuItemType == QStyleOptionMenuItem::Separator)
         return QSize(size.width(), dp(1));
 
+    const bool iconColumn = item->maxIconWidth > 0;
     int width = 2 * dp(ROW_PADDING) + size.width();
-    if (item->maxIconWidth > 0 || item->menuHasCheckableItems)
+    if (iconColumn)
         width += dp(ICON_SIZE) + dp(SPACING);
 
     const qsizetype tab = item->text.indexOf(QLatin1Char('\t'));
@@ -259,7 +270,7 @@ QSize MenuStyle::sizeFromContents(ContentsType type, const QStyleOption *option,
     }
     if (item->menuItemType == QStyleOptionMenuItem::SubMenu)
         width += dp(SPACING) + dp(ICON_SIZE);
-    if (!item->icon.isNull() && item->checkType != QStyleOptionMenuItem::NotCheckable)
+    if (item->checkType != QStyleOptionMenuItem::NotCheckable && (!item->icon.isNull() || !iconColumn))
         width += dp(SPACING) + dp(ICON_SIZE);
 
     return QSize(std::max(width, dp(PANEL_WIDTH) - 2 * dp(PANEL_MARGIN)), dp(ROW_HEIGHT));
@@ -327,10 +338,12 @@ void MenuStyle::drawControl(ControlElement element, const QStyleOption *option,
     const int iconSize = dp(ICON_SIZE);
     const int iconTop = rect.top() + (rect.height() - iconSize) / 2;
     const bool checkable = item->checkType != QStyleOptionMenuItem::NotCheckable;
+    /* the check mark takes the icon column, or the trailing edge when the menu has no icons */
+    const bool iconColumn = item->maxIconWidth > 0;
     int left = rect.left() + dp(ROW_PADDING);
     int right = rect.right() + 1 - dp(ROW_PADDING);
 
-    if (item->maxIconWidth > 0 || item->menuHasCheckableItems)
+    if (iconColumn)
     {
         const QRect slot(left, iconTop, iconSize, iconSize);
         if (!item->icon.isNull())
@@ -349,7 +362,7 @@ void MenuStyle::drawControl(ControlElement element, const QStyleOption *option,
         drawChevron(painter, QRect(right - iconSize, iconTop, iconSize, iconSize), textColor);
         right -= iconSize + dp(SPACING);
     }
-    else if (!item->icon.isNull() && checkable && item->checked)
+    else if (checkable && item->checked && (!item->icon.isNull() || !iconColumn))
     {
         drawCheck(painter, QRect(right - iconSize, iconTop, iconSize, iconSize), accent);
         right -= iconSize + dp(SPACING);

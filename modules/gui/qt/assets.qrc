@@ -119,6 +119,11 @@
         <file alias="volume-wedge.svg">pixmaps/icons/figma/volume-wedge.svg</file>
         <file alias="waveform-duo.svg">pixmaps/icons/figma/waveform-duo.svg</file>
         <file alias="window-duo.svg">pixmaps/icons/figma/window-duo.svg</file>
+        <file alias="add.svg">pixmaps/icons/figma/add.svg</file>
+        <file alias="album.svg">pixmaps/icons/figma/album.svg</file>
+        <file alias="edit.svg">pixmaps/icons/figma/edit.svg</file>
+        <file alias="more.svg">pixmaps/icons/figma/more.svg</file>
+        <file alias="remove.svg">pixmaps/icons/figma/remove.svg</file>
     </qresource>
     <qresource prefix="/menu">
         <file alias="add.svg">pixmaps/menu/add.svg</file>
