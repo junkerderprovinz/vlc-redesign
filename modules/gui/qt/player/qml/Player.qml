@@ -56,6 +56,11 @@ FocusScope {
                                         &&
                                         (MainCtx.intfMainWindow.visibility !== Window.FullScreen))
 
+    // In the light theme the video spans the whole player, under the translucent
+    // bars and library panel.
+    readonly property bool _videoUnderChrome: MainCtx.hasEmbededVideo && !windowTheme.tokens.isDark
+    readonly property bool _videoBetweenBars: MainCtx.hasEmbededVideo && _controlsUnderVideo && !_videoUnderChrome
+
     property bool _keyPressed: false
 
     // Settings
@@ -179,8 +184,8 @@ FocusScope {
         anchors {
             left: parent.left
             right: parent.right
-            top: (MainCtx.hasEmbededVideo && rootPlayer._controlsUnderVideo) ? topBar.bottom : parent.top
-            bottom: (MainCtx.hasEmbededVideo && rootPlayer._controlsUnderVideo) ? controlBar.top : parent.bottom
+            top: rootPlayer._videoBetweenBars ? topBar.bottom : parent.top
+            bottom: rootPlayer._videoBetweenBars ? controlBar.top : parent.bottom
         }
 
         sourceComponent: MainCtx.hasEmbededVideo ? videoComponent : audioComponent
@@ -912,6 +917,7 @@ FocusScope {
         // The controls stay visible while the library is open.
         onLoaded: {
             item.maximumWidth = Qt.binding(() => rootPlayer.width / 2)
+            item.overVideo = Qt.binding(() => rootPlayer._videoUnderChrome)
             rootPlayer.lockUnlockAutoHide(true)
         }
 
@@ -924,7 +930,7 @@ FocusScope {
     Binding {
         target: playerSpecializationLoader
         property: "anchors.leftMargin"
-        value: libraryPanelLoader.active ? libraryPanelLoader.width : 0
+        value: (libraryPanelLoader.active && !rootPlayer._videoUnderChrome) ? libraryPanelLoader.width : 0
     }
 
     TopBar {
@@ -949,7 +955,7 @@ FocusScope {
         title: Player.title
 
         pinControls: MainCtx.pinVideoControls
-        overVideo: MainCtx.hasEmbededVideo && !rootPlayer._controlsUnderVideo
+        overVideo: MainCtx.hasEmbededVideo && !rootPlayer._videoBetweenBars
 
         showCSD: MainCtx.clientSideDecoration && (MainCtx.intfMainWindow.visibility !== Window.FullScreen)
         showToolbar: MainCtx.hasToolbarMenu && (MainCtx.intfMainWindow.visibility !== Window.FullScreen)

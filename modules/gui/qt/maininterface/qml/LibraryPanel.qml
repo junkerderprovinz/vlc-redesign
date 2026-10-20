@@ -34,6 +34,9 @@ FocusScope {
 
     property real maximumWidth: Number.MAX_VALUE
 
+    // The video shows through the panel.
+    property bool overVideo: false
+
     readonly property real panelWidth: Math.round(Helpers.clamp(MainCtx.libraryPanel.width,
                                                                 VLCStyle.dp(330, VLCStyle.scale),
                                                                 Math.max(VLCStyle.dp(330, VLCStyle.scale),
@@ -85,6 +88,10 @@ FocusScope {
         compact: true
         card: false
 
+        background: Rectangle {
+            color: root.overVideo ? rail.colorContext.tokens.bgA3Glass : rail.colorContext.bg.secondary
+        }
+
         pageLoader: stackView
 
         Navigation.parentItem: root
@@ -98,7 +105,7 @@ FocusScope {
 
         width: root.panelWidth
 
-        color: theme.bg.primary
+        color: root.overVideo ? theme.tokens.bgB1Glass : theme.bg.primary
         clip: true
 
         Widgets.PageLoader {

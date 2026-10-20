@@ -272,7 +272,8 @@ T.Page {
         }
 
         background: Rectangle {
-            color: theme.bg.primary
+            // Beside the player, the library panel draws the background.
+            color: MainCtx.playerView ? "transparent" : theme.bg.primary
 
             Rectangle {
                 anchors.left: parent.left
