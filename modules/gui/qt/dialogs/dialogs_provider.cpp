@@ -56,7 +56,6 @@
 #include "dialogs/plugins/plugins.hpp"
 #include "dialogs/epg/epg.hpp"
 #include "dialogs/playlists/playlists.hpp"
-#include "dialogs/firstrun/firstrunwizard.hpp"
 
 #include <vlc_url.h>
 
@@ -76,7 +75,6 @@
 #define BASE_DIALOG(X) \
     X(prefsDialog) \
     X(openDialog) \
-    X(firstRunDialog) \
     X(extendedDialog) \
     X(messagesDialog) \
     X(gotoTimeDialog) \
@@ -329,9 +327,20 @@ void DialogsProvider::advancedPrefsDialog()
 
 void DialogsProvider::firstRunDialog()
 {
-    ensureDialog(m_firstRunDialog);
-    QVLCDialog::setWindowTransientParent(m_firstRunDialog.get(), nullptr, p_intf);
-    m_firstRunDialog->show();
+    setFirstRunDialogVisible(true);
+}
+
+bool DialogsProvider::firstRunDialogVisible() const
+{
+    return m_firstRunDialogVisible;
+}
+
+void DialogsProvider::setFirstRunDialogVisible(bool visible)
+{
+    if (m_firstRunDialogVisible == visible)
+        return;
+    m_firstRunDialogVisible = visible;
+    emit firstRunDialogVisibleChanged();
 }
 
 void DialogsProvider::extendedDialog()

@@ -57,7 +57,6 @@ libqt_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) $(CPPFLAGS_qt) \
 	-I$(srcdir) -I$(builddir) \
 	-I$(builddir)/dialogs/extended \
 	-I$(builddir)/dialogs/fingerprint \
-	-I$(builddir)/dialogs/firstrun \
 	-I$(builddir)/dialogs/help \
 	-I$(builddir)/dialogs/messages \
 	-I$(builddir)/dialogs/open \
@@ -127,7 +126,7 @@ libqt_plugin_la_SOURCES = \
 	dialogs/fingerprint/chromaprint.hpp \
 	dialogs/fingerprint/fingerprintdialog.cpp \
 	dialogs/fingerprint/fingerprintdialog.hpp \
-	dialogs/firstrun/firstrunwizard.cpp dialogs/firstrun/firstrunwizard.hpp \
+	dialogs/firstrun/firstruncontroller.cpp dialogs/firstrun/firstruncontroller.hpp \
 	dialogs/gototime/gototime.cpp dialogs/gototime/gototime.hpp \
 	dialogs/help/aboutmodel.hpp \
 	dialogs/help/help.cpp dialogs/help/help.hpp \
@@ -423,7 +422,7 @@ nodist_libqt_plugin_la_SOURCES = \
 	dialogs/extensions/extensions_manager.moc.cpp \
 	dialogs/fingerprint/chromaprint.moc.cpp \
 	dialogs/fingerprint/fingerprintdialog.moc.cpp \
-	dialogs/firstrun/firstrunwizard.moc.cpp \
+	dialogs/firstrun/firstruncontroller.moc.cpp \
 	dialogs/gototime/gototime.moc.cpp \
 	dialogs/help/aboutmodel.moc.cpp \
 	dialogs/help/help.moc.cpp \
@@ -553,7 +552,6 @@ nodist_libqt_plugin_la_SOURCES += \
 	dialogs/extended/ui_equalizer.h \
 	dialogs/extended/ui_video_effects.h \
 	dialogs/fingerprint/ui_fingerprintdialog.h \
-	dialogs/firstrun/ui_firstrunwizard.h \
 	dialogs/help/ui_about.h \
 	dialogs/help/ui_update.h \
 	dialogs/messages/ui_messages_panel.h \
@@ -767,7 +765,6 @@ libqt_plugin_la_UI = \
 	dialogs/extended/equalizer.ui \
 	dialogs/extended/video_effects.ui \
 	dialogs/fingerprint/fingerprintdialog.ui \
-	dialogs/firstrun/firstrunwizard.ui \
 	dialogs/help/about.ui \
 	dialogs/help/update.ui \
 	dialogs/messages/messages_panel.ui \
@@ -1269,6 +1266,12 @@ libqml_module_dialogs_a_QML = \
 	dialogs/extended/qml/PlayerSettingsPlayback.qml \
 	dialogs/extended/qml/PlayerSettingsSubtitles.qml \
 	dialogs/extended/qml/PlayerSettingsVideo.qml \
+	dialogs/firstrun/qml/FirstRunAppearance.qml \
+	dialogs/firstrun/qml/FirstRunDialog.qml \
+	dialogs/firstrun/qml/FirstRunPreview.qml \
+	dialogs/firstrun/qml/FirstRunPrivacy.qml \
+	dialogs/firstrun/qml/FirstRunShortcuts.qml \
+	dialogs/firstrun/qml/FirstRunWelcome.qml \
 	dialogs/toolbar/qml/EditorDNDDelegate.qml \
 	dialogs/toolbar/qml/EditorDNDView.qml\
 	dialogs/toolbar/qml/EditorDummyButton.qml \

@@ -595,6 +595,20 @@ Item {
     }
 
     Loader {
+        active: DialogsProvider.firstRunDialogVisible
+
+        sourceComponent: FirstRunDialog {
+            rootWindow: root.bgContent
+            onAboutToHide: root.restoreFocus()
+        }
+
+        onLoaded: {
+            item.parent = T.Overlay.overlay
+            item.open()
+        }
+    }
+
+    Loader {
         id: toolbarEditorDialogLoader
         active: false
         source: "qrc:///qt/qml/VLC/Dialogs/ToolbarEditorDialog.qml"

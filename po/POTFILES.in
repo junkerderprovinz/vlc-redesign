@@ -689,8 +689,12 @@ modules/gui/qt/dialogs/fingerprint/chromaprint.cpp
 modules/gui/qt/dialogs/fingerprint/chromaprint.hpp
 modules/gui/qt/dialogs/fingerprint/fingerprintdialog.cpp
 modules/gui/qt/dialogs/fingerprint/fingerprintdialog.hpp
-modules/gui/qt/dialogs/firstrun/firstrunwizard.cpp
-modules/gui/qt/dialogs/firstrun/firstrunwizard.hpp
+modules/gui/qt/dialogs/firstrun/firstruncontroller.cpp
+modules/gui/qt/dialogs/firstrun/qml/FirstRunAppearance.qml
+modules/gui/qt/dialogs/firstrun/qml/FirstRunDialog.qml
+modules/gui/qt/dialogs/firstrun/qml/FirstRunPrivacy.qml
+modules/gui/qt/dialogs/firstrun/qml/FirstRunShortcuts.qml
+modules/gui/qt/dialogs/firstrun/qml/FirstRunWelcome.qml
 modules/gui/qt/dialogs/gototime/gototime.cpp
 modules/gui/qt/dialogs/gototime/gototime.hpp
 modules/gui/qt/dialogs/help/help.cpp
