@@ -44,6 +44,9 @@ T.Pane {
 
     readonly property bool showsVideo: MainCtx.hasEmbededVideo && MainCtx.canShowVideoPIP
 
+    // The play queue opens inside the card, above the video.
+    property bool queueVisible: false
+
     readonly property string _folder: {
         const text = Player.url.toString()
         if (!text.startsWith("file://"))
@@ -135,6 +138,71 @@ T.Pane {
             anchors.margins: VLCStyle.dp(8, VLCStyle.scale)
 
             spacing: VLCStyle.dp(20, VLCStyle.scale)
+
+            ColumnLayout {
+                Layout.fillWidth: true
+                Layout.topMargin: -content.anchors.margins
+                Layout.leftMargin: -content.anchors.margins
+                Layout.rightMargin: -content.anchors.margins
+                Layout.preferredHeight: VLCStyle.dp(339, VLCStyle.scale)
+
+                visible: root.queueVisible
+
+                spacing: VLCStyle.dp(1, VLCStyle.scale)
+
+                Rectangle {
+                    Layout.fillWidth: true
+                    Layout.preferredHeight: VLCStyle.dp(58, VLCStyle.scale)
+
+                    radius: VLCStyle.dp(14, VLCStyle.scale)
+                    color: theme.tokens.bgA5
+
+                    // square off the bottom corners
+                    Rectangle {
+                        anchors.left: parent.left
+                        anchors.right: parent.right
+                        anchors.bottom: parent.bottom
+
+                        height: parent.radius
+                        color: parent.color
+                    }
+
+                    T.Label {
+                        anchors.left: parent.left
+                        anchors.right: parent.right
+                        anchors.top: parent.top
+                        anchors.topMargin: VLCStyle.dp(16, VLCStyle.scale)
+
+                        text: qsTr("Play Queue")
+                        color: theme.tokens.fgA2
+                        font.pixelSize: VLCStyle.fontSize_large
+                        horizontalAlignment: Text.AlignHCenter
+                        elide: Text.ElideRight
+                    }
+                }
+
+                Loader {
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    Layout.leftMargin: content.anchors.margins
+                    Layout.rightMargin: content.anchors.margins
+
+                    active: root.queueVisible
+
+                    sourceComponent: PlaylistPane {
+                        useAcrylic: false
+                        wheelEnabled: true
+
+                        topPadding: 0
+                        bottomPadding: 0
+
+                        background: null
+
+                        Navigation.parentItem: root
+                        Navigation.downItem: playButton
+                    }
+                }
+            }
 
             ColumnLayout {
                 Layout.fillWidth: true
@@ -371,9 +439,12 @@ T.Pane {
                         text: VLCIcons.lists
                         description: qsTr("Play Queue")
 
-                        checked: MainCtx.playqueuePanel.visible
+                        // Clicking keeps the focus where it is, so the overlay hides with the pointer.
+                        focusPolicy: Qt.TabFocus
 
-                        onClicked: MainCtx.playqueuePanel.visible = !MainCtx.playqueuePanel.visible
+                        checked: root.queueVisible
+
+                        onClicked: root.queueVisible = !root.queueVisible
 
                         Navigation.parentItem: root
                         Navigation.upItem: progress
