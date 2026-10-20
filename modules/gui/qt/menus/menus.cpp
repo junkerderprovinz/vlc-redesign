@@ -855,7 +855,7 @@ void VLCMenuBar::PlaylistMenu( qt_intf_t *p_intf, QMenu *menu )
 
 /**
  * Application menu of the title bar: the open entries and the dialogs of the
- * interface first, then every classic menu
+ * interface, then the classic menus in one submenu
  **/
 void VLCMenuBar::AppMenu( qt_intf_t *p_intf, QMenu *menu )
 {
@@ -906,14 +906,19 @@ void VLCMenuBar::AppMenu( qt_intf_t *p_intf, QMenu *menu )
 
     menu->addSeparator();
 
-    FileMenu( p_intf, menu->addMenu( qtr( "&Media" ) ) );
-    NavigMenu( p_intf, menu->addMenu( qtr( "P&layback" ) ) );
-    AudioMenu( p_intf, menu->addMenu( qtr( "&Audio" ) ) );
-    VideoMenu( p_intf, menu->addMenu( qtr( "&Video" ) ) );
-    SubtitleMenu( p_intf, menu->addMenu( qtr( "Subti&tle" ) ) );
-    ToolsMenu( p_intf, menu->addMenu( qtr( "Tool&s" ) ) );
-    ViewMenu( p_intf, menu->addMenu( qtr( "V&iew" ) ) );
-    HelpMenu( p_intf, menu->addMenu( qtr( "&Help" ) ) );
+    QMenu *more = new QMenu( qtr( "More" ), menu );
+    FileMenu( p_intf, more->addMenu( qtr( "&Media" ) ) );
+    NavigMenu( p_intf, more->addMenu( qtr( "P&layback" ) ) );
+    AudioMenu( p_intf, more->addMenu( qtr( "&Audio" ) ) );
+    VideoMenu( p_intf, more->addMenu( qtr( "&Video" ) ) );
+    SubtitleMenu( p_intf, more->addMenu( qtr( "Subti&tle" ) ) );
+    ToolsMenu( p_intf, more->addMenu( qtr( "Tool&s" ) ) );
+    ViewMenu( p_intf, more->addMenu( qtr( "V&iew" ) ) );
+    HelpMenu( p_intf, more->addMenu( qtr( "&Help" ) ) );
+    action = menu->addMenu( more );
+    action->setIcon( entryIcon( p_intf, menu, "more" ) );
+
+    menu->setMinimumWidth( qRound( 375 * mi->getIntfUserScaleFactor() ) );
 }
 
 /* Video Tracks and Subtitles tracks */
@@ -1020,8 +1025,6 @@ QMenu* VLCMenuBar::PopupMenu( qt_intf_t *p_intf, bool show )
                 ->setIcon( entryIcon( p_intf, menu, "playback-settings-active" ) );
     }
 
-    menu->addSeparator();
-
     if( !p_intf->b_isDialogProvider )
     {
         QMenu* settingsMenu = new QMenu( qtr( "More Settings" ), menu );
@@ -1050,6 +1053,8 @@ QMenu* VLCMenuBar::PopupMenu( qt_intf_t *p_intf, bool show )
             menu->popup( QCursor::pos() );
         return menu;
     }
+
+    menu->addSeparator();
 
     /* skins: same as Tool menu but with extra entries */
     {
