@@ -100,9 +100,6 @@ T.Pane {
             menu.close()
     }
 
-    // the colour context has no palette until it is attached
-    readonly property var _tokens: theme.palette ?? VLCStyle.palette
-
     readonly property ColorContext colorContext: ColorContext {
         id: theme
         colorSet: ColorContext.Window
@@ -122,7 +119,7 @@ T.Pane {
     }
 
     background: Rectangle {
-        color: _tokens.bgA3Glass
+        color: theme.tokens.bgA3Glass
 
         Rectangle {
             anchors.left: parent.left
@@ -130,7 +127,7 @@ T.Pane {
             anchors.top: parent.top
 
             height: VLCStyle.dp(1, VLCStyle.scale)
-            color: _tokens.dividerDim
+            color: theme.separator
         }
     }
 

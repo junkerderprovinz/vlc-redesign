@@ -37,7 +37,7 @@ T.ProgressBar {
 
     property bool _isSeekPointsShown: true
 
-    property color backgroundColor: _tokens.bgB2
+    property color backgroundColor: theme.tokens.bgB2
     property real touchHandlerMargin: VLCStyle.touchHandlerMargin
 
     readonly property real _inset: VLCStyle.dp(2, VLCStyle.scale)
@@ -59,9 +59,6 @@ T.ProgressBar {
     function _positionAt(x) {
         return (x - _inset - _handleWidth / 2) / _range
     }
-
-    // the colour context has no palette until it is attached
-    readonly property var _tokens: theme.palette ?? VLCStyle.palette
 
     readonly property ColorContext colorContext: ColorContext {
         id: theme
@@ -343,7 +340,7 @@ T.ProgressBar {
 
             visible: !control.waveform
             radius: VLCStyle.dp(4, VLCStyle.scale)
-            color: _tokens.bgAccentBright
+            color: theme.tokens.bgAccentBright
 
             // We use dynamic mutability group because time interpolation
             // may induce rapid change:
@@ -413,7 +410,7 @@ T.ProgressBar {
                 }
 
                 Bars {
-                    barColor: _tokens.fgA4
+                    barColor: theme.tokens.fgA4
                 }
 
                 Item {
@@ -422,7 +419,7 @@ T.ProgressBar {
                     clip: true
 
                     Bars {
-                        barColor: _tokens.accentDim
+                        barColor: theme.tokens.accentDim
                     }
                 }
             }
@@ -578,7 +575,7 @@ T.ProgressBar {
             color: theme.accent
 
             border.width: control.visualFocus ? VLCStyle.dp(1, VLCStyle.scale) : 0
-            border.color: _tokens.fg1
+            border.color: theme.tokens.fg1
 
             // We use dynamic mutability group because time interpolation
             // may induce rapid change:

@@ -116,8 +116,6 @@ FocusScope {
         History.previous()
     }
 
-    readonly property var _tokens: windowTheme.palette ?? VLCStyle.palette
-
     //we draw both the view and the window here
     ColorContext {
         id: windowTheme
@@ -258,7 +256,7 @@ FocusScope {
 
                 // The video sits in a rounded frame of the window colour, except between
                 // the bars of the light theme, where it fills the space.
-                readonly property bool framed: !rootPlayer._controlsUnderVideo || windowTheme.palette.isDark
+                readonly property bool framed: !rootPlayer._controlsUnderVideo || windowTheme.tokens.isDark
                 readonly property real frameWidth: framed ? VLCStyle.dp(10, VLCStyle.scale) : 0
 
                 VideoSurface {
@@ -374,7 +372,7 @@ FocusScope {
                     source: textureProviderIndirection
 
                     postprocess: true
-                    tint: bgtheme.palette.isDark ? "black" : "white"
+                    tint: bgtheme.tokens.isDark ? "black" : "white"
                     tintStrength: 0.5
                     backgroundColor: bgtheme.bg.primary
 
@@ -675,7 +673,7 @@ FocusScope {
                             font.weight: Font.Medium
                             elide: Text.ElideRight
                             horizontalAlignment: Text.AlignHCenter
-                            color: rootPlayer._tokens.fgA1
+                            color: windowTheme.tokens.fgA1
                             Accessible.description: qsTr("title")
 
                             property bool componentCompleted: false

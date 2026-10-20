@@ -65,8 +65,6 @@ FocusScope {
     property bool showFolder: folderName !== ""
     property string folderName: _location
 
-    readonly property var _tokens: theme.palette ?? VLCStyle.palette
-
     readonly property ColorContext colorContext: ColorContext {
         id: theme
         colorSet: ColorContext.Window
@@ -119,7 +117,7 @@ FocusScope {
     Rectangle {
         anchors.fill: parent
 
-        color: root.overVideo ? root._tokens.bgA3Glass : theme.bg.primary
+        color: root.overVideo ? theme.tokens.bgA3Glass : theme.bg.primary
     }
 
     //drag and dbl click the titlebar in CSD mode
@@ -292,7 +290,7 @@ FocusScope {
                 background: Rectangle {
                     radius: VLCStyle.dp(6, VLCStyle.scale)
                     color: (locationButton.hovered || locationButton.visualFocus)
-                           ? Qt.alpha(root._tokens.fg1, 0.06) : "transparent"
+                           ? theme.tokens.hover : "transparent"
                 }
 
                 contentItem: RowLayout {
@@ -302,7 +300,7 @@ FocusScope {
                         Layout.preferredWidth: VLCStyle.dp(28, VLCStyle.scale)
 
                         text: VLCIcons.folder
-                        color: root._tokens.fgA2
+                        color: theme.tokens.fgA2
                         font.pixelSize: VLCStyle.icon_normal
                         horizontalAlignment: Text.AlignHCenter
                     }
@@ -311,7 +309,7 @@ FocusScope {
                         Layout.fillWidth: true
 
                         text: locationButton.text
-                        color: root._tokens.fgA2
+                        color: theme.tokens.fgA2
                         font.pixelSize: VLCStyle.fontSize_large
                         elide: Text.ElideRight
                     }
@@ -334,7 +332,7 @@ FocusScope {
         visible: !root.showToolbar
 
         text: root.title !== "" ? root.title : qsTr("VLC Media Player")
-        color: root._tokens.fgA2
+        color: theme.tokens.fgA2
         font.pixelSize: VLCStyle.fontSize_large
         elide: Text.ElideRight
         verticalAlignment: Text.AlignVCenter

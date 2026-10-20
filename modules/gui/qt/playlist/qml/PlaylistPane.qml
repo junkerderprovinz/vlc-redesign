@@ -66,8 +66,6 @@ T.Pane {
     Accessible.name: qsTr("Play Queue")
     AccessibleCompat.id: "playqueuePane"
 
-    readonly property var _tokens: theme.palette ?? VLCStyle.palette
-
     readonly property ColorContext colorContext: ColorContext {
         id: theme
         colorSet: ColorContext.View
@@ -143,7 +141,7 @@ T.Pane {
                 Layout.fillWidth: true
                 Layout.minimumWidth: Math.min(implicitWidth, VLCStyle.dp(160, VLCStyle.scale))
 
-                color: root._tokens.fgA3
+                color: theme.tokens.fgA3
                 font.pixelSize: VLCStyle.fontSize_large
                 elide: Text.ElideRight
 

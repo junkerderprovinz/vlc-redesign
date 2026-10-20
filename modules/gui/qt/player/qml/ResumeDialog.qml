@@ -81,8 +81,6 @@ T.Pane {
         }
     }
 
-    readonly property var _tokens: theme.palette ?? VLCStyle.palette
-
     readonly property ColorContext colorContext: ColorContext {
         id: theme
         colorSet: ColorContext.Window
@@ -100,11 +98,11 @@ T.Pane {
 
     background: Rectangle {
         radius: VLCStyle.dp(16, VLCStyle.scale)
-        color: resumePanel._tokens.bgA3Glass
+        color: theme.tokens.bgA3Glass
 
         Widgets.RoundedRectangleShadow {
             z: -1
-            color: Qt.rgba(0, 0, 0, resumePanel._tokens.isDark ? 0.46 : 0.18)
+            color: theme.shadow
             yOffset: VLCStyle.dp(8, VLCStyle.scale)
             blurRadius: VLCStyle.dp(15, VLCStyle.scale)
         }
@@ -118,7 +116,7 @@ T.Pane {
 
             Layout.fillWidth: true
 
-            color: resumePanel._tokens.fg2
+            color: theme.tokens.fg2
             font.pixelSize: VLCStyle.fontSize_xlarge
             elide: Text.ElideRight
 
@@ -181,7 +179,7 @@ T.Pane {
                 implicitHeight: VLCStyle.dp(32, VLCStyle.scale)
 
                 radius: VLCStyle.dp(6, VLCStyle.scale)
-                backgroundColor: resumePanel._tokens.bgA1
+                backgroundColor: theme.tokens.bgA1
 
                 text: VLCIcons.close
                 description: qsTr("Dismiss")

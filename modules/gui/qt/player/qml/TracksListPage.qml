@@ -38,9 +38,6 @@ FocusScope {
 
     focus: true
 
-    // the colour context has no palette until it is attached
-    readonly property var _tokens: theme.palette ?? VLCStyle.palette
-
     readonly property ColorContext colorContext: ColorContext {
         id: theme
 
@@ -124,7 +121,7 @@ FocusScope {
                 visible: root.tab === TracksMenu.Tab.Audio
 
                 implicitHeight: VLCStyle.dp(1, VLCStyle.scale)
-                color: root._tokens.dividerDim
+                color: theme.separator
             }
 
             Section {
@@ -213,7 +210,7 @@ FocusScope {
             Layout.fillWidth: true
 
             text: section.title
-            color: root._tokens.fgA3
+            color: theme.tokens.fgA3
             font.pixelSize: VLCStyle.fontSize_large
             elide: Text.ElideRight
         }
@@ -308,7 +305,7 @@ FocusScope {
 
         background: Rectangle {
             radius: VLCStyle.dp(6, VLCStyle.scale)
-            color: (choice.hovered || choice.visualFocus) ? Qt.alpha(root._tokens.fg1, 0.06) : "transparent"
+            color: (choice.hovered || choice.visualFocus) ? theme.tokens.hover : "transparent"
         }
 
         contentItem: RowLayout {
@@ -327,7 +324,7 @@ FocusScope {
                 Layout.fillWidth: true
 
                 text: choice.text
-                color: choice.selected ? root._tokens.fg2 : root._tokens.fgA1
+                color: choice.selected ? theme.tokens.fg2 : theme.tokens.fgA1
                 font.pixelSize: VLCStyle.fontSize_large
                 elide: Text.ElideRight
             }

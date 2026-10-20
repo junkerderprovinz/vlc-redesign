@@ -37,9 +37,6 @@ T.Control {
                                     && Player.playingState !== Player.PLAYING_STATE_PAUSED
                                     && Player.playingState !== Player.PLAYING_STATE_STOPPED
 
-    // the colour context has no palette until it is attached
-    readonly property var _tokens: theme.palette ?? VLCStyle.palette
-
     readonly property ColorContext colorContext: ColorContext {
         id: theme
 
@@ -153,7 +150,7 @@ T.Control {
     contentItem: Widgets.IconLabel {
         text: root.playing ? VLCIcons.pause_filled : VLCIcons.play_filled
 
-        color: root.playing ? _tokens.bgB1 : theme.fg.primary
+        color: root.playing ? theme.tokens.bgB1 : theme.fg.primary
 
         font.pixelSize: VLCStyle.icon_toolbar
 
@@ -170,11 +167,11 @@ T.Control {
         color: {
             if (!root.playing)
                 return theme.bg.primary
-            return root.cursorInside ? _tokens.fgA2 : _tokens.fgA3
+            return root.cursorInside ? theme.tokens.fgA2 : theme.tokens.fgA3
         }
 
         border.width: root.visualFocus ? VLCStyle.dp(1, VLCStyle.scale) : 0
-        border.color: _tokens.fg1
+        border.color: theme.tokens.fg1
 
         Behavior on color {
             enabled: theme.initialized

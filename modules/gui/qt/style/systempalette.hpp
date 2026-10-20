@@ -90,12 +90,40 @@ public:
     std::unique_ptr<CSDMetrics> m_csdMetrics;
 };
 
+#define TOKEN_MEMBER(name) \
+    Q_PROPERTY(QColor name MEMBER name CONSTANT FINAL)
+
 /**
- * Named colors of the interface design, the palette color sets are built from them.
+ * Named colors the palette color sets are built from, QML reads them through
+ * ColorContext.tokens where no color role fits.
  * Every accent entry is derived from the single accent color.
  */
 struct DesignTokens
 {
+    Q_GADGET
+
+    Q_PROPERTY(bool isDark MEMBER isDark CONSTANT FINAL)
+
+    TOKEN_MEMBER(fg1) TOKEN_MEMBER(fg2)
+    TOKEN_MEMBER(fgA1) TOKEN_MEMBER(fgA2) TOKEN_MEMBER(fgA3) TOKEN_MEMBER(fgA4)
+    TOKEN_MEMBER(fgB1)
+
+    TOKEN_MEMBER(bgA1) TOKEN_MEMBER(bgA2) TOKEN_MEMBER(bgA3) TOKEN_MEMBER(bgA4) TOKEN_MEMBER(bgA5)
+    TOKEN_MEMBER(bgB1) TOKEN_MEMBER(bgB2)
+    TOKEN_MEMBER(bgA3Glass) TOKEN_MEMBER(bgB1Glass) TOKEN_MEMBER(bgB2Glass)
+
+    TOKEN_MEMBER(dividerBright) TOKEN_MEMBER(dividerDim)
+
+    TOKEN_MEMBER(accent) TOKEN_MEMBER(accentBright) TOKEN_MEMBER(accentDim)
+    TOKEN_MEMBER(bgAccentBright) TOKEN_MEMBER(bgAccentDark)
+    TOKEN_MEMBER(accentLogo)
+    TOKEN_MEMBER(fgOnAccent)
+
+    TOKEN_MEMBER(fgDisabled) TOKEN_MEMBER(hover)
+
+public:
+    bool isDark = false;
+
     QColor fg1, fg2;
     QColor fgA1, fgA2, fgA3, fgA4;
     QColor fgB1;
@@ -115,9 +143,15 @@ struct DesignTokens
 
     QColor shadow;
 
+    // disabled text and the translucent hover feedback of every color set
+    QColor fgDisabled;
+    QColor hover;
+
     static DesignTokens dark(const QColor& accent);
     static DesignTokens light(const QColor& accent);
 };
+
+#undef TOKEN_MEMBER
 
 #define TOKEN_DEFINITION(name) \
     Q_PROPERTY(QColor name READ get_##name NOTIFY paletteChanged FINAL) \
@@ -175,6 +209,7 @@ public:
     CSDMetrics* getCSDMetrics() const;
 
     inline MainCtx* getCtx() const { return m_ctx; }
+    inline const DesignTokens& tokens() const { return m_tokens; }
     bool hasCSDImage() const;
 
     void setColor(ColorContext::ColorSet colorSet,  ColorContext::ColorSection section,

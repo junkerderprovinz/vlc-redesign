@@ -44,8 +44,6 @@ T.Pane {
 
     readonly property bool showsVideo: MainCtx.hasEmbededVideo && MainCtx.canShowVideoPIP
 
-    readonly property var _tokens: theme.palette ?? VLCStyle.palette
-
     readonly property string _folder: {
         const text = Player.url.toString()
         if (!text.startsWith("file://"))
@@ -125,7 +123,7 @@ T.Pane {
 
             Widgets.RoundedRectangleShadow {
                 z: -1
-                color: Qt.rgba(0, 0, 0, root._tokens.isDark ? 0.38 : 0.18)
+                color: Qt.rgba(0, 0, 0, theme.tokens.isDark ? 0.38 : 0.18)
                 blurRadius: VLCStyle.dp(12, VLCStyle.scale)
             }
         }
@@ -155,9 +153,9 @@ T.Pane {
                         visible: !root.showsVideo
 
                         radius: VLCStyle.dp(6, VLCStyle.scale)
-                        color: root._tokens.bgA4
+                        color: theme.tokens.bgA4
                         border.width: VLCStyle.dp(2, VLCStyle.scale)
-                        border.color: root._tokens.bgB2
+                        border.color: theme.tokens.bgB2
 
                         Widgets.ImageExt {
                             anchors.fill: parent
@@ -194,7 +192,7 @@ T.Pane {
                         target: videoSurface
                         frameWidth: VLCStyle.dp(2, VLCStyle.scale)
                         radius: VLCStyle.dp(4, VLCStyle.scale)
-                        color: root._tokens.bgB2
+                        color: theme.tokens.bgB2
                     }
 
                     Rectangle {
@@ -343,7 +341,7 @@ T.Pane {
                     Layout.fillWidth: true
 
                     text: Player.title
-                    color: root._tokens.fgA1
+                    color: theme.tokens.fgA1
                     font.pixelSize: VLCStyle.fontSize_xlarge
                     elide: Text.ElideRight
                 }
@@ -416,7 +414,7 @@ T.Pane {
 
         Widgets.IconLabel {
             text: chip.glyph
-            color: root._tokens.fgA2
+            color: theme.tokens.fgA2
             font.pixelSize: VLCStyle.icon_normal
         }
 
@@ -424,7 +422,7 @@ T.Pane {
             Layout.fillWidth: true
 
             text: chip.text
-            color: root._tokens.fgA1
+            color: theme.tokens.fgA1
             font.pixelSize: VLCStyle.fontSize_xlarge
             elide: Text.ElideRight
         }

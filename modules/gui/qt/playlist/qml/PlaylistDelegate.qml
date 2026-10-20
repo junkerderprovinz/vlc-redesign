@@ -129,8 +129,6 @@ T.Control {
 
     // Childs
 
-    readonly property var _tokens: theme.palette ?? VLCStyle.palette
-
     readonly property ColorContext colorContext: ColorContext {
         id: theme
         colorSet: ColorContext.Item
@@ -163,7 +161,7 @@ T.Control {
 
             text: delegate.isCurrent && Player.playingState === Player.PLAYING_STATE_PAUSED ? VLCIcons.pause_filled
                                                                                               : VLCIcons.move
-            color: delegate.isCurrent ? theme.accent : delegate._tokens.fgA3
+            color: delegate.isCurrent ? theme.accent : theme.tokens.fgA3
             font.pixelSize: VLCStyle.icon_normal
 
             Accessible.role: Accessible.Graphic
@@ -184,7 +182,7 @@ T.Control {
             Layout.fillWidth: true
 
             text: delegate.title || delegate.url || qsTr("Unknown Title")
-            color: delegate.isCurrent ? theme.accent : delegate._tokens.fgA1
+            color: delegate.isCurrent ? theme.accent : theme.tokens.fgA1
             font.pixelSize: VLCStyle.fontSize_large
             font.weight: Font.Normal
         }
@@ -195,7 +193,7 @@ T.Control {
             text: delegate.duration.formatHMS()
             horizontalAlignment: Text.AlignRight
             verticalAlignment: Text.AlignVCenter
-            color: delegate._tokens.fgA3
+            color: theme.tokens.fgA3
             font.pixelSize: VLCStyle.fontSize_large
             font.weight: Font.Normal
         }

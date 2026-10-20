@@ -33,6 +33,7 @@ Q_MOC_INCLUDE("style/systempalette.hpp")
 class SystemPalette;
 class ColorContext;
 class ColorContextState;
+struct DesignTokens;
 
 class ColorProperty {
     Q_GADGET
@@ -146,6 +147,8 @@ public:
     Q_PROPERTY(QColor shadow READ shadow NOTIFY colorsChanged FINAL)
     Q_PROPERTY(QColor accent READ accent NOTIFY colorsChanged FINAL)
 
+    //raw colors of the palette, for the places no role describes
+    Q_PROPERTY(DesignTokens tokens READ tokens NOTIFY colorsChanged)
 
     Q_PROPERTY(bool initialized READ initialized NOTIFY initializedChanged FINAL)
 public:
@@ -167,6 +170,7 @@ public:
     QColor indicator() const;
     QColor shadow() const;
     QColor accent() const;
+    DesignTokens tokens() const;
 
     void setPalette(SystemPalette*);
     void setColorSet(ColorSet);

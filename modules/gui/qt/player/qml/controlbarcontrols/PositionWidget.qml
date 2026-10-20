@@ -44,9 +44,6 @@ FocusScope {
     Accessible.role: Accessible.Grouping
     Accessible.name: qsTr("Seek bar")
 
-    // the colour context has no palette until it is attached
-    readonly property var _tokens: theme.palette ?? VLCStyle.palette
-
     readonly property ColorContext colorContext: ColorContext {
         id: theme
         colorSet: ColorContext.Window
@@ -85,13 +82,13 @@ FocusScope {
 
         background: Rectangle {
             radius: VLCStyle.dp(6, VLCStyle.scale)
-            color: (box.hovered || box.highlighted) ? root._tokens.bgB2 : "transparent"
+            color: (box.hovered || box.highlighted) ? theme.tokens.bgB2 : "transparent"
         }
 
         contentItem: T.Label {
             id: label
 
-            color: root._tokens.fgA2
+            color: theme.tokens.fgA2
             font.pixelSize: VLCStyle.dp(15, VLCStyle.scale)
             horizontalAlignment: Text.AlignHCenter
             verticalAlignment: Text.AlignVCenter
@@ -137,9 +134,9 @@ FocusScope {
 
                 visible: false
 
-                color: root._tokens.fgA2
+                color: theme.tokens.fgA2
                 selectionColor: theme.accent
-                selectedTextColor: root._tokens.fgB1
+                selectedTextColor: theme.tokens.fgB1
                 font.pixelSize: VLCStyle.dp(15, VLCStyle.scale)
                 horizontalAlignment: TextInput.AlignHCenter
                 verticalAlignment: TextInput.AlignVCenter

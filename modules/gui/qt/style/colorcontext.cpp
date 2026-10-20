@@ -426,3 +426,10 @@ QColor ColorContext::accent() const
 {
     return getColor(Decoration, Accent);
 }
+
+DesignTokens ColorContext::tokens() const
+{
+    if (!m_palette)
+        return {};
+    return m_palette->tokens();
+}

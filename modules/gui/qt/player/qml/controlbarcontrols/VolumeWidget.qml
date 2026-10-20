@@ -71,9 +71,6 @@ T.Pane {
     Keys.priority: Keys.AfterItem
     Keys.onPressed: (event) => Navigation.defaultKeyAction(event)
 
-    // the colour context has no palette until it is attached
-    readonly property var _tokens: theme.palette ?? VLCStyle.palette
-
     readonly property ColorContext colorContext: ColorContext {
         id: theme
         colorSet: ColorContext.Window
@@ -265,7 +262,7 @@ T.Pane {
 
                 readonly property real fill: _player.muted ? 0 : root._fillForVolume(volControl.value)
 
-                readonly property color trackColor: _tokens.isDark ? _tokens.bgB2 : _tokens.bgA4
+                readonly property color trackColor: theme.tokens.isDark ? theme.tokens.bgB2 : theme.tokens.bgA4
 
                 opacity: _player.muted ? 0.5 : 1.0
 

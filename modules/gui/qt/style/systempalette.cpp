@@ -510,8 +510,8 @@ float relativeLuminance(const QColor& c)
 }
 
 /**
- * text color for content drawn on @a background, the dark text of the design
- * unless the light one gives a better contrast ratio
+ * text color for content drawn on @a background, @a dark unless @a light
+ * gives a better contrast ratio
  */
 QColor textOnColor(const QColor& background, const QColor& dark, const QColor& light)
 {
@@ -521,7 +521,7 @@ QColor textOnColor(const QColor& background, const QColor& dark, const QColor& l
     return (darkRatio >= lightRatio) ? dark : light;
 }
 
-void setControlColors(SystemPalette& palette, const DesignTokens& t, bool dark)
+void setControlColors(SystemPalette& palette, const DesignTokens& t)
 {
     typedef ColorContext C;
 
@@ -531,10 +531,6 @@ void setControlColors(SystemPalette& palette, const DesignTokens& t, bool dark)
         for (C::ColorState state : { C::Normal, C::Disabled, C::Pressed, C::Hovered, C::Focused })
             palette.setColor(set, section, name, state, color);
     };
-
-    // FG/A4 is darker than FG/A2 in the light theme, it can not mark a disabled text there
-    const QColor fgDisabled = dark ? t.fgA4 : setColorAlpha(t.fgA2, 0.45);
-    const QColor hoverTint = setColorAlpha(dark ? Qt::white : Qt::black, 0.06);
 
     //Standard Buttons, secondary is the cancel button of dialogs
     {
@@ -551,10 +547,10 @@ void setControlColors(SystemPalette& palette, const DesignTokens& t, bool dark)
 
         setColorAll(CS, C::Fg, C::Primary, t.fgA2);
         palette.setColor(CS, C::Fg, C::Primary, C::Normal, t.fgA3);
-        palette.setColor(CS, C::Fg, C::Primary, C::Disabled, fgDisabled);
+        palette.setColor(CS, C::Fg, C::Primary, C::Disabled, t.fgDisabled);
 
         setColorAll(CS, C::Fg, C::Secondary, t.fgA2);
-        palette.setColor(CS, C::Fg, C::Secondary, C::Disabled, fgDisabled);
+        palette.setColor(CS, C::Fg, C::Secondary, C::Disabled, t.fgDisabled);
 
         setColorAll(CS, C::Decoration, C::Border, Qt::transparent);
         setColorAll(CS, C::Decoration, C::Accent, t.accent);
@@ -585,14 +581,14 @@ void setControlColors(SystemPalette& palette, const DesignTokens& t, bool dark)
     //tool button
     {
         C::ColorSet CS = C::ToolButton;
-        setColorAll(CS, C::Bg, C::Primary, hoverTint);
+        setColorAll(CS, C::Bg, C::Primary, t.hover);
         palette.setColor(CS, C::Bg, C::Primary, C::Normal, Qt::transparent);
         palette.setColor(CS, C::Bg, C::Primary, C::Disabled, Qt::transparent);
         setColorAll(CS, C::Bg, C::Secondary, t.bgB2);
 
         setColorAll(CS, C::Fg, C::Primary, t.fg2);
         palette.setColor(CS, C::Fg, C::Primary, C::Normal, t.fgA2);
-        palette.setColor(CS, C::Fg, C::Primary, C::Disabled, fgDisabled);
+        palette.setColor(CS, C::Fg, C::Primary, C::Disabled, t.fgDisabled);
         setColorAll(CS, C::Fg, C::Secondary, t.fg2);
 
         setColorAll(CS, C::Decoration, C::Border, Qt::transparent);
@@ -602,13 +598,13 @@ void setControlColors(SystemPalette& palette, const DesignTokens& t, bool dark)
     //tab button
     {
         C::ColorSet CS = C::TabButton;
-        setColorAll(CS, C::Bg, C::Primary, hoverTint);
+        setColorAll(CS, C::Bg, C::Primary, t.hover);
         palette.setColor(CS, C::Bg, C::Primary, C::Normal, Qt::transparent);
         palette.setColor(CS, C::Bg, C::Primary, C::Disabled, Qt::transparent);
 
         setColorAll(CS, C::Fg, C::Primary, t.fgA2);
         palette.setColor(CS, C::Fg, C::Primary, C::Normal, t.fgA3);
-        palette.setColor(CS, C::Fg, C::Primary, C::Disabled, fgDisabled);
+        palette.setColor(CS, C::Fg, C::Primary, C::Disabled, t.fgDisabled);
         setColorAll(CS, C::Fg, C::Secondary, t.fgA2);
 
         setColorAll(CS, C::Decoration, C::Accent, t.accent);
@@ -648,7 +644,7 @@ void setControlColors(SystemPalette& palette, const DesignTokens& t, bool dark)
         setColorAll(CS, C::Bg, C::Neutral, t.bgA3Glass);
 
         setColorAll(CS, C::Fg, C::Primary, t.fgA2);
-        palette.setColor(CS, C::Fg, C::Primary, C::Disabled, fgDisabled);
+        palette.setColor(CS, C::Fg, C::Primary, C::Disabled, t.fgDisabled);
         setColorAll(CS, C::Fg, C::Secondary, t.fgA3);
         setColorAll(CS, C::Fg, C::Highlight, t.fg1);
 
@@ -662,10 +658,10 @@ void setControlColors(SystemPalette& palette, const DesignTokens& t, bool dark)
     for (C::ColorSet CS : { C::TextField, C::SpinBox })
     {
         setColorAll(CS, C::Bg, C::Primary, t.bgB2);
-        setColorAll(CS, C::Bg, C::Secondary, dark ? t.bgA5 : t.bgA2);
+        setColorAll(CS, C::Bg, C::Secondary, t.isDark ? t.bgA5 : t.bgA2);
 
         setColorAll(CS, C::Fg, C::Primary, t.fgA2);
-        palette.setColor(CS, C::Fg, C::Primary, C::Disabled, fgDisabled);
+        palette.setColor(CS, C::Fg, C::Primary, C::Disabled, t.fgDisabled);
         setColorAll(CS, C::Fg, C::Secondary, t.fgA4);
 
         setColorAll(CS, C::Bg, C::Highlight, t.bgAccentBright);
@@ -684,7 +680,7 @@ void setControlColors(SystemPalette& palette, const DesignTokens& t, bool dark)
         C::ColorSet CS = C::SpinBox;
         setColorAll(CS, C::Fg, C::Secondary, t.fgA2);
         palette.setColor(CS, C::Fg, C::Secondary, C::Normal, t.fgA3);
-        palette.setColor(CS, C::Fg, C::Secondary, C::Disabled, fgDisabled);
+        palette.setColor(CS, C::Fg, C::Secondary, C::Disabled, t.fgDisabled);
     }
 
     //Switch, also used by segmented controls
@@ -696,7 +692,7 @@ void setControlColors(SystemPalette& palette, const DesignTokens& t, bool dark)
 
         setColorAll(CS, C::Fg, C::Primary, t.fgA2);
         palette.setColor(CS, C::Fg, C::Primary, C::Normal, t.fgA3);
-        palette.setColor(CS, C::Fg, C::Primary, C::Disabled, fgDisabled);
+        palette.setColor(CS, C::Fg, C::Primary, C::Disabled, t.fgDisabled);
         setColorAll(CS, C::Fg, C::Secondary, t.accent);
         setColorAll(CS, C::Fg, C::Highlight, t.fgA3);
 
@@ -748,6 +744,11 @@ DesignTokens DesignTokens::dark(const QColor& accent)
 
     t.shadow = setColorAlpha(Qt::black, 0.46);
 
+    t.fgDisabled = t.fgA4;
+    t.hover = setColorAlpha(Qt::white, 0.06);
+
+    t.isDark = true;
+
     return t;
 }
 
@@ -793,6 +794,10 @@ DesignTokens DesignTokens::light(const QColor& accent)
 
     t.shadow = setColorAlpha(Qt::black, 0.18);
 
+    // fgA4 is nearly as strong as fgA2 here, it can not mark a disabled text
+    t.fgDisabled = setColorAlpha(t.fgA2, 0.45);
+    t.hover = setColorAlpha(Qt::black, 0.06);
+
     return t;
 }
 
@@ -823,10 +828,7 @@ void SystemPalette::makeDesignPalette()
 
     const DesignTokens& t = m_tokens;
 
-    // hover feedback is translucent so it works on any background
     const QColor ink = m_isDark ? Qt::white : Qt::black;
-    const QColor hoverOverlay = setColorAlpha(ink, 0.06);
-    const QColor disabledText = setColorAlpha(t.fgA2, 0.4);
 
     m_colorMap.clear();
 
@@ -837,10 +839,10 @@ void SystemPalette::makeDesignPalette()
         setColor(CS, C::Bg, C::Secondary, C::Normal, t.bgA4);
 
         setColor(CS, C::Fg, C::Primary, C::Normal, t.fgA2);
-        setColor(CS, C::Fg, C::Primary, C::Disabled, disabledText);
+        setColor(CS, C::Fg, C::Primary, C::Disabled, t.fgDisabled);
 
         setColor(CS, C::Fg, C::Secondary, C::Normal, t.fgA3);
-        setColor(CS, C::Fg, C::Secondary, C::Disabled, disabledText);
+        setColor(CS, C::Fg, C::Secondary, C::Disabled, t.fgDisabled);
 
         setColor(CS, C::Bg, C::Highlight, C::Normal, t.bgA2);
         setColor(CS, C::Fg, C::Highlight, C::Normal, t.fg1);
@@ -892,15 +894,15 @@ void SystemPalette::makeDesignPalette()
         setColor(CS, C::Bg, C::Primary, C::Focused, t.bgA2);
         setColor(CS, C::Bg, C::Primary, C::Hovered, t.bgA2);
         setColor(CS, C::Fg, C::Primary, C::Normal, t.fgA2);
-        setColor(CS, C::Fg, C::Primary, C::Disabled, disabledText);
+        setColor(CS, C::Fg, C::Primary, C::Disabled, t.fgDisabled);
     }
 
     //Item
     {
         C::ColorSet CS = C::Item;
         setColor(CS, C::Bg, C::Primary, C::Normal, Qt::transparent);
-        setColor(CS, C::Bg, C::Primary, C::Focused, hoverOverlay);
-        setColor(CS, C::Bg, C::Primary, C::Hovered, hoverOverlay);
+        setColor(CS, C::Bg, C::Primary, C::Focused, t.hover);
+        setColor(CS, C::Bg, C::Primary, C::Hovered, t.hover);
 
         setColor(CS, C::Bg, C::Highlight, C::Normal, t.bgA2);
         setColor(CS, C::Bg, C::Highlight, C::Focused, mixColor(ink, t.bgA2, 0.04f));
@@ -925,7 +927,7 @@ void SystemPalette::makeDesignPalette()
         setColor(CS, C::Fg, C::Negative, C::Normal, t.negative);
     }
 
-    setControlColors(*this, m_tokens, m_isDark);
+    setControlColors(*this, m_tokens);
 }
 
 void SystemPalette::makeSystemPalette()
@@ -958,7 +960,7 @@ void SystemPalette::makeSystemPalette()
     {
         m_isDark = palette->isThemeDark();
         m_tokens = m_isDark ? DesignTokens::dark(accentColor()) : DesignTokens::light(accentColor());
-        setControlColors(*this, m_tokens, m_isDark);
+        setControlColors(*this, m_tokens);
     }
 
     m_palettePriv = std::move(palette);

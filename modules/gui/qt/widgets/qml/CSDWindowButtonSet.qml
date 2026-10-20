@@ -73,7 +73,7 @@ Row {
 
                 hoverColor: windowButtonGroup.hoverColor
 
-                isThemeDark: theme.palette.isDark
+                isThemeDark: theme.tokens.isDark
 
                 iconTxt: (MainCtx.intfMainWindow.visibility === Window.FullScreen)
                          ? VLCIcons.defullscreen
@@ -95,7 +95,7 @@ Row {
 
                 hoverColor: windowButtonGroup.hoverColor
 
-                isThemeDark: theme.palette.isDark
+                isThemeDark: theme.tokens.isDark
 
                 iconTxt:{
                     switch (entry.modelData.type) {
