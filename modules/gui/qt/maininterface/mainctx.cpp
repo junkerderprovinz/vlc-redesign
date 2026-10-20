@@ -456,6 +456,30 @@ void MainCtx::loadPrefs(const bool callSignals)
     loadFromVLCOption(m_safeArea, "qt-safe-area", &MainCtx::safeAreaChanged);
 
     loadFromVLCOption(m_mouseHideTimeout, "mouse-hide-timeout", &MainCtx::mouseHideTimeoutChanged);
+
+    {
+        char* accentOption = var_InheritString(p_intf, "qt-accent-color");
+        QColor accent = defaultAccentColor();
+#if QT_VERSION >= QT_VERSION_CHECK(6, 6, 0)
+        if (accentOption && !strcmp(accentOption, "system"))
+            accent = qApp->palette().color(QPalette::Normal, QPalette::Accent);
+        else
+#endif
+        if (accentOption && strcmp(accentOption, "default"))
+        {
+            const QColor parsed(accentOption);
+            if (parsed.isValid())
+                accent = parsed;
+        }
+        free(accentOption);
+
+        if (accent != m_accentColor)
+        {
+            m_accentColor = accent;
+            if (callSignals)
+                emit accentColorChanged();
+        }
+    }
 }
 
 void MainCtx::loadFromSettingsImpl(const bool callSignals)
@@ -614,6 +638,29 @@ void MainCtx::setHasToolbarMenu( bool hasToolbarMenu )
     config_PutInt("qt-menubar", (int) hasToolbarMenu);
 
     emit hasToolbarMenuChanged();
+}
+
+void MainCtx::setAccentColor(const QColor& color)
+{
+    if (!color.isValid())
+        return;
+
+    config_PutPsz("qt-accent-color", qtu(color.name(QColor::HexRgb)));
+
+    if (m_accentColor == color)
+        return;
+    m_accentColor = color;
+    emit accentColorChanged();
+}
+
+void MainCtx::resetAccentColor()
+{
+    config_PutPsz("qt-accent-color", "default");
+
+    if (m_accentColor == defaultAccentColor())
+        return;
+    m_accentColor = defaultAccentColor();
+    emit accentColorChanged();
 }
 
 void MainCtx::setPinVideoControls(bool pinVideoControls)

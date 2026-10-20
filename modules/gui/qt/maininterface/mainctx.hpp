@@ -28,6 +28,7 @@
 
 #include <QtQuick/QQuickView>
 #include <QApplication>
+#include <QColor>
 #include <QQuickItem>
 #include <QTimer>
 
@@ -113,6 +114,8 @@ class MainCtx : public QObject
     Q_PROPERTY(bool hasGridListMode MEMBER m_hasGridListMode NOTIFY hasGridListModeChanged FINAL)
     Q_PROPERTY(Grouping grouping READ grouping WRITE setGrouping NOTIFY groupingChanged FINAL)
     Q_PROPERTY(ColorSchemeModel* colorScheme READ getColorScheme CONSTANT FINAL)
+    Q_PROPERTY(QColor accentColor READ accentColor WRITE setAccentColor RESET resetAccentColor NOTIFY accentColorChanged FINAL)
+    Q_PROPERTY(QColor defaultAccentColor READ defaultAccentColor CONSTANT FINAL)
     Q_PROPERTY(bool hasVLM READ hasVLM CONSTANT FINAL)
     Q_PROPERTY(bool clientSideDecoration READ useClientSideDecoration NOTIFY useClientSideDecorationChanged FINAL)
     Q_PROPERTY(bool hasFirstrun READ hasFirstrun CONSTANT FINAL)
@@ -240,6 +243,8 @@ public:
     inline bool albumSections() const { return m_albumSections; }
     inline bool lyricsMode() const { return m_lyricsMode; }
     inline ColorSchemeModel* getColorScheme() const { return m_colorScheme; }
+    inline QColor accentColor() const { return m_accentColor; }
+    static inline QColor defaultAccentColor() { return QColor(0xd3, 0x79, 0x18); }
     bool hasVLM() const;
     bool useClientSideDecoration() const;
     bool hasFirstrun() const;
@@ -451,6 +456,7 @@ protected:
     bool                 m_hasGridListMode = false;
     Grouping             m_grouping = GROUPING_NONE;
     ColorSchemeModel*    m_colorScheme = nullptr;
+    QColor               m_accentColor = defaultAccentColor();
     bool                 m_windowTitlebar = true;
     // NOTE: Ideally this should be a QVLCBool.
     bool                 m_hasToolbarMenu = false;
@@ -525,6 +531,8 @@ public slots:
     void incrementIntfUserScaleFactor( bool increment);
     void setIntfUserScaleFactor( double );
     void setHasToolbarMenu( bool );
+    void setAccentColor( const QColor& );
+    void resetAccentColor();
 
     void setPinVideoControls( bool );
     void setPinOpacity( float );
@@ -574,6 +582,7 @@ signals:
     void albumSectionsChanged( bool );
     void lyricsModeChanged( bool );
     void colorSchemeChanged( QString );
+    void accentColorChanged();
     void useClientSideDecorationChanged();
     void hasToolbarMenuChanged();
 

@@ -111,6 +111,85 @@ class VLCIcons : public QObject {
     Q_PROPERTY(QChar medialibrary_remove MEMBER medialibrary_remove CONSTANT FINAL)
     Q_PROPERTY(QChar regex MEMBER regex CONSTANT FINAL)
     Q_PROPERTY(QChar ic_fluent_text_change_case_24_regular MEMBER ic_fluent_text_change_case_24_regular CONSTANT FINAL)
+    Q_PROPERTY(QChar accessibility MEMBER accessibility CONSTANT FINAL)
+    Q_PROPERTY(QChar album MEMBER album CONSTANT FINAL)
+    Q_PROPERTY(QChar arrow_down MEMBER arrow_down CONSTANT FINAL)
+    Q_PROPERTY(QChar arrow_left MEMBER arrow_left CONSTANT FINAL)
+    Q_PROPERTY(QChar arrow_right MEMBER arrow_right CONSTANT FINAL)
+    Q_PROPERTY(QChar arrow_up MEMBER arrow_up CONSTANT FINAL)
+    Q_PROPERTY(QChar artist MEMBER artist CONSTANT FINAL)
+    Q_PROPERTY(QChar audio MEMBER audio CONSTANT FINAL)
+    Q_PROPERTY(QChar backward_10_sec MEMBER backward_10_sec CONSTANT FINAL)
+    Q_PROPERTY(QChar backward_15_sec MEMBER backward_15_sec CONSTANT FINAL)
+    Q_PROPERTY(QChar bookmarks MEMBER bookmarks CONSTANT FINAL)
+    Q_PROPERTY(QChar capture_device MEMBER capture_device CONSTANT FINAL)
+    Q_PROPERTY(QChar chapters MEMBER chapters CONSTANT FINAL)
+    Q_PROPERTY(QChar check_selected MEMBER check_selected CONSTANT FINAL)
+    Q_PROPERTY(QChar chevron_left MEMBER chevron_left CONSTANT FINAL)
+    Q_PROPERTY(QChar chevron_right MEMBER chevron_right CONSTANT FINAL)
+    Q_PROPERTY(QChar collapse_sidebar MEMBER collapse_sidebar CONSTANT FINAL)
+    Q_PROPERTY(QChar disc MEMBER disc CONSTANT FINAL)
+    Q_PROPERTY(QChar edit MEMBER edit CONSTANT FINAL)
+    Q_PROPERTY(QChar eq MEMBER eq CONSTANT FINAL)
+    Q_PROPERTY(QChar expand_sidebar MEMBER expand_sidebar CONSTANT FINAL)
+    Q_PROPERTY(QChar favorite MEMBER favorite CONSTANT FINAL)
+    Q_PROPERTY(QChar file MEMBER file CONSTANT FINAL)
+    Q_PROPERTY(QChar folder MEMBER folder CONSTANT FINAL)
+    Q_PROPERTY(QChar folder_selected MEMBER folder_selected CONSTANT FINAL)
+    Q_PROPERTY(QChar forward_10_sec MEMBER forward_10_sec CONSTANT FINAL)
+    Q_PROPERTY(QChar forward_15_sec MEMBER forward_15_sec CONSTANT FINAL)
+    Q_PROPERTY(QChar fullscreen_active MEMBER fullscreen_active CONSTANT FINAL)
+    Q_PROPERTY(QChar genre MEMBER genre CONSTANT FINAL)
+    Q_PROPERTY(QChar hdr MEMBER hdr CONSTANT FINAL)
+    Q_PROPERTY(QChar home_selected MEMBER home_selected CONSTANT FINAL)
+    Q_PROPERTY(QChar hotkeys MEMBER hotkeys CONSTANT FINAL)
+    Q_PROPERTY(QChar interface_settings MEMBER interface_settings CONSTANT FINAL)
+    Q_PROPERTY(QChar link MEMBER link CONSTANT FINAL)
+    Q_PROPERTY(QChar lists MEMBER lists CONSTANT FINAL)
+    Q_PROPERTY(QChar maximize MEMBER maximize CONSTANT FINAL)
+    Q_PROPERTY(QChar minimize MEMBER minimize CONSTANT FINAL)
+    Q_PROPERTY(QChar move MEMBER move CONSTANT FINAL)
+    Q_PROPERTY(QChar music MEMBER music CONSTANT FINAL)
+    Q_PROPERTY(QChar new_folder MEMBER new_folder CONSTANT FINAL)
+    Q_PROPERTY(QChar open MEMBER open CONSTANT FINAL)
+    Q_PROPERTY(QChar paint MEMBER paint CONSTANT FINAL)
+    Q_PROPERTY(QChar pause MEMBER pause CONSTANT FINAL)
+    Q_PROPERTY(QChar pip MEMBER pip CONSTANT FINAL)
+    Q_PROPERTY(QChar playback MEMBER playback CONSTANT FINAL)
+    Q_PROPERTY(QChar playback_settings MEMBER playback_settings CONSTANT FINAL)
+    Q_PROPERTY(QChar plugins MEMBER plugins CONSTANT FINAL)
+    Q_PROPERTY(QChar preferences MEMBER preferences CONSTANT FINAL)
+    Q_PROPERTY(QChar privacy MEMBER privacy CONSTANT FINAL)
+    Q_PROPERTY(QChar profile MEMBER profile CONSTANT FINAL)
+    Q_PROPERTY(QChar queue MEMBER queue CONSTANT FINAL)
+    Q_PROPERTY(QChar quit MEMBER quit CONSTANT FINAL)
+    Q_PROPERTY(QChar recent MEMBER recent CONSTANT FINAL)
+    Q_PROPERTY(QChar refresh MEMBER refresh CONSTANT FINAL)
+    Q_PROPERTY(QChar repeat_right MEMBER repeat_right CONSTANT FINAL)
+    Q_PROPERTY(QChar replay MEMBER replay CONSTANT FINAL)
+    Q_PROPERTY(QChar save MEMBER save CONSTANT FINAL)
+    Q_PROPERTY(QChar shuffle_right MEMBER shuffle_right CONSTANT FINAL)
+    Q_PROPERTY(QChar sidebar_active MEMBER sidebar_active CONSTANT FINAL)
+    Q_PROPERTY(QChar sidebar_left MEMBER sidebar_left CONSTANT FINAL)
+    Q_PROPERTY(QChar sidebar_right MEMBER sidebar_right CONSTANT FINAL)
+    Q_PROPERTY(QChar songs MEMBER songs CONSTANT FINAL)
+    Q_PROPERTY(QChar songs_selected MEMBER songs_selected CONSTANT FINAL)
+    Q_PROPERTY(QChar sort MEMBER sort CONSTANT FINAL)
+    Q_PROPERTY(QChar speed MEMBER speed CONSTANT FINAL)
+    Q_PROPERTY(QChar streaming MEMBER streaming CONSTANT FINAL)
+    Q_PROPERTY(QChar streaming_selected MEMBER streaming_selected CONSTANT FINAL)
+    Q_PROPERTY(QChar subtitle MEMBER subtitle CONSTANT FINAL)
+    Q_PROPERTY(QChar subtitles MEMBER subtitles CONSTANT FINAL)
+    Q_PROPERTY(QChar swap MEMBER swap CONSTANT FINAL)
+    Q_PROPERTY(QChar tv_selected MEMBER tv_selected CONSTANT FINAL)
+    Q_PROPERTY(QChar video MEMBER video CONSTANT FINAL)
+    Q_PROPERTY(QChar videos MEMBER videos CONSTANT FINAL)
+    Q_PROPERTY(QChar videos_selected MEMBER videos_selected CONSTANT FINAL)
+    Q_PROPERTY(QChar view MEMBER view CONSTANT FINAL)
+    Q_PROPERTY(QChar volume_none MEMBER volume_none CONSTANT FINAL)
+    Q_PROPERTY(QChar window MEMBER window CONSTANT FINAL)
+    Q_PROPERTY(QChar wrench MEMBER wrench CONSTANT FINAL)
+    Q_PROPERTY(QChar zoom MEMBER zoom CONSTANT FINAL)
 
 
 public:
@@ -218,6 +297,85 @@ public:
     static constexpr inline QChar medialibrary_remove{ u'\ue05e' };
     static constexpr inline QChar regex{ u'\ue05f' };
     static constexpr inline QChar ic_fluent_text_change_case_24_regular{ u'\ue060' };
+    static constexpr inline QChar accessibility{ u'\ue061' };
+    static constexpr inline QChar album{ u'\ue062' };
+    static constexpr inline QChar arrow_down{ u'\ue063' };
+    static constexpr inline QChar arrow_left{ u'\ue064' };
+    static constexpr inline QChar arrow_right{ u'\ue065' };
+    static constexpr inline QChar arrow_up{ u'\ue066' };
+    static constexpr inline QChar artist{ u'\ue067' };
+    static constexpr inline QChar audio{ u'\ue068' };
+    static constexpr inline QChar backward_10_sec{ u'\ue069' };
+    static constexpr inline QChar backward_15_sec{ u'\ue06a' };
+    static constexpr inline QChar bookmarks{ u'\ue06b' };
+    static constexpr inline QChar capture_device{ u'\ue06c' };
+    static constexpr inline QChar chapters{ u'\ue06d' };
+    static constexpr inline QChar check_selected{ u'\ue06e' };
+    static constexpr inline QChar chevron_left{ u'\ue06f' };
+    static constexpr inline QChar chevron_right{ u'\ue070' };
+    static constexpr inline QChar collapse_sidebar{ u'\ue071' };
+    static constexpr inline QChar disc{ u'\ue072' };
+    static constexpr inline QChar edit{ u'\ue073' };
+    static constexpr inline QChar eq{ u'\ue074' };
+    static constexpr inline QChar expand_sidebar{ u'\ue075' };
+    static constexpr inline QChar favorite{ u'\ue076' };
+    static constexpr inline QChar file{ u'\ue077' };
+    static constexpr inline QChar folder{ u'\ue078' };
+    static constexpr inline QChar folder_selected{ u'\ue079' };
+    static constexpr inline QChar forward_10_sec{ u'\ue07a' };
+    static constexpr inline QChar forward_15_sec{ u'\ue07b' };
+    static constexpr inline QChar fullscreen_active{ u'\ue07c' };
+    static constexpr inline QChar genre{ u'\ue07d' };
+    static constexpr inline QChar hdr{ u'\ue07e' };
+    static constexpr inline QChar home_selected{ u'\ue07f' };
+    static constexpr inline QChar hotkeys{ u'\ue080' };
+    static constexpr inline QChar interface_settings{ u'\ue081' };
+    static constexpr inline QChar link{ u'\ue082' };
+    static constexpr inline QChar lists{ u'\ue083' };
+    static constexpr inline QChar maximize{ u'\ue084' };
+    static constexpr inline QChar minimize{ u'\ue085' };
+    static constexpr inline QChar move{ u'\ue086' };
+    static constexpr inline QChar music{ u'\ue087' };
+    static constexpr inline QChar new_folder{ u'\ue088' };
+    static constexpr inline QChar open{ u'\ue089' };
+    static constexpr inline QChar paint{ u'\ue08a' };
+    static constexpr inline QChar pause{ u'\ue08b' };
+    static constexpr inline QChar pip{ u'\ue08c' };
+    static constexpr inline QChar playback{ u'\ue08d' };
+    static constexpr inline QChar playback_settings{ u'\ue08e' };
+    static constexpr inline QChar plugins{ u'\ue08f' };
+    static constexpr inline QChar preferences{ u'\ue090' };
+    static constexpr inline QChar privacy{ u'\ue091' };
+    static constexpr inline QChar profile{ u'\ue092' };
+    static constexpr inline QChar queue{ u'\ue093' };
+    static constexpr inline QChar quit{ u'\ue094' };
+    static constexpr inline QChar recent{ u'\ue095' };
+    static constexpr inline QChar refresh{ u'\ue096' };
+    static constexpr inline QChar repeat_right{ u'\ue097' };
+    static constexpr inline QChar replay{ u'\ue098' };
+    static constexpr inline QChar save{ u'\ue099' };
+    static constexpr inline QChar shuffle_right{ u'\ue09a' };
+    static constexpr inline QChar sidebar_active{ u'\ue09b' };
+    static constexpr inline QChar sidebar_left{ u'\ue09c' };
+    static constexpr inline QChar sidebar_right{ u'\ue09d' };
+    static constexpr inline QChar songs{ u'\ue09e' };
+    static constexpr inline QChar songs_selected{ u'\ue09f' };
+    static constexpr inline QChar sort{ u'\ue0a0' };
+    static constexpr inline QChar speed{ u'\ue0a1' };
+    static constexpr inline QChar streaming{ u'\ue0a2' };
+    static constexpr inline QChar streaming_selected{ u'\ue0a3' };
+    static constexpr inline QChar subtitle{ u'\ue0a4' };
+    static constexpr inline QChar subtitles{ u'\ue0a5' };
+    static constexpr inline QChar swap{ u'\ue0a6' };
+    static constexpr inline QChar tv_selected{ u'\ue0a7' };
+    static constexpr inline QChar video{ u'\ue0a8' };
+    static constexpr inline QChar videos{ u'\ue0a9' };
+    static constexpr inline QChar videos_selected{ u'\ue0aa' };
+    static constexpr inline QChar view{ u'\ue0ab' };
+    static constexpr inline QChar volume_none{ u'\ue0ac' };
+    static constexpr inline QChar window{ u'\ue0ad' };
+    static constexpr inline QChar wrench{ u'\ue0ae' };
+    static constexpr inline QChar zoom{ u'\ue0af' };
 
 };
 

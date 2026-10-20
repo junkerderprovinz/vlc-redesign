@@ -90,13 +90,40 @@ public:
     std::unique_ptr<CSDMetrics> m_csdMetrics;
 };
 
-#define COLOR_DEFINITION(name, value) \
+/**
+ * Named colors of the interface design, the palette color sets are built from them.
+ * Every accent entry is derived from the single accent color.
+ */
+struct DesignTokens
+{
+    QColor fg1, fg2;
+    QColor fgA1, fgA2, fgA3, fgA4;
+    QColor fgB1;
+
+    QColor bgA1, bgA2, bgA3, bgA4, bgA5;
+    QColor bgB1, bgB2;
+    QColor bgA3Glass, bgB1Glass, bgB2Glass;
+
+    QColor dividerBright, dividerDim;
+
+    QColor accent, accentBright, accentDim;
+    QColor bgAccentBright, bgAccentDark;
+    QColor accentLogo;
+    QColor fgOnAccent;
+
+    QColor positive, neutral, negative;
+
+    QColor shadow;
+
+    static DesignTokens dark(const QColor& accent);
+    static DesignTokens light(const QColor& accent);
+};
+
+#define TOKEN_DEFINITION(name) \
     Q_PROPERTY(QColor name READ get_##name NOTIFY paletteChanged FINAL) \
 public: \
-    inline QColor get_## name() const { return name; } \
-private: \
-    QColor name {value}
-
+    inline QColor get_## name() const { return m_tokens.name; } \
+private:
 
 
 class SystemPalette : public QObject, public QQmlParserStatus
@@ -110,30 +137,35 @@ public:
     Q_PROPERTY(bool hasCSDImage READ hasCSDImage NOTIFY hasCSDImageChanged FINAL)
     Q_PROPERTY(CSDMetrics* csdMetrics READ getCSDMetrics NOTIFY CSDMetricsChanged FINAL)
 
-    //standard color definitions used by light/dark themes
-    COLOR_DEFINITION(orange500, "#FF8800");
-    COLOR_DEFINITION(orange800, "#FF610A");
+    TOKEN_DEFINITION(fg1)
+    TOKEN_DEFINITION(fg2)
+    TOKEN_DEFINITION(fgA1)
+    TOKEN_DEFINITION(fgA2)
+    TOKEN_DEFINITION(fgA3)
+    TOKEN_DEFINITION(fgA4)
+    TOKEN_DEFINITION(fgB1)
 
-    COLOR_DEFINITION(orange400, "#f89a06"); //FIXME name have been chosen randomly by me
-    COLOR_DEFINITION(orange200, "#e29a06"); //FIXME name have been chosen randomly by me
+    TOKEN_DEFINITION(bgA1)
+    TOKEN_DEFINITION(bgA2)
+    TOKEN_DEFINITION(bgA3)
+    TOKEN_DEFINITION(bgA4)
+    TOKEN_DEFINITION(bgA5)
+    TOKEN_DEFINITION(bgB1)
+    TOKEN_DEFINITION(bgB2)
+    TOKEN_DEFINITION(bgA3Glass)
+    TOKEN_DEFINITION(bgB1Glass)
+    TOKEN_DEFINITION(bgB2Glass)
 
-    COLOR_DEFINITION(darkGrey200, "#1E1E1E");
-    COLOR_DEFINITION(darkGrey300, "#212121");
-    COLOR_DEFINITION(darkGrey400, "#242424");
-    COLOR_DEFINITION(darkGrey500, "#272727");
-    COLOR_DEFINITION(darkGrey600, "#2A2A2A");
-    COLOR_DEFINITION(darkGrey700, "#2D2D2D");
-    COLOR_DEFINITION(darkGrey800, "#303030");
+    TOKEN_DEFINITION(dividerBright)
+    TOKEN_DEFINITION(dividerDim)
 
-    COLOR_DEFINITION(lightGrey100, "#FAFAFA");
-    COLOR_DEFINITION(lightGrey200, "#F6F6F6");
-    COLOR_DEFINITION(lightGrey300, "#F2F2F2");
-    COLOR_DEFINITION(lightGrey400, "#EDEDED");
-    COLOR_DEFINITION(lightGrey500, "#E9E9E9");
-    COLOR_DEFINITION(lightGrey600, "#E5E5E5");
-    COLOR_DEFINITION(lightGrey700, "#E0E0E0");
-
-    COLOR_DEFINITION(red500, "#FF0000");
+    TOKEN_DEFINITION(accent)
+    TOKEN_DEFINITION(accentBright)
+    TOKEN_DEFINITION(accentDim)
+    TOKEN_DEFINITION(bgAccentBright)
+    TOKEN_DEFINITION(bgAccentDark)
+    TOKEN_DEFINITION(accentLogo)
+    TOKEN_DEFINITION(fgOnAccent)
 
 public:
     SystemPalette(QObject* parent = nullptr);
@@ -170,10 +202,15 @@ private:
 
     void makeLightPalette();
     void makeDarkPalette();
+    void makeDesignPalette();
     void makeSystemPalette();
+
+    QColor accentColor() const;
 
 private:
     MainCtx* m_ctx = nullptr;
+
+    DesignTokens m_tokens;
 
     ColorSchemeModel::ColorScheme m_source = ColorSchemeModel::ColorScheme::Day;
     bool m_isDark = false;
@@ -185,7 +222,6 @@ private:
 
 };
 
-#undef COLOR_PROPERTY
-#undef COLOR_DEFINITION
+#undef TOKEN_DEFINITION
 
 #endif // VLC_SYSTEMPALETTE_H

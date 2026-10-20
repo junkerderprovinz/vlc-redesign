@@ -27,20 +27,17 @@ Row {
 
     spacing: 0
     padding: 0
+    rightPadding: VLCStyle.titleBar_padding
 
     width: implicitWidth
 
     property color color: theme.fg.primary
-    property color hoverColor: theme.bg.primary.alpha(0.5)
-
-    readonly property bool useWinIcons: ((MainCtx.osName === MainCtx.Windows)&&(MainCtx.osVersion >= 10))
+    property color hoverColor: theme.palette.bgA1
 
     readonly property bool buttonHovered: {
         let h = false
-        for (let i = 0; i < repeater.count; ++i) {
-            const button = repeater.itemAt(i)
-            h = h || button.hovered || button.showHovered
-        }
+        for (let i = 0; i < repeater.count; ++i)
+            h = h || repeater.itemAt(i).hovered
 
         return h
     }
@@ -55,78 +52,92 @@ Row {
 
         model: MainCtx.csdButtonModel.windowCSDButtons
 
-        CSDWindowButton {
+        Row {
+            id: entry
+
             required property var modelData
+
+            readonly property bool hovered: button.hovered || button.showHovered || fullscreenButton.hovered
 
             height: windowButtonGroup.height
 
-            showHovered: modelData.showHovered
+            // the fullscreen toggle sits right before the close button
+            CSDWindowButton {
+                id: fullscreenButton
 
-            externalPressed: modelData.externalPressed
+                visible: entry.modelData.type === CSDButton.Close
 
-            color: (modelData.type === CSDButton.Close && (hovered || modelData.showHovered))
-                   ? "white"
-                   : windowButtonGroup.color
+                height: entry.height
 
-            hoverColor: (modelData.type === CSDButton.Close) ? "red" : windowButtonGroup.hoverColor
+                color: windowButtonGroup.color
 
-            isThemeDark: theme.palette.isDark
+                hoverColor: windowButtonGroup.hoverColor
 
-            iconTxt:{
-                switch (modelData.type) {
-                case CSDButton.Minimize:
-                {
-                    if (useWinIcons)
-                        return "\uE921"
+                isThemeDark: theme.palette.isDark
 
-                    else
+                iconTxt: (MainCtx.intfMainWindow.visibility === Window.FullScreen)
+                         ? VLCIcons.defullscreen
+                         : VLCIcons.fullscreen
+
+                onClicked: MainCtx.toggleInterfaceFullScreen()
+            }
+
+            CSDWindowButton {
+                id: button
+
+                height: entry.height
+
+                showHovered: entry.modelData.showHovered
+
+                externalPressed: entry.modelData.externalPressed
+
+                color: windowButtonGroup.color
+
+                hoverColor: windowButtonGroup.hoverColor
+
+                isThemeDark: theme.palette.isDark
+
+                iconTxt:{
+                    switch (entry.modelData.type) {
+                    case CSDButton.Minimize:
                         return VLCIcons.window_minimize
-                }
 
-                case CSDButton.MaximizeRestore:
-                {
-                    if (useWinIcons)
-                        return (MainCtx.intfMainWindow.visibility === Window.Maximized)
-                                ? "\uE923"
-                                : "\uE922"
-
-                    else
+                    case CSDButton.MaximizeRestore:
                         return (MainCtx.intfMainWindow.visibility === Window.Maximized)
                                 ? VLCIcons.window_restore
                                 : VLCIcons.window_maximize
-                }
 
-                case CSDButton.Close:
-                {
-                    if (useWinIcons)
-                        return "\uE8BB"
-
-                    else
+                    case CSDButton.Close:
                         return VLCIcons.window_close
+                    }
+                    console.assert(false, "unreachable")
                 }
+
+                onClicked: entry.modelData.click()
+
+                // handles VLCStyle.scale changes
+                onWidthChanged: Qt.callLater(updateRect)
+                onHeightChanged: Qt.callLater(updateRect)
+
+                Connections {
+                    target: VLCStyle
+
+                    // handle window resize
+                    function onAppWidthChanged() { Qt.callLater(button.updateRect) }
+                    function onAppHeightChanged() { Qt.callLater(button.updateRect) }
                 }
-                console.assert(false, "unreachable")
-            }
 
-            onClicked: modelData.click()
+                function updateRect() {
+                    const point = mapToItem(null, 0, 0)
+                    const rect = Qt.rect(point.x, point.y, width, height)
 
-            // handles VLCStyle.scale changes
-            onWidthChanged: Qt.callLater(updateRect)
-            onHeightChanged: Qt.callLater(updateRect)
+                    entry.modelData.rect = rect
+                }
 
-            Connections {
-                target: VLCStyle
-
-                // handle window resize
-                function onAppWidthChanged() { Qt.callLater(updateRect) }
-                function onAppHeightChanged() { Qt.callLater(updateRect) }
-            }
-
-            function updateRect() {
-                const point = mapToItem(null, 0, 0)
-                const rect = Qt.rect(point.x, point.y, width, height)
-
-                modelData.rect = rect
+                // register this button on the C++ side so WM_NCHITTEST can
+                // find it; unregistration happens automatically when the item
+                // is destroyed
+                Component.onCompleted: entry.modelData.registerItem(button)
             }
         }
     }

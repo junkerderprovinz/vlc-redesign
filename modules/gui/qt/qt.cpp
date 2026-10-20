@@ -53,6 +53,7 @@ extern "C" char **environ;
 
 #include <QApplication>
 #include <QDate>
+#include <QFontDatabase>
 #include <QMutex>
 #include <QtQuickControls2/QQuickStyle>
 #include <QLoggingCategory>
@@ -1282,6 +1283,18 @@ static void *Thread( void *obj )
         app.setWindowIcon( QIcon::fromTheme( "vlc", QIcon( ":/logo/vlc256.png" ) ) );
 
     app.setDesktopFileName( PACKAGE );
+
+    /* Interface font, used by the QML interface and the dialogs */
+    {
+        const int fontId = QFontDatabase::addApplicationFont( QStringLiteral(":/fonts/InterVariable.ttf") );
+        const QStringList families = QFontDatabase::applicationFontFamilies( fontId );
+        if( !families.isEmpty() )
+        {
+            QFont font = QApplication::font();
+            font.setFamily( families.first() );
+            QApplication::setFont( font );
+        }
+    }
 
     DialogErrorModel::getInstance( p_intf );
     VLCDialogModel::getInstance( p_intf );

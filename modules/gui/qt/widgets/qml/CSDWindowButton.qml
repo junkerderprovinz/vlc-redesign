@@ -20,7 +20,6 @@ import QtQuick.Templates as T
 import QtQuick.Layouts
 
 import VLC.Widgets as Widgets
-import VLC.MainInterface
 import VLC.Style
 
 
@@ -37,7 +36,7 @@ T.Button {
     readonly property bool _paintHovered: control.hovered || showHovered
 
     padding: 0
-    width: VLCStyle.dp(40, VLCStyle.scale)
+    width: VLCStyle.csdButton_width
 
     implicitWidth: Math.max(implicitBackgroundWidth + leftInset + rightInset,
                             implicitContentWidth + leftPadding + rightPadding)
@@ -46,18 +45,26 @@ T.Button {
 
     focusPolicy: Qt.NoFocus
 
-    background: Rectangle {
-        height: control.height
-        width: control.width
-        color: {
-            if (control.pressed || (control.externalPressed && control._paintHovered))
-                return control.isThemeDark ? Qt.lighter(control.hoverColor, 1.2)
-                                           : Qt.darker(control.hoverColor, 1.2)
+    // the whole bar height stays clickable, only the visual button is smaller
+    background: Item {
+        Rectangle {
+            anchors.centerIn: parent
 
-            if (control._paintHovered)
-                return control.hoverColor
+            width: parent.width
+            height: Math.min(VLCStyle.csdButton_height, parent.height)
 
-            return "transparent"
+            radius: VLCStyle.radius_small
+
+            color: {
+                if (control.pressed || (control.externalPressed && control._paintHovered))
+                    return control.isThemeDark ? Qt.lighter(control.hoverColor, 1.2)
+                                               : Qt.darker(control.hoverColor, 1.2)
+
+                if (control._paintHovered)
+                    return control.hoverColor
+
+                return "transparent"
+            }
         }
     }
 
@@ -67,26 +74,8 @@ T.Button {
             anchors.centerIn: parent
             text: control.iconTxt
 
-            font.family:{
-                if (MainCtx.osName === MainCtx.Windows)
-                {
-                    if(MainCtx.osVersion === 10)
-                        return "Segoe MDL2 Assets"
-
-                    else if(MainCtx.osVersion >= 11)
-                        return "Segoe Fluent Icons"
-                }
-     
-                return VLCIcons.fontFamily
-            }
-
             font.pixelSize: VLCStyle.icon_CSD
             color: control.color
         }
     }
-
-    // register this button on the C++ side so WM_NCHITTEST can
-    // find it; unregistration happens automatically when the item
-    // is destroyed
-    Component.onCompleted: modelData.registerItem(control)
 }

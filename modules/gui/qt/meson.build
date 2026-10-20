@@ -876,6 +876,7 @@ qml_modules += {
         'widgets/qml/AnimatedBackground.qml',
         'widgets/qml/CSDThemeButton.qml',
         'widgets/qml/CSDThemeButtonSet.qml',
+        'widgets/qml/CSDTitleBar.qml',
         'widgets/qml/CSDWindowButton.qml',
         'widgets/qml/CSDWindowButtonSet.qml',
         'widgets/qml/CSDTitlebarTapNDrapHandler.qml',

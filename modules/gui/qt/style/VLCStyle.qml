@@ -26,14 +26,14 @@ QtObject {
 
     readonly property real scale: MainCtx.intfScaleFactor
 
-    readonly property FontMetrics fontMetrics_xxsmall  : FontMetrics { font.pixelSize: MainCtx.dp(6, scale);  }
-    readonly property FontMetrics fontMetrics_xsmall   : FontMetrics { font.pixelSize: MainCtx.dp(8, scale);  }
-    readonly property FontMetrics fontMetrics_small    : FontMetrics { font.pixelSize: MainCtx.dp(10, scale); }
-    readonly property FontMetrics fontMetrics_normal   : FontMetrics { font.pixelSize: MainCtx.dp(12, scale); }
-    readonly property FontMetrics fontMetrics_large    : FontMetrics { font.pixelSize: MainCtx.dp(14, scale); }
-    readonly property FontMetrics fontMetrics_xlarge   : FontMetrics { font.pixelSize: MainCtx.dp(16, scale); }
-    readonly property FontMetrics fontMetrics_xxlarge  : FontMetrics { font.pixelSize: MainCtx.dp(20, scale); }
-    readonly property FontMetrics fontMetrics_xxxlarge : FontMetrics { font.pixelSize: MainCtx.dp(24, scale); }
+    readonly property FontMetrics fontMetrics_xxsmall  : FontMetrics { font.pixelSize: MainCtx.dp(8, scale);  }
+    readonly property FontMetrics fontMetrics_xsmall   : FontMetrics { font.pixelSize: MainCtx.dp(10, scale); }
+    readonly property FontMetrics fontMetrics_small    : FontMetrics { font.pixelSize: MainCtx.dp(12, scale); }
+    readonly property FontMetrics fontMetrics_normal   : FontMetrics { font.pixelSize: MainCtx.dp(14, scale); }
+    readonly property FontMetrics fontMetrics_large    : FontMetrics { font.pixelSize: MainCtx.dp(16, scale); }
+    readonly property FontMetrics fontMetrics_xlarge   : FontMetrics { font.pixelSize: MainCtx.dp(20, scale); }
+    readonly property FontMetrics fontMetrics_xxlarge  : FontMetrics { font.pixelSize: MainCtx.dp(24, scale); }
+    readonly property FontMetrics fontMetrics_xxxlarge : FontMetrics { font.pixelSize: MainCtx.dp(32, scale); }
 
     readonly property SystemPalette palette:  SystemPalette {
         objectName: "themePalette"
@@ -47,15 +47,31 @@ QtObject {
         ctx: MainCtx
     }
 
+    // accent colors offered by the interface settings, the first one is the default,
+    // any other color can be set through MainCtx.accentColor
+    readonly property var accentColors: [
+        "#d37918", // orange
+        "#e15032", // red
+        "#c49e23", // yellow
+        "#19a234", // green
+        "#18aad3", // cyan
+        "#185dd3", // blue
+        "#8e42ff", // purple
+        "#f052b3", // pink
+        "#afafaf"  // grey
+    ]
+
     readonly property real highPixelDensityThreshold: 5.9 // 150 dpi (dpmm)
 
     // Sizes
     readonly property double margin_xxxsmall: MainCtx.dp(2, scale);
     readonly property double margin_xxsmall: MainCtx.dp(4, scale);
     readonly property double margin_xsmall: MainCtx.dp(8, scale);
+    readonly property double margin_compact: MainCtx.dp(10, scale);
     readonly property double margin_small: MainCtx.dp(12, scale);
+    readonly property double margin_medium: MainCtx.dp(14, scale);
     readonly property double margin_normal: MainCtx.dp(16, scale);
-    readonly property double margin_large: MainCtx.dp(24, scale);
+    readonly property double margin_large: MainCtx.dp(20, scale);
     readonly property double margin_xlarge: MainCtx.dp(32, scale);
     readonly property double margin_xxlarge: MainCtx.dp(36, scale);
 
@@ -65,7 +81,18 @@ QtObject {
 
     // Borders
     readonly property int border: MainCtx.dp(1, scale)
-    readonly property int focus_border: border
+    readonly property int focus_border: MainCtx.dp(2, scale)
+
+    // Corner radii
+    readonly property real radius_xsmall: MainCtx.dp(2, scale)
+    readonly property real radius_small: MainCtx.dp(4, scale)
+    readonly property real radius_normal: MainCtx.dp(6, scale)
+    readonly property real radius_large: MainCtx.dp(10, scale)
+    readonly property real radius_xlarge: MainCtx.dp(14, scale)
+
+    // Text
+    readonly property string fontFamily: "Inter"
+    readonly property int fontWeight_title: Font.Light
 
     readonly property int fontSize_xsmall: fontMetrics_xsmall.font.pixelSize
     readonly property int fontSize_small:  fontMetrics_small.font.pixelSize
@@ -74,6 +101,10 @@ QtObject {
     readonly property int fontSize_xlarge: fontMetrics_xlarge.font.pixelSize
     readonly property int fontSize_xxlarge: fontMetrics_xxlarge.font.pixelSize
     readonly property int fontSize_xxxlarge: fontMetrics_xxxlarge.font.pixelSize
+
+    // breadcrumbs and section headers, page titles use fontWeight_title
+    readonly property int fontSize_header: fontSize_large
+    readonly property int fontSize_title: fontSize_xxxlarge
 
     readonly property int fontHeight_xsmall: Math.ceil(fontMetrics_xsmall.lineSpacing)
     readonly property int fontHeight_small:  Math.ceil(fontMetrics_small.lineSpacing)
@@ -92,10 +123,10 @@ QtObject {
 
     readonly property int listAlbumCover_height: MainCtx.dp(32, scale)
     readonly property int listAlbumCover_width: listAlbumCover_height * 16.0/9
-    readonly property int listAlbumCover_radius: MainCtx.dp(3, scale)
+    readonly property int listAlbumCover_radius: MainCtx.dp(4, scale)
     readonly property int trackListAlbumCover_width: MainCtx.dp(32, scale)
     readonly property int trackListAlbumCover_heigth: MainCtx.dp(32, scale)
-    readonly property int trackListAlbumCover_radius: MainCtx.dp(3, scale)
+    readonly property int trackListAlbumCover_radius: MainCtx.dp(4, scale)
 
     readonly property int tableCoverRow_height: Math.max(listAlbumCover_height, fontHeight_normal) + margin_xsmall * 2
     readonly property int tableRow_height: fontHeight_normal + margin_small * 2
@@ -120,7 +151,7 @@ QtObject {
     readonly property int icon_addressBar: icon_normal
     readonly property int icon_actionButton: icon_normal
     readonly property int icon_PIP: icon_normal
-    readonly property int icon_CSD: icon_small
+    readonly property int icon_CSD: icon_normal
     readonly property int icon_playlistArt: MainCtx.dp(32, scale)
 
     readonly property int play_cover_small: MainCtx.dp(24, scale)
@@ -186,7 +217,7 @@ QtObject {
     readonly property int checkButton_margins: MainCtx.dp(4, scale)
     readonly property int checkButton_handle_margins: MainCtx.dp(2, scale)
 
-    readonly property int navBoxButton_radius: MainCtx.dp(8, scale)
+    readonly property int navBoxButton_radius: MainCtx.dp(6, scale)
 
     readonly property int table_section_width: MainCtx.dp(32, scale)
     readonly property int table_section_text_margin: MainCtx.dp(10, scale)
@@ -203,7 +234,7 @@ QtObject {
     readonly property int gridCover_video_height: ( gridCover_video_width * 10.0 ) / 16
     readonly property int gridCover_video_border: MainCtx.dp(4, scale)
 
-    readonly property int gridCover_radius: MainCtx.dp(4, scale)
+    readonly property int gridCover_radius: MainCtx.dp(12, scale)
 
     readonly property int expandCover_music_height: MainCtx.dp(171, scale)
     readonly property int expandCover_music_width: MainCtx.dp(171, scale)
@@ -212,7 +243,7 @@ QtObject {
 
     readonly property int artistGridCover_radius: MainCtx.dp(90, scale)
 
-    readonly property real mainView_topLeftRadius: MainCtx.dp(8, scale)
+    readonly property real mainView_topLeftRadius: MainCtx.dp(6, scale)
 
     //GridItem
     readonly property int gridItemTitle_topMargin: margin_xsmall + margin_xxxsmall
@@ -239,7 +270,7 @@ QtObject {
     readonly property int layoutTitle_top_padding: margin_large
     readonly property int layoutTitle_bottom_padding: margin_normal + margin_xxxsmall
 
-    readonly property int layout_left_margin: margin_normal
+    readonly property int layout_left_margin: margin_large
     readonly property int layout_right_margin: layout_left_margin
 
     readonly property int table_cover_border: MainCtx.dp(2, scale)
@@ -264,6 +295,16 @@ QtObject {
 
     readonly property int globalToolbar_height: MainCtx.dp(40, scale)
     readonly property int localToolbar_height: MainCtx.dp(48, scale)
+
+    // window title bar drawn by the interface
+    readonly property int titleBar_height: globalToolbar_height
+    readonly property int titleBar_padding: MainCtx.dp(6, scale)
+    readonly property int csdButton_width: MainCtx.dp(36, scale)
+    readonly property int csdButton_height: MainCtx.dp(24, scale)
+
+    // bottom player control bar
+    readonly property int controlBar_height: MainCtx.dp(54, scale)
+    readonly property int controlBar_padding: MainCtx.dp(11, scale)
 
     readonly property int bannerTabButton_width_small: icon_banner
     readonly property int bannerTabButton_width_large: column_width
