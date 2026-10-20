@@ -122,6 +122,8 @@ extern "C" char **environ;
 #include <vlc_threads.h>
 #include <vlc_messages.h>
 
+#include <QDir>
+#include <QFile>
 #include <QQuickWindow>
 #include <QOpenGLContext> // Available in Qt GUI, no need for Qt OpenGL module
 
@@ -978,6 +980,23 @@ static void *Thread( void *obj )
             QSettings::NativeFormat,
 #endif
             QSettings::UserScope, "vlc", "vlc-qt-interface" );
+
+    /* Keep the QML and the RHI pipeline caches in VLC's cache directory, which
+     * is next to the executable in portable mode. */
+    const QString cacheDir = QVLCUserDir( VLC_CACHE_DIR );
+    if( !cacheDir.isEmpty() && QDir().mkpath( cacheDir ) )
+    {
+        if( qEnvironmentVariableIsEmpty( "QML_DISK_CACHE_PATH" ) )
+            qputenv( "QML_DISK_CACHE_PATH", QFile::encodeName( cacheDir + "/qmlcache" ) );
+
+        if( qEnvironmentVariableIsEmpty( "QSG_RHI_PIPELINE_CACHE_SAVE" ) &&
+            qEnvironmentVariableIsEmpty( "QSG_RHI_PIPELINE_CACHE_LOAD" ) )
+        {
+            const QByteArray pipelineCache = QFile::encodeName( cacheDir + "/qtpipelinecache" );
+            qputenv( "QSG_RHI_PIPELINE_CACHE_SAVE", pipelineCache );
+            qputenv( "QSG_RHI_PIPELINE_CACHE_LOAD", pipelineCache );
+        }
+    }
 
     // It is guaranteed that the returned format is supported, if a format is returned.
     static const auto createCompatibleOpenGLFormat = []() -> std::optional<QSurfaceFormat> {
