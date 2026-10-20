@@ -210,6 +210,15 @@ public:
     };
     Q_ENUM(Grouping)
 
+    enum PlayerSettingsTab
+    {
+        PLAYER_SETTINGS_PLAYBACK,
+        PLAYER_SETTINGS_VIDEO,
+        PLAYER_SETTINGS_AUDIO,
+        PLAYER_SETTINGS_SUBTITLES
+    };
+    Q_ENUM(PlayerSettingsTab)
+
     enum OsType
     {
         Windows,
@@ -536,7 +545,7 @@ protected:
     SortCtx* m_sort = nullptr;
 
     bool m_playerSettingsVisible = false;
-    int m_playerSettingsTab = 1;
+    int m_playerSettingsTab = PLAYER_SETTINGS_VIDEO;
 
 #ifdef UPDATE_CHECK
     //m_updateModel is created on first access

@@ -78,7 +78,6 @@ T.Control {
 
     hoverEnabled: true
 
-    // Rows are 32 px high with 12 px between them.
     topInset: VLCStyle.dp(6, VLCStyle.scale)
     bottomInset: VLCStyle.dp(6, VLCStyle.scale)
     verticalPadding: topInset

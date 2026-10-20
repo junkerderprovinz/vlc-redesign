@@ -269,7 +269,7 @@ public:
 
         if (m_hasMedialib)
         {
-            ModelEntry videoEntry{ qtr("Videos"), "video",VLCIcons::topbar_video, QStringLiteral(":/icons/ic_fluent_filmstrip.svg") };
+            ModelEntry videoEntry{ qtr("Videos"), "video", VLCIcons::topbar_video, QStringLiteral(":/icons/ic_fluent_filmstrip.svg") };
             videoEntry.children.emplace_back(qtr("All"), "all");
             videoEntry.children.emplace_back(qtr("Playlists"), "playlists");
             m_model.children.push_back(std::move(videoEntry));

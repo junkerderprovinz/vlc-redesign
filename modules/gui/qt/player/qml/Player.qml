@@ -254,7 +254,7 @@ FocusScope {
 
                 focus: true
 
-                // The video sits in a rounded frame of the window colour, except between
+                // The video sits in a rounded frame of the window color, except between
                 // the bars of the light theme, where it fills the space.
                 readonly property bool framed: !rootPlayer._controlsUnderVideo || windowTheme.tokens.isDark
                 readonly property real frameWidth: framed ? VLCStyle.dp(10, VLCStyle.scale) : 0
@@ -993,14 +993,9 @@ FocusScope {
             MainCtx.playerView = false
         }
 
-        sidebarVisible: MainCtx.libraryPanel?.visible ?? false
+        sidebarVisible: MainCtx.libraryPanel.visible
 
-        onToggleSidebar: {
-            if (MainCtx.libraryPanel)
-                MainCtx.libraryPanel.visible = !MainCtx.libraryPanel.visible
-            else
-                backRequested()
-        }
+        onToggleSidebar: MainCtx.libraryPanel.visible = !MainCtx.libraryPanel.visible
 
         onFolderClicked: backRequested()
 

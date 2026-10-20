@@ -181,6 +181,14 @@ void NavigationHistory::next(Qt::FocusReason reason)
     if (m_next.empty())
         return;
 
+    while (!isNodeValid(*m_next.back().second)) {
+        m_next.pop_back();
+        if (m_next.empty()) {
+            emit nextEmptyChanged(true);
+            return;
+        }
+    }
+
     m_history.push_back(std::move(m_next.back()));
     m_next.pop_back();
 

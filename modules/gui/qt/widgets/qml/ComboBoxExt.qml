@@ -164,7 +164,7 @@ T.ComboBox {
         }
     }
 
-    // like the design, the open list covers the field
+    // the open list covers the field
     popup: Popup {
         y: 0
 
