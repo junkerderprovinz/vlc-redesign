@@ -151,6 +151,8 @@ libqt_plugin_la_SOURCES = \
 	dialogs/preferences/preferences_widgets.hpp \
 	dialogs/preferences/simple_preferences.cpp \
 	dialogs/preferences/simple_preferences.hpp \
+	dialogs/settings/settings_bridge.cpp \
+	dialogs/settings/settings_bridge.hpp \
 	dialogs/sout/convert.cpp dialogs/sout/convert.hpp \
 	dialogs/sout/profile_selector.cpp \
 	dialogs/sout/profile_selector.hpp \
@@ -437,6 +439,7 @@ nodist_libqt_plugin_la_SOURCES = \
 	dialogs/preferences/preferences.moc.cpp \
 	dialogs/preferences/preferences_widgets.moc.cpp \
 	dialogs/preferences/simple_preferences.moc.cpp \
+	dialogs/settings/settings_bridge.moc.cpp \
 	dialogs/sout/convert.moc.cpp \
 	dialogs/sout/profile_selector.moc.cpp \
 	dialogs/sout/sout.moc.cpp \
@@ -1255,8 +1258,20 @@ libqml_module_dialogs_a_QML = \
 	dialogs/toolbar/qml/EditorTabButton.qml \
 	dialogs/toolbar/qml/ToolbarEditor.qml \
 	dialogs/toolbar/qml/ToolbarEditorDialog.qml \
-	dialogs/toolbar/qml/ToolbarEditorButtonList.qml
-libqml_module_dialogs_a_Singleton_QML =
+	dialogs/toolbar/qml/ToolbarEditorButtonList.qml \
+	dialogs/settings/qml/SettingsAddons.qml \
+	dialogs/settings/qml/SettingsButton.qml \
+	dialogs/settings/qml/SettingsColorPicker.qml \
+	dialogs/settings/qml/SettingsDialog.qml \
+	dialogs/settings/qml/SettingsEqualizer.qml \
+	dialogs/settings/qml/SettingsPages.qml \
+	dialogs/settings/qml/SettingsRow.qml \
+	dialogs/settings/qml/SettingsSection.qml \
+	dialogs/settings/qml/SettingsSlider.qml \
+	dialogs/settings/qml/SettingsSwatches.qml \
+	dialogs/settings/qml/SettingsTextField.qml
+libqml_module_dialogs_a_Singleton_QML = \
+	dialogs/settings/qml/SettingsTheme.qml
 libqml_module_dialogs_a_SOURCES = $(QML_MODULE_dialogs_SRC)
 nodist_libqml_module_dialogs_a_SOURCES = dialogs/qmlassets.cpp $(QML_MODULE_dialogs_NODIST_EXTRA)
 QML_MODULE_LIBS += libqml_module_dialogs.a

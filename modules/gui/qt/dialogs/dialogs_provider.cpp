@@ -68,6 +68,7 @@
 #include <QInputDialog>
 #include <QPointer>
 #include <QMessageBox>
+#include <QMetaMethod>
 
 #define I_OP_DIR_WINTITLE I_DIR_OR_FOLDER( N_("Open Directory"), \
                                            N_("Open Folder") )
@@ -289,6 +290,12 @@ const QEvent::Type DialogEvent::DialogEvent_Type =
 
 void DialogsProvider::prefsDialog()
 {
+    if (isSignalConnected(QMetaMethod::fromSignal(&DialogsProvider::showSettingsDialog)))
+    {
+        emit showSettingsDialog();
+        return;
+    }
+
     if (Q_LIKELY(!m_prefsDialog))
     {
         m_prefsDialog = new PrefsDialog( nullptr, p_intf );
@@ -299,6 +306,24 @@ void DialogsProvider::prefsDialog()
     else
     {
         m_prefsDialog->reject();
+    }
+}
+
+void DialogsProvider::advancedPrefsDialog()
+{
+    if (!m_prefsDialog)
+    {
+        m_prefsDialog = new PrefsDialog( nullptr, p_intf );
+        m_prefsDialog->setAttribute(Qt::WA_DeleteOnClose);
+        m_prefsDialog->installEventFilter(this);
+        m_prefsDialog->setAdvanced();
+        m_prefsDialog->open();
+    }
+    else
+    {
+        m_prefsDialog->setAdvanced();
+        m_prefsDialog->raise();
+        m_prefsDialog->activateWindow();
     }
 }
 

@@ -82,10 +82,12 @@ private:
     QLabel *expert_text;
     QLabel *expert_longtext;
 
-private slots:
+public slots:
     void setExpert();
     void setAdvanced();
     void setSimple();
+
+private slots:
 
     void changeExpertDesc( const QModelIndex &, const QModelIndex & );
     void changeAdvPanel( QTreeWidgetItem * );

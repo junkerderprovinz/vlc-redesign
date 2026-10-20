@@ -63,6 +63,7 @@ moc_headers = files(
     'dialogs/preferences/preferences.hpp',
     'dialogs/preferences/preferences_widgets.hpp',
     'dialogs/preferences/simple_preferences.hpp',
+    'dialogs/settings/settings_bridge.hpp',
     'dialogs/sout/convert.hpp',
     'dialogs/sout/profile_selector.hpp',
     'dialogs/sout/sout.hpp',
@@ -270,6 +271,8 @@ qt_plugin_sources = files(
     'dialogs/preferences/preferences_widgets.hpp',
     'dialogs/preferences/simple_preferences.cpp',
     'dialogs/preferences/simple_preferences.hpp',
+    'dialogs/settings/settings_bridge.cpp',
+    'dialogs/settings/settings_bridge.hpp',
     'dialogs/sout/convert.cpp',
     'dialogs/sout/convert.hpp',
     'dialogs/sout/profile_selector.cpp',
@@ -622,7 +625,21 @@ qml_modules += {
         'dialogs/toolbar/qml/EditorTabButton.qml',
         'dialogs/toolbar/qml/ToolbarEditor.qml',
         'dialogs/toolbar/qml/ToolbarEditorDialog.qml',
-        'dialogs/toolbar/qml/ToolbarEditorButtonList.qml'
+        'dialogs/toolbar/qml/ToolbarEditorButtonList.qml',
+        'dialogs/settings/qml/SettingsAddons.qml',
+        'dialogs/settings/qml/SettingsButton.qml',
+        'dialogs/settings/qml/SettingsColorPicker.qml',
+        'dialogs/settings/qml/SettingsDialog.qml',
+        'dialogs/settings/qml/SettingsEqualizer.qml',
+        'dialogs/settings/qml/SettingsPages.qml',
+        'dialogs/settings/qml/SettingsRow.qml',
+        'dialogs/settings/qml/SettingsSection.qml',
+        'dialogs/settings/qml/SettingsSlider.qml',
+        'dialogs/settings/qml/SettingsSwatches.qml',
+        'dialogs/settings/qml/SettingsTextField.qml'
+    ),
+    'singletons': files(
+        'dialogs/settings/qml/SettingsTheme.qml',
     ),
 }
 

@@ -39,6 +39,9 @@ T.Control {
 
     readonly property bool horizontal: (orientation === Qt.Horizontal)
 
+    property real segmentHeight: horizontal ? VLCStyle.dp(40, VLCStyle.scale)
+                                            : VLCStyle.dp(36, VLCStyle.scale)
+
     readonly property alias count: repeater.count
 
     // Signals
@@ -120,8 +123,7 @@ T.Control {
                     required property int index
 
                     width: root._segmentWidth
-                    height: root.horizontal ? VLCStyle.dp(40, VLCStyle.scale)
-                                            : VLCStyle.dp(36, VLCStyle.scale)
+                    height: root.segmentHeight
 
                     text: (typeof modelData === "string") ? modelData : (modelData?.text ?? "")
                     trailing: (typeof modelData === "object") ? (modelData?.trailing ?? null) : null
