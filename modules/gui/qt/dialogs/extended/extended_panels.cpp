@@ -45,6 +45,7 @@
 #include <QScreen>
 
 #include "extended_panels.hpp"
+#include "effects_controller.hpp"
 #include "dialogs/preferences/preferences.hpp"
 #include "qt.hpp"
 #include "maininterface/mainctx.hpp"
@@ -60,42 +61,6 @@
 #include <vlc_plugin.h>
 #include <vlc_player.h>
 #include <vlc_interface.h>
-
-static bool filterIsPresent( const QString &filters, const QString &filter )
-{
-    QStringList list = filters.split( ':', Qt::SkipEmptyParts );
-
-    foreach( const QString &filterCmp, list )
-    {
-        if( filterCmp.compare( filter ) == 0 )
-            return true;
-    }
-    return false;
-}
-
-static const char* GetVFilterType( qt_intf_t *p_intf, const char *psz_name )
-{
-    module_t *p_obj = module_find( psz_name );
-    if( !p_obj )
-    {
-        msg_Err( p_intf, "Unable to find filter module \"%s\".", psz_name );
-        return NULL;
-    }
-
-    if( module_provides( p_obj, "video splitter" ) )
-        return "video-splitter";
-    else if( module_provides( p_obj, "video filter" ) )
-        return "video-filter";
-    else if( module_provides( p_obj, "sub source" ) )
-        return "sub-source";
-    else if( module_provides( p_obj, "sub filter" ) )
-        return "sub-filter";
-    else
-    {
-        msg_Err( p_intf, "Unknown video filter type." );
-        return NULL;
-    }
-}
 
 static const QString ModuleFromWidgetName( QObject *obj )
 {
@@ -302,37 +267,6 @@ void ExtVideo::clean()
     ui.cropBotPx->setValue( 0 );
     ui.cropLeftPx->setValue( 0 );
     ui.cropRightPx->setValue( 0 );
-}
-
-static QString ChangeFiltersString( qt_intf_t *p_intf, const char *psz_filter_type, const char *psz_name, bool b_add )
-{
-    char *psz_chain = nullptr;
-    if (const auto vout = THEMIM->getVout(); vout != nullptr)
-        psz_chain = var_GetString( vout.get(), psz_filter_type );
-
-    QString const chain = QString( psz_chain ? psz_chain : "" );
-    QStringList list = chain.split( ':', Qt::SkipEmptyParts );
-
-    if( b_add && std::find(list.begin(), list.end(), psz_name) == list.end() )
-        list << psz_name;
-    else if (!b_add)
-        list.removeAll( psz_name );
-
-    free( psz_chain );
-
-    return list.join( ":" );
-}
-
-static void UpdateVFiltersString( qt_intf_t *p_intf,
-                                  const char *psz_filter_type, const char *value )
-{
-    /* Try to set non splitter filters on the fly */
-    if( strcmp( psz_filter_type, "video-splitter" ) )
-    {
-        auto p_vout = THEMIM->getVout();
-        if( p_vout )
-            var_SetString( p_vout.get(), psz_filter_type, value );
-    }
 }
 
 void ExtVideo::changeVFiltersString( const char *psz_name, bool b_add )

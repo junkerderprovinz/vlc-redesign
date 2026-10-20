@@ -803,6 +803,11 @@ QMenu* VLCMenuBar::PopupMenu( qt_intf_t *p_intf, bool show )
         action->setText( qtr( "&Playback" ) );
         if( action->menu()->isEmpty() )
             action->setEnabled( false );
+
+        /* Player settings panel */
+        if( p_intf->p_mi )
+            addDPStaticEntry( menu, qtr( "Player &Settings" ), ":/menu/ic_fluent_options.svg",
+                              []() { THEDP->playerSettingsPanel(); } );
     }
 
     menu->addSeparator();

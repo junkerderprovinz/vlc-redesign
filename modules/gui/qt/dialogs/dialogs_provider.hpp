@@ -220,6 +220,11 @@ public slots:
     void firstRunDialog();
     void extendedDialog();
     void synchroDialog();
+
+    void extendedDialogTab( int tab );
+    void playerSettingsPanel( int tab = -1 );
+    void mediaStatsDialog();
+
     void messagesDialog( int page = 0 );
     void sendKey( int key );
 #ifdef ENABLE_VLM

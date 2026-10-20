@@ -18,6 +18,7 @@
 import QtQuick
 
 
+import VLC.MainInterface
 import VLC.Widgets as Widgets
 import VLC.Style
 import VLC.Dialogs
@@ -32,5 +33,12 @@ ControlButton {
 
     AccessibleCompat.id: "extendedSettingsButton"
 
-    onClicked: DialogsProvider.extendedDialog()
+    checked: MainCtx.playerSettingsVisible && MainCtx.playerView
+
+    onClicked: {
+        if (checked)
+            MainCtx.playerSettingsVisible = false
+        else
+            DialogsProvider.playerSettingsPanel()
+    }
 }

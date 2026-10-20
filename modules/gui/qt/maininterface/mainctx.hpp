@@ -167,6 +167,10 @@ class MainCtx : public QObject
     Q_PROPERTY(UpdateModel* updateModel READ getUpdateModel CONSTANT FINAL)
 #endif
 
+    // the settings side panel of the player and its current tab
+    Q_PROPERTY(bool playerSettingsVisible READ isPlayerSettingsVisible WRITE setPlayerSettingsVisible NOTIFY playerSettingsVisibleChanged FINAL)
+    Q_PROPERTY(int playerSettingsTab READ getPlayerSettingsTab WRITE setPlayerSettingsTab NOTIFY playerSettingsTabChanged FINAL)
+
 public:
     /* tors */
     MainCtx(qt_intf_t *);
@@ -426,6 +430,23 @@ public:
     UpdateModel* getUpdateModel() const;
 #endif
 
+    bool isPlayerSettingsVisible() const { return m_playerSettingsVisible; }
+    void setPlayerSettingsVisible( bool visible )
+    {
+        if( visible == m_playerSettingsVisible )
+            return;
+        m_playerSettingsVisible = visible;
+        emit playerSettingsVisibleChanged();
+    }
+    int getPlayerSettingsTab() const { return m_playerSettingsTab; }
+    void setPlayerSettingsTab( int tab )
+    {
+        if( tab == m_playerSettingsTab )
+            return;
+        m_playerSettingsTab = tab;
+        emit playerSettingsTabChanged();
+    }
+
 protected:
     /* Systray */
     void initSystray();
@@ -513,6 +534,9 @@ protected:
 
     SearchCtx* m_search = nullptr;
     SortCtx* m_sort = nullptr;
+
+    bool m_playerSettingsVisible = false;
+    int m_playerSettingsTab = 1;
 
 #ifdef UPDATE_CHECK
     //m_updateModel is created on first access
@@ -629,6 +653,9 @@ signals:
     void mainInterfaceModesChanged(MainInterfaceModes);
 
     void usingTouchChanged();
+
+    void playerSettingsVisibleChanged();
+    void playerSettingsTabChanged();
 
 private:
     void loadPrefs(bool callSignals);

@@ -63,6 +63,7 @@
 #include "dialogs/dialogs_provider.hpp"
 #include "dialogs/dialogs/dialogmodel.hpp"
 #include "dialogs/settings/settings_bridge.hpp"
+#include "dialogs/extended/effects_controller.hpp"
 #ifdef UPDATE_CHECK
 #include "dialogs/help/help.hpp" // UpdateModel
 #endif
@@ -285,6 +286,7 @@ void MainUI::registerQMLTypes()
 
         qmlRegisterSingletonInstance<SettingsBridge>(uri, versionMajor, versionMinor, "SettingsBridge", new SettingsBridge(m_intf, this));
         qmlRegisterTypesAndRevisions<ConfigOption>(uri, versionMajor);
+        qmlRegisterSingletonInstance<EffectsController>(uri, versionMajor, versionMinor, "EffectsController", new EffectsController(m_intf, this));
 
         qmlRegisterModule(uri, versionMajor, versionMinor);
         qmlProtectModule(uri, versionMajor);

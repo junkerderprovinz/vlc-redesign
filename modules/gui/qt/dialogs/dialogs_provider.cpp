@@ -354,6 +354,39 @@ void DialogsProvider::synchroDialog()
         m_extendedDialog->hide();
 }
 
+void DialogsProvider::extendedDialogTab( int tab )
+{
+    ensureDialog(m_extendedDialog);
+    m_extendedDialog->showTab( tab );
+    m_extendedDialog->raise();
+    m_extendedDialog->activateWindow();
+}
+
+void DialogsProvider::playerSettingsPanel( int tab )
+{
+    MainCtx *mi = p_intf->p_mi;
+    if( !mi )
+    {
+        extendedDialog();
+        return;
+    }
+
+    if( tab >= 0 )
+        mi->setPlayerSettingsTab( tab );
+    mi->setPlayerView( true );
+    mi->setPlayerSettingsVisible( true );
+}
+
+void DialogsProvider::mediaStatsDialog()
+{
+    ensureDialog(m_mediaInfoDialog);
+
+    if( !m_mediaInfoDialog->isVisible() || m_mediaInfoDialog->currentTab() != MediaInfoDialog::INPUTSTATS_PANEL )
+        m_mediaInfoDialog->showTab( MediaInfoDialog::INPUTSTATS_PANEL );
+    else
+        m_mediaInfoDialog->hide();
+}
+
 void DialogsProvider::messagesDialog(int page)
 {
     ensureDialog(m_messagesDialog);

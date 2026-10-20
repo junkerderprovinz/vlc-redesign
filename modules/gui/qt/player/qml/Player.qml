@@ -1174,6 +1174,49 @@ FocusScope {
         }
     }
 
+    // the player settings take the place of the play queue panel
+    Loader {
+        id: playerSettingsLoader
+
+        anchors {
+            top: topBar.visible ? topBar.bottom : parent.top
+            right: parent.right
+            bottom: parent.bottom
+
+            topMargin: VLCStyle.dp(20, VLCStyle.scale)
+            rightMargin: VLCStyle.applicationHorizontalMargin + VLCStyle.dp(20, VLCStyle.scale)
+            bottomMargin: parent.height - rootPlayer.positionSliderY + VLCStyle.dp(20, VLCStyle.scale)
+        }
+
+        z: 1
+
+        active: MainCtx.playerSettingsVisible
+
+        onActiveChanged: {
+            if (active)
+                MainCtx.playqueuePanel.visible = false
+            rootPlayer.lockUnlockAutoHide(active)
+        }
+
+        Connections {
+            target: MainCtx.playqueuePanel
+
+            function onVisibleChanged() {
+                if (MainCtx.playqueuePanel.visible)
+                    MainCtx.playerSettingsVisible = false
+            }
+        }
+
+        sourceComponent: PlayerSettingsPanel {
+            focus: true
+
+            onCloseRequested: {
+                MainCtx.playerSettingsVisible = false
+                controlBar.forceActiveFocus()
+            }
+        }
+    }
+
     Dialogs {
         z: 10
         bgContent: rootPlayer

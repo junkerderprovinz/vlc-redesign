@@ -116,6 +116,8 @@ libqt_plugin_la_SOURCES = \
 	dialogs/epg/EPGWidget.cpp \
 	dialogs/epg/EPGWidget.hpp \
 	dialogs/epg/epg.cpp dialogs/epg/epg.hpp \
+	dialogs/extended/effects_controller.cpp \
+	dialogs/extended/effects_controller.hpp \
 	dialogs/extended/extended.cpp dialogs/extended/extended.hpp \
 	dialogs/extended/extended_panels.cpp \
 	dialogs/extended/extended_panels.hpp \
@@ -414,6 +416,7 @@ nodist_libqt_plugin_la_SOURCES = \
 	dialogs/epg/EPGView.moc.cpp \
 	dialogs/epg/EPGWidget.moc.cpp \
 	dialogs/epg/epg.moc.cpp \
+	dialogs/extended/effects_controller.moc.cpp \
 	dialogs/extended/extended.moc.cpp \
 	dialogs/extended/extended_panels.moc.cpp \
 	dialogs/extensions/extensions.moc.cpp \
@@ -1252,6 +1255,20 @@ libqml_module_dialogs_a_QML = \
 	dialogs/dialogs/qml/Dialogs.qml \
 	dialogs/dialogs/qml/ModalDialog.qml \
 	dialogs/dialogs/qml/WindowDialog.qml \
+	dialogs/extended/qml/EffectsColorField.qml \
+	dialogs/extended/qml/EffectsColors.qml \
+	dialogs/extended/qml/EffectsComboBox.qml \
+	dialogs/extended/qml/EffectsExpander.qml \
+	dialogs/extended/qml/EffectsRow.qml \
+	dialogs/extended/qml/EffectsSection.qml \
+	dialogs/extended/qml/EffectsSlider.qml \
+	dialogs/extended/qml/EffectsSwitch.qml \
+	dialogs/extended/qml/EffectsValueField.qml \
+	dialogs/extended/qml/PlayerSettingsAudio.qml \
+	dialogs/extended/qml/PlayerSettingsPanel.qml \
+	dialogs/extended/qml/PlayerSettingsPlayback.qml \
+	dialogs/extended/qml/PlayerSettingsSubtitles.qml \
+	dialogs/extended/qml/PlayerSettingsVideo.qml \
 	dialogs/toolbar/qml/EditorDNDDelegate.qml \
 	dialogs/toolbar/qml/EditorDNDView.qml\
 	dialogs/toolbar/qml/EditorDummyButton.qml \

@@ -103,7 +103,8 @@ T.TabButton {
     }
 
     contentItem: RowLayout {
-        spacing: control.spacing
+        // the spacing goes between the icon and the text only, not around the fillers
+        spacing: 0
 
         Item {
             Layout.fillWidth: true
@@ -147,6 +148,9 @@ T.TabButton {
             Accessible.ignored: true
 
             Layout.alignment: Qt.AlignVCenter
+            Layout.leftMargin: (control.iconTxt.length > 0 || control.iconSource.toString().length > 0
+                                || (control.checked && control.checkedIconSource.toString().length > 0))
+                               ? control.spacing : 0
             Layout.maximumWidth: implicitWidth + 1
             Layout.fillWidth: true
         }
