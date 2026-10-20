@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Copyright (C) 2019 VLC authors and VideoLAN
+ * Copyright (C) 2021 VLC authors and VideoLAN
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,10 +20,34 @@ import QtQuick.Templates as T
 
 import VLC.Style
 
-T.Label {
-    font.pixelSize: VLCStyle.icon_medium
-    font.family: VLCIcons.fontFamily
+Item {
+    id: dummy
 
-    verticalAlignment: Text.AlignVCenter
-    horizontalAlignment: Text.AlignHCenter
+    property alias text: label.text
+    property alias color: label.color
+    property alias frameColor: frame.color
+    property alias backgroundColor: frame.fillColor
+
+    implicitWidth: VLCStyle.dp(30, VLCStyle.scale)
+    implicitHeight: VLCStyle.dp(32, VLCStyle.scale)
+
+    EditorDashedFrame {
+        id: frame
+
+        anchors.fill: parent
+    }
+
+    T.Label {
+        id: label
+
+        anchors.centerIn: parent
+
+        font.pixelSize: VLCStyle.icon_toolbar
+        font.family: VLCIcons.fontFamily
+
+        verticalAlignment: Text.AlignVCenter
+        horizontalAlignment: Text.AlignHCenter
+
+        Accessible.ignored: true
+    }
 }

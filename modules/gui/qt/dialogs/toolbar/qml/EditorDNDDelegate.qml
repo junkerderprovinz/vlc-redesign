@@ -23,13 +23,14 @@ import QtQml.Models
 
 
 import VLC.Player
+import VLC.PlayerControls
 import VLC.Widgets as Widgets
 import VLC.Style
 
 T.Control {
     id: control
 
-    padding: background.border.width
+    padding: VLCStyle.margin_xxxsmall
 
     implicitWidth: Math.max(implicitBackgroundWidth + leftInset + rightInset,
                             implicitContentWidth + leftPadding + rightPadding)
@@ -56,6 +57,9 @@ T.Control {
         id: mouseArea
 
         anchors.fill: parent
+
+        // Above the control, so that the press starts a drag.
+        z: 1
 
         cursorShape: (pressed || root.dragActive) ? Qt.DragMoveCursor
                                                   : Qt.OpenHandCursor
@@ -138,12 +142,8 @@ T.Control {
         color: theme.accent
     }
 
-    background: Rectangle {
-        color: "transparent"
-
-        border.width: VLCStyle.dp(1, VLCStyle.scale)
-        border.color: theme.border
-        border.pixelAligned: (radius < Number.EPSILON)
+    background: EditorDashedFrame {
+        color: (control.containsMouse || control.pressed) ? theme.palette.fgA2 : theme.palette.fgA3
     }
 
     contentItem: Item {
@@ -159,7 +159,10 @@ T.Control {
 
             anchors.fill: (parent === control.contentItem) ? parent : undefined
 
-            source: PlayerControlbarControls.control(model.id).source
+            source: (model.id === ControlListModel.POSITION_WIDGET) ? Qt.resolvedUrl("EditorPositionPreview.qml")
+                                                                    : PlayerControlbarControls.control(model.id).source
+
+            enabled: false
 
             Drag.source: control
 

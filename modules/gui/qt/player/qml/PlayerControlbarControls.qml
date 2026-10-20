@@ -71,7 +71,18 @@ QtObject {
         { id: ControlListModel.PLAYER_SWITCH_BUTTON, file: "PlayerSwitchButton.qml", label: VLCIcons.fullscreen, text: qsTr("Switch Player") },
         { id: ControlListModel.ARTWORK_INFO, file: "ArtworkInfoWidget.qml", label: VLCIcons.info, text: qsTr("Artwork Info") },
         { id: ControlListModel.PLAYBACK_SPEED_BUTTON, file: "PlaybackSpeedButton.qml", label: "1x", text: qsTr("Playback Speed") },
-        { id: ControlListModel.HIGH_RESOLUTION_TIME_WIDGET, file: "HighResolutionTimeWidget.qml", label: VLCIcons.time, text: qsTr("High Resolution Time") }
+        { id: ControlListModel.HIGH_RESOLUTION_TIME_WIDGET, file: "HighResolutionTimeWidget.qml", label: VLCIcons.time, text: qsTr("High Resolution Time") },
+        { id: ControlListModel.WIDGET_DIVIDER, file: "DividerWidget.qml", label: "", text: qsTr("Divider") },
+        { id: ControlListModel.SKIP_BACK_15_BUTTON, file: "SkipBack15Button.qml", label: VLCIcons.backward_15_sec, text: qsTr("Backward 15s") },
+        { id: ControlListModel.SKIP_FW_15_BUTTON, file: "SkipForward15Button.qml", label: VLCIcons.forward_15_sec, text: qsTr("Forward 15s") },
+        { id: ControlListModel.PREFERENCES_BUTTON, file: "PreferencesButton.qml", label: VLCIcons.settings, text: qsTr("VLC Settings") },
+        { id: ControlListModel.HOME_BUTTON, file: "HomeButton.qml", label: VLCIcons.home, text: qsTr("Go Home") },
+        { id: ControlListModel.PLAYLISTS_BUTTON, file: "PlaylistsButton.qml", label: VLCIcons.playlist, text: qsTr("Playlists") },
+        { id: ControlListModel.REPLAY_BUTTON, file: "ReplayButton.qml", label: VLCIcons.replay, text: qsTr("Replay") },
+        { id: ControlListModel.THUMBNAIL_WIDGET, file: "ThumbnailWidget.qml", label: VLCIcons.album, text: qsTr("Thumbnail") },
+        { id: ControlListModel.TITLE_WIDGET, file: "TitleWidget.qml", label: VLCIcons.info, text: qsTr("File Name") },
+        { id: ControlListModel.ARTIST_WIDGET, file: "ArtistWidget.qml", label: VLCIcons.info, text: qsTr("Artist Name") },
+        { id: ControlListModel.FOLDER_WIDGET, file: "FolderWidget.qml", label: VLCIcons.info, text: qsTr("Folder Name") }
     ]
 
     function control(id) {

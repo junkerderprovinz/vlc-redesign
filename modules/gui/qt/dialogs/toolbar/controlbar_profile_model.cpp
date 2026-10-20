@@ -102,22 +102,19 @@ decltype (ControlbarProfileModel::m_defaults)
                         {
                             {
                                 {
-                                    ControlListModel::LANG_BUTTON,
-                                    ControlListModel::BOOKMARK_BUTTON,
-                                    ControlListModel::EXTENDED_BUTTON,
-                                    ControlListModel::NAVIGATION_BUTTONS
-                                },
-                                {
-                                    ControlListModel::SKIP_BACK_BUTTON,
                                     ControlListModel::PREVIOUS_BUTTON,
                                     ControlListModel::PLAY_BUTTON,
-                                    ControlListModel::NEXT_BUTTON,
-                                    ControlListModel::SKIP_FW_BUTTON
+                                    ControlListModel::NEXT_BUTTON
+                                },
+                                {
+                                    ControlListModel::POSITION_WIDGET
                                 },
                                 {
                                     ControlListModel::VOLUME,
-                                    ControlListModel::RENDERER_BUTTON,
-                                    ControlListModel::FULLSCREEN_BUTTON
+                                    ControlListModel::AUDIO_TRACK_BUTTON,
+                                    ControlListModel::LANG_BUTTON,
+                                    ControlListModel::EXTENDED_BUTTON,
+                                    ControlListModel::PLAYLIST_BUTTON
                                 }
                             }
                         }
@@ -127,21 +124,19 @@ decltype (ControlbarProfileModel::m_defaults)
                         {
                             {
                                 {
-                                    ControlListModel::LANG_BUTTON,
-                                    ControlListModel::BOOKMARK_BUTTON,
-                                    ControlListModel::EXTENDED_BUTTON
+                                    ControlListModel::PREVIOUS_BUTTON,
+                                    ControlListModel::SKIP_BACK_15_BUTTON,
+                                    ControlListModel::PLAY_BUTTON,
+                                    ControlListModel::SKIP_FW_15_BUTTON,
+                                    ControlListModel::NEXT_BUTTON
                                 },
                                 {
-                                    ControlListModel::RANDOM_BUTTON,
-                                    ControlListModel::PREVIOUS_BUTTON,
-                                    ControlListModel::PLAY_BUTTON,
-                                    ControlListModel::NEXT_BUTTON,
-                                    ControlListModel::LOOP_BUTTON
+                                    ControlListModel::POSITION_WIDGET
                                 },
                                 {
                                     ControlListModel::VOLUME,
-                                    ControlListModel::RENDERER_BUTTON,
-                                    ControlListModel::FULLSCREEN_BUTTON
+                                    ControlListModel::AUDIO_TRACK_BUTTON,
+                                    ControlListModel::PLAYLIST_BUTTON
                                 }
                             }
                         }
@@ -154,11 +149,81 @@ decltype (ControlbarProfileModel::m_defaults)
                                     ControlListModel::ARTWORK_INFO
                                 },
                                 {
-                                    ControlListModel::RANDOM_BUTTON,
                                     ControlListModel::PREVIOUS_BUTTON,
                                     ControlListModel::PLAY_BUTTON,
-                                    ControlListModel::NEXT_BUTTON,
-                                    ControlListModel::LOOP_BUTTON
+                                    ControlListModel::NEXT_BUTTON
+                                },
+                                {
+                                    ControlListModel::VOLUME,
+                                    ControlListModel::PLAYLIST_BUTTON,
+                                    ControlListModel::PLAYER_SWITCH_BUTTON
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            {
+                Style::MUSIC_STYLE,
+                N_("Music Style"),
+                {
+                    {
+                        PlayerControlbarModel::Videoplayer,
+                        {
+                            {
+                                {
+                                    ControlListModel::PREVIOUS_BUTTON,
+                                    ControlListModel::SKIP_BACK_15_BUTTON,
+                                    ControlListModel::PLAY_BUTTON,
+                                    ControlListModel::SKIP_FW_15_BUTTON,
+                                    ControlListModel::NEXT_BUTTON
+                                },
+                                {
+                                    ControlListModel::POSITION_WIDGET
+                                },
+                                {
+                                    ControlListModel::VOLUME,
+                                    ControlListModel::AUDIO_TRACK_BUTTON,
+                                    ControlListModel::LANG_BUTTON,
+                                    ControlListModel::PLAYLIST_BUTTON
+                                }
+                            }
+                        }
+                    },
+                    {
+                        PlayerControlbarModel::Audioplayer,
+                        {
+                            {
+                                {
+                                    ControlListModel::PREVIOUS_BUTTON,
+                                    ControlListModel::SKIP_BACK_15_BUTTON,
+                                    ControlListModel::PLAY_BUTTON,
+                                    ControlListModel::SKIP_FW_15_BUTTON,
+                                    ControlListModel::NEXT_BUTTON
+                                },
+                                {
+                                    ControlListModel::POSITION_WIDGET
+                                },
+                                {
+                                    ControlListModel::VOLUME,
+                                    ControlListModel::RANDOM_BUTTON,
+                                    ControlListModel::LOOP_BUTTON,
+                                    ControlListModel::PLAYLIST_BUTTON
+                                }
+                            }
+                        }
+                    },
+                    {
+                        PlayerControlbarModel::Miniplayer,
+                        {
+                            {
+                                {
+                                    ControlListModel::ARTWORK_INFO
+                                },
+                                {
+                                    ControlListModel::SKIP_BACK_15_BUTTON,
+                                    ControlListModel::PLAY_BUTTON,
+                                    ControlListModel::SKIP_FW_15_BUTTON
                                 },
                                 {
                                     ControlListModel::VOLUME,

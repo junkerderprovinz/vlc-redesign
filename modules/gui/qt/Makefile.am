@@ -1259,6 +1259,9 @@ libqml_module_dialogs_a_QML = \
 	dialogs/toolbar/qml/ToolbarEditor.qml \
 	dialogs/toolbar/qml/ToolbarEditorDialog.qml \
 	dialogs/toolbar/qml/ToolbarEditorButtonList.qml \
+	dialogs/toolbar/qml/EditorDashedFrame.qml \
+	dialogs/toolbar/qml/EditorZone.qml \
+	dialogs/toolbar/qml/EditorPositionPreview.qml \
 	dialogs/settings/qml/SettingsAddons.qml \
 	dialogs/settings/qml/SettingsButton.qml \
 	dialogs/settings/qml/SettingsColorPicker.qml \
@@ -1478,7 +1481,18 @@ libqml_module_playercontrols_a_QML = \
 	player/qml/controlbarcontrols/Fallback.qml \
 	player/qml/controlbarcontrols/ControlButton.qml \
 	player/qml/controlbarcontrols/PositionWidget.qml \
-	player/qml/controlbarcontrols/AudioTrackButton.qml
+	player/qml/controlbarcontrols/AudioTrackButton.qml \
+	player/qml/controlbarcontrols/DividerWidget.qml \
+	player/qml/controlbarcontrols/SkipBack15Button.qml \
+	player/qml/controlbarcontrols/SkipForward15Button.qml \
+	player/qml/controlbarcontrols/PreferencesButton.qml \
+	player/qml/controlbarcontrols/HomeButton.qml \
+	player/qml/controlbarcontrols/PlaylistsButton.qml \
+	player/qml/controlbarcontrols/ReplayButton.qml \
+	player/qml/controlbarcontrols/ThumbnailWidget.qml \
+	player/qml/controlbarcontrols/TitleWidget.qml \
+	player/qml/controlbarcontrols/ArtistWidget.qml \
+	player/qml/controlbarcontrols/FolderWidget.qml
 libqml_module_playercontrols_a_Singleton_QML =
 libqml_module_playercontrols_a_SOURCES = $(QML_MODULE_playercontrols_SRC)
 nodist_libqml_module_playercontrols_a_SOURCES = playercontrols/qmlassets.cpp $(QML_MODULE_playercontrols_NODIST_EXTRA)

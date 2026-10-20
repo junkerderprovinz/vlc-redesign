@@ -84,17 +84,17 @@ public:
         NAVIGATION_BOX,
         POSITION_WIDGET,
         AUDIO_TRACK_BUTTON,
-        RESERVED_0X2D,
-        RESERVED_0X2E,
-        RESERVED_0X2F,
-        RESERVED_0X30,
-        RESERVED_0X31,
-        RESERVED_0X32,
-        RESERVED_0X33,
-        RESERVED_0X34,
-        RESERVED_0X35,
-        RESERVED_0X36,
-        RESERVED_0X37,
+        WIDGET_DIVIDER,
+        SKIP_BACK_15_BUTTON,
+        SKIP_FW_15_BUTTON,
+        PREFERENCES_BUTTON,
+        HOME_BUTTON,
+        PLAYLISTS_BUTTON,
+        REPLAY_BUTTON,
+        THUMBNAIL_WIDGET,
+        TITLE_WIDGET,
+        ARTIST_WIDGET,
+        FOLDER_WIDGET,
         RESERVED_0X38,
         RESERVED_0X39,
         RESERVED_0X3A,
@@ -112,6 +112,7 @@ public:
 
     static_assert(RESERVED_0X1F == 0x1F, "missaligned");
     static_assert(POSITION_WIDGET == 0x2B, "missaligned");
+    static_assert(RESERVED_0X38 == 0x38, "missaligned");
     static_assert(RESERVED_0X3F == 0x3F, "missaligned");
 
     // Basic functionality:
@@ -126,6 +127,8 @@ public:
     Qt::ItemFlags flags(const QModelIndex& index) const override;
 
     QHash<int, QByteArray> roleNames() const override;
+
+    Q_INVOKABLE bool contains(int control) const;
 
     QVector<int> getControls() const;
     void setControls(const QVector<int>& list);

@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Copyright (C) 2019 VLC authors and VideoLAN
+ * Copyright (C) 2021 VLC authors and VideoLAN
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,12 +21,19 @@ import QtQuick
 import VLC.Style
 import VLC.Widgets as Widgets
 
-Widgets.BannerTabButton {
+Widgets.SegmentButton {
     id: root
 
-    implicitWidth: VLCStyle.button_width_large
-
     signal dropEnterred()
+
+    checkable: false
+    autoExclusive: false
+
+    height: VLCStyle.dp(28, VLCStyle.scale)
+
+    font.pixelSize: VLCStyle.fontSize_normal
+
+    Accessible.role: Accessible.PageTab
 
     DropArea {
         anchors.fill: parent

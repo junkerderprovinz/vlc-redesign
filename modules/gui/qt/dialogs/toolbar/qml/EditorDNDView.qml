@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Copyright (C) 2019 VLC authors and VideoLAN
+ * Copyright (C) 2021 VLC authors and VideoLAN
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,33 +16,61 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 import QtQuick
-import QtQuick.Templates as T
 import QtQml.Models
 
 
 import VLC.Style
 import VLC.Util
-import VLC.Widgets as Widgets
+import VLC.PlayerControls
 
 ListView {
     id: playerBtnDND
 
     spacing: VLCStyle.margin_xsmall
     orientation: Qt.Horizontal
-    clip: true
+    interactive: false
+
+    implicitWidth: contentWidth
 
     currentIndex: -1
     highlightFollowsCurrentItem: false
     boundsBehavior: Flickable.StopAtBounds
 
-    property bool containsDrag: footerItem.dropVisible
+    property bool containsDrag: false
 
-    property alias scrollBar: scrollBar
+    // Width the view may take; stretching controls such as the seek bar
+    // share what the other controls leave of it.
+    property real availableWidth: -1
 
-    property bool extraWidthAvailable: true
+    readonly property real stretchWidth: {
+        if (availableWidth < 0)
+            return VLCStyle.dp(160, VLCStyle.scale)
 
-    T.ScrollBar.horizontal: Widgets.ScrollBarExt {
-        id: scrollBar
+        // Delegates are created after the count changes.
+        if (contentItem.children.length === 0)
+            return 0
+
+        let fixed = 0
+        let stretching = 0
+        for (let i = 0; i < count; ++i) {
+            const item = itemAtIndex(i)
+            if (!item)
+                continue
+            if (item.stretches)
+                ++stretching
+            else
+                fixed += item.implicitWidth
+        }
+
+        if (stretching === 0)
+            return 0
+
+        return (availableWidth - fixed - spacing * Math.max(0, count - 1)) / stretching
+    }
+
+    function isStretching(controlId) {
+        return controlId === ControlListModel.POSITION_WIDGET
+                || controlId === ControlListModel.WIDGET_SPACER_EXTEND
     }
 
     remove: Transition {
@@ -53,30 +81,6 @@ ListView {
             duration: VLCStyle.duration_long
         }
     }
-
-    // FIXME: Animations are disabled because they are incompatible
-    // with the delegate loader which sets extra width after the
-    // control gets loaded.
-    /*
-    add: Transition {
-        NumberAnimation {
-            property: "opacity"; from: 0; to: 1.0
-
-            duration: VLCStyle.duration_long
-        }
-    }
-
-    displaced: Transition {
-        NumberAnimation {
-            properties: "x"
-
-            duration: VLCStyle.duration_long
-            easing.type: Easing.OutSine
-        }
-
-        NumberAnimation { property: "opacity"; to: 1.0 }
-    }
-    */
 
     function dropEvent(drag, destIndex) {
         if (drag.source.dndView === playerBtnDND) {
@@ -97,16 +101,6 @@ ListView {
         }
     }
 
-    readonly property ColorContext colorContext: ColorContext {
-        id: theme
-        colorSet: ColorContext.View
-    }
-
-    VLCFlickableScrollHandler {
-        fallbackScroll: true
-        enabled: true
-    }
-
     MouseArea {
         anchors.fill: parent
 
@@ -117,62 +111,21 @@ ListView {
         cursorShape: root.dragActive ? Qt.DragMoveCursor : Qt.ArrowCursor
     }
 
-    footer: Item {
-        implicitHeight: playerBtnDND.height
-        implicitWidth: Math.max(implicitHeight, playerBtnDND.width - x)
-
-        property alias dropVisible: footerDropArea.containsDrag
-
-        Rectangle {
-            id: footerDropIndicator
-            anchors.verticalCenter: parent.verticalCenter
-            anchors.left: parent.left
-
-            z: 2
-
-            implicitWidth: VLCStyle.dp(2, VLCStyle.scale)
-            implicitHeight: VLCStyle.icon_medium
-
-            visible: dropVisible
-            color: theme.accent
-        }
-
-        DropArea {
-            id: footerDropArea
-
-            anchors {
-                left: parent.left
-                right: parent.right
-                top: footerDropIndicator.top
-                bottom: footerDropIndicator.bottom
-            }
-
-            onEntered: (drag) => {
-                if (drag.source.dndView === playerBtnDND &&
-                        drag.source.DelegateModel.itemsIndex === playerBtnDND.count - 1) {
-                    drag.accepted = false
-                }
-            }
-
-            onDropped: (drop) => {
-                let destIndex = playerBtnDND.count
-
-                if (drop.source.dndView === playerBtnDND)
-                    --destIndex
-
-                dropEvent(drop, destIndex)
-            }
-        }
-    }
-
     delegate: EditorDNDDelegate {
-        height: Math.min((contentItem.implicitHeight > 0) ? contentItem.implicitHeight : Number.MAX_VALUE, VLCStyle.controlLayoutHeight)
+        id: dndDelegate
+
+        readonly property bool stretches: playerBtnDND.isStretching(controlId)
+
+        width: stretches ? Math.max(VLCStyle.dp(80, VLCStyle.scale), playerBtnDND.stretchWidth)
+                         : implicitWidth
+        height: (contentItem.implicitHeight > 0) ? Math.min(implicitHeight, playerBtnDND.height)
+                                                 : playerBtnDND.height
 
         anchors.verticalCenter: parent ? parent.verticalCenter : undefined
         dndView: playerBtnDND
 
         Binding {
-            when: dropArea.containsDrag
+            when: dndDelegate.dropArea.containsDrag
             value: true
 
             target: playerBtnDND

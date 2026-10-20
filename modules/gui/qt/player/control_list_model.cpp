@@ -84,6 +84,11 @@ QHash<int, QByteArray> ControlListModel::roleNames() const
     };
 }
 
+bool ControlListModel::contains(int control) const
+{
+    return m_controls.contains(static_cast<ControlType>(control));
+}
+
 QVector<int> ControlListModel::getControls() const
 {
     QVector<int> list;
