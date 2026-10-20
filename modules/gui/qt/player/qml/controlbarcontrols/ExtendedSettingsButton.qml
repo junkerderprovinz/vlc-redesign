@@ -29,7 +29,7 @@ ControlButton {
 
     text: VLCIcons.effect_filter
 
-    description: qsTr("Extended settings")
+    description: qsTr("Player Settings")
 
     AccessibleCompat.id: "extendedSettingsButton"
 

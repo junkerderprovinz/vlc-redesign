@@ -185,7 +185,7 @@ FocusScope {
             anchors.fill: parent
             anchors.margins: VLCStyle.dp(20, VLCStyle.scale)
 
-            text: qsTr("Show Preferences")
+            text: qsTr("Global Settings")
 
             onClicked: {
                 root.trackMenuController.requestClose()

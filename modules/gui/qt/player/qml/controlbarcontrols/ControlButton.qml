@@ -21,7 +21,6 @@ import QtQuick
 import VLC.Widgets as Widgets
 import VLC.Style
 
-// Icon button of the player control bar: a 24 px glyph in a 30 x 32 hit area.
 Widgets.IconToolButton {
     id: control
 

@@ -23,12 +23,12 @@ import VLC.Style
 import VLC.Dialogs
 import VLC.Util
 
-Widgets.IconToolButton {
+ControlButton {
     id: preferencesBtn
 
     text: VLCIcons.settings
     onClicked: DialogsProvider.prefsDialog()
-    description: qsTr("VLC Settings")
+    description: qsTr("Global Settings")
 
     AccessibleCompat.id: "preferencesButton"
 }

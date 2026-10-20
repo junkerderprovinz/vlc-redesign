@@ -52,13 +52,12 @@ FocusScope {
     property bool showToolbar: false
     property bool pinControls: false
 
-    // Draws the bar translucent when it lies over the video.
     property bool overVideo: false
 
     property bool playlistVisible: false
 
-    // Same entries as the title bar of the main window: the sidebar toggle shows
-    // the library beside the video, the folder chip goes back to the library.
+    // the sidebar toggle shows the library beside the video, the folder chip
+    // goes back to the library
     property bool showSidebarToggle: true
     property alias sidebarVisible: sidebarToggle.checked
 
@@ -229,7 +228,7 @@ FocusScope {
                 visible: root.showSidebarToggle
 
                 text: VLCIcons.sidebar_left
-                description: qsTr("Toggle sidebar")
+                description: qsTr("Library Panel")
 
                 AccessibleCompat.id: "sidebarToggleButton"
 

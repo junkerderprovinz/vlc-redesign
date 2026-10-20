@@ -245,7 +245,7 @@ T.Page {
 
             readonly property var _actions: [
                 { text: qsTr("Add Folder to Play Queue..."), trigger: () => DialogsProvider.PLAppendDir() },
-                { text: qsTr("Preferences..."), trigger: () => DialogsProvider.prefsDialog() }
+                { text: qsTr("Global Settings..."), trigger: () => DialogsProvider.prefsDialog() }
             ]
 
             function show(item) {

@@ -30,7 +30,7 @@ ControlButton {
 
     text: VLCIcons.skip_back
     onClicked: Player.jumpBwd()
-    description: qsTr("Step back")
+    description: qsTr("Jump Backward")
 
     AccessibleCompat.id: "skipBackButton"
 }

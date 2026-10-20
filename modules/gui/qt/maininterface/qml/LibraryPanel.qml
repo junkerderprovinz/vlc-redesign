@@ -29,7 +29,7 @@ FocusScope {
     id: root
 
     Accessible.role: Accessible.Pane
-    Accessible.name: qsTr("Library panel")
+    Accessible.name: qsTr("Library Panel")
     AccessibleCompat.id: "libraryPanel"
 
     property real maximumWidth: Number.MAX_VALUE

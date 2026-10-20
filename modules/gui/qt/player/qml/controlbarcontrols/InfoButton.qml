@@ -30,7 +30,7 @@ ControlButton {
     enabled: Player.isStarted
     text: VLCIcons.info
     onClicked: DialogsProvider.mediaInfoDialog()
-    description: qsTr("Information")
+    description: qsTr("Media Information")
 
     AccessibleCompat.id: "infoButton"
 }

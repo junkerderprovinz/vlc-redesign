@@ -29,7 +29,7 @@ ControlButton {
     checked: MainPlaylistController.random
     text: VLCIcons.shuffle
     onClicked: MainPlaylistController.toggleRandom()
-    description: qsTr("Random")
+    description: qsTr("Shuffle")
 
     AccessibleCompat.id: "randomButton"
 }
