@@ -15,7 +15,6 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
-
 import QtQuick
 import QtQuick.Templates as T
 import QtQuick.Layouts
@@ -35,7 +34,12 @@ T.ItemDelegate {
 
     property bool showText: true
 
-    property real radius: VLCStyle.button_radius
+    // Sub entries have no icon, they line up with the label of their parent.
+    property bool indented: false
+
+    property real radius: VLCStyle.margin_xxsmall
+
+    readonly property real iconWidth: VLCStyle.dp(30, VLCStyle.scale)
 
     // Settings
 
@@ -44,19 +48,10 @@ T.ItemDelegate {
     implicitHeight: Math.max(implicitBackgroundHeight + topInset + bottomInset,
                              implicitContentHeight + topPadding + bottomPadding)
 
-    padding: VLCStyle.margin_xxsmall
+    padding: 0
+    leftPadding: (showText && indented) ? iconWidth + spacing : 0
 
-    leftInset: implicitLeftInset
-    rightInset: implicitRightInset
-
-    topInset: implicitTopInset
-    bottomInset: implicitBottomInset
-
-    property real implicitLeftInset: VLCStyle.margin_xxsmall
-    property real implicitRightInset: VLCStyle.margin_xxsmall
-
-    property real implicitTopInset: VLCStyle.margin_xxxsmall
-    property real implicitBottomInset: VLCStyle.margin_xxxsmall
+    spacing: VLCStyle.margin_xsmall
 
     // Accessible
 
@@ -68,6 +63,8 @@ T.ItemDelegate {
             "video": "videoNavBar",
             "music": "musicNavBar",
             "network": "browseNavBar",
+            "playlists": "playlistsNavBar",
+            "recent": "recentNavBar",
             "discover": "discoverNavBar"
         }
         const id = navBarIds[model.uri[0]]
@@ -103,43 +100,27 @@ T.ItemDelegate {
         border.color: visualFocus ? theme.visualFocus : "transparent"
 
         radius: control.radius
-
-        Widgets.CurrentIndicator {
-            anchors {
-                left: parent.left
-                leftMargin: VLCStyle.margin_xxxsmall
-                verticalCenter: parent.verticalCenter
-            }
-            implicitHeight: parent.height / 2
-            visible: control.checked
-
-            radius: control.radius / 2
-        }
     }
 
     contentItem: RowLayout {
-        spacing: VLCStyle.margin_xsmall
+        spacing: control.spacing
 
-        Item {
-            Layout.preferredWidth: VLCStyle.icon_banner
+        Widgets.IconLabel {
+            id: iconLabel
+
+            Layout.preferredWidth: control.iconWidth
             Layout.fillHeight: true
 
-            Widgets.IconLabel {
-                id: iconLabel
+            visible: text.length > 0 && !control.indented
 
-                visible: text.length > 0
+            text: control.iconTxt
 
-                anchors.centerIn: parent
+            horizontalAlignment: Text.AlignHCenter
+            verticalAlignment: Text.AlignVCenter
 
-                text: control.iconTxt
+            color: (control.highlighted || control.checked) ? theme.accent : theme.fg.primary
 
-                horizontalAlignment: Text.AlignHCenter
-                verticalAlignment: Text.AlignVCenter
-
-                color: (control.highlighted || control.checked) ? theme.accent : theme.fg.primary
-
-                font.pixelSize: VLCStyle.icon_banner
-            }
+            font.pixelSize: VLCStyle.icon_normal
         }
 
         T.Label {
@@ -158,9 +139,7 @@ T.ItemDelegate {
 
             visible: control.showText
 
-            font.pixelSize: VLCStyle.fontSize_normal
-
-            font.weight: control.checked ? Font.DemiBold : Font.Normal
+            font.pixelSize: VLCStyle.fontSize_large
 
             //button text is already exposed
             Accessible.ignored: true

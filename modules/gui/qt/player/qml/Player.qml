@@ -929,6 +929,39 @@ FocusScope {
         }
     }
 
+    Loader {
+        id: libraryPanelLoader
+
+        anchors {
+            top: topBar.bottom
+            bottom: controlBar.top
+            left: parent.left
+        }
+
+        z: 1
+
+        active: MainCtx.libraryPanel.visible && (MainCtx.intfMainWindow.visibility !== Window.FullScreen)
+
+        source: "qrc:///qt/qml/VLC/MainInterface/LibraryPanel.qml"
+
+        // The controls stay visible while the library is open.
+        onLoaded: {
+            item.maximumWidth = Qt.binding(() => rootPlayer.width / 2)
+            rootPlayer.lockUnlockAutoHide(true)
+        }
+
+        onActiveChanged: {
+            if (!active)
+                rootPlayer.lockUnlockAutoHide(false)
+        }
+    }
+
+    Binding {
+        target: playerSpecializationLoader
+        property: "anchors.leftMargin"
+        value: libraryPanelLoader.active ? libraryPanelLoader.width : 0
+    }
+
     TopBar {
         id: topBar
 

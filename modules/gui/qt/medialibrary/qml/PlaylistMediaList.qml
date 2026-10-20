@@ -43,6 +43,8 @@ MainViewLoader {
 
     property bool isMusic: false
 
+    property alias playlistType: playlistModel.playlistType
+
     readonly property int currentIndex: currentItem?.currentIndex ?? -1
 
     property Component header: null

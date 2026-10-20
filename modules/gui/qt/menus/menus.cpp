@@ -315,6 +315,12 @@ void VLCMenuBar::ViewMenu(qt_intf_t *p_intf, QMenu *menu)
     connect( action, &QAction::triggered, mi->getPlayqueuePanel(), &SidePanelCtx::setDocked );
     action->setChecked( mi->getPlayqueuePanel()->isDocked() );
 
+    /* Library beside the player */
+    action = menu->addAction( qtr( "&Library Panel" ) );
+    action->setCheckable( true );
+    connect( action, &QAction::triggered, mi->getLibraryPanel(), &SidePanelCtx::setVisible );
+    action->setChecked( mi->getLibraryPanel()->isVisible() );
+
     menu->addSeparator();
 
     action = menu->addAction( qtr( "Always on &top" ) );

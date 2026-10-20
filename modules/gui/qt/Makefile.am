@@ -1271,7 +1271,9 @@ libqml_module_maininterface_a_QML = \
 	maininterface/qml/SideNavigationPane.qml \
 	maininterface/qml/SideNavigationDelegate.qml \
 	maininterface/qml/NoMedialibHome.qml \
-	maininterface/qml/OpenFileSplitButton.qml
+	maininterface/qml/OpenFileSplitButton.qml \
+	maininterface/qml/AddMediaMenu.qml \
+	maininterface/qml/LibraryPanel.qml
 
 if UPDATE_CHECK
 libqml_module_maininterface_a_QML += maininterface/qml/UpdatePane.qml
@@ -1326,7 +1328,9 @@ libqml_module_medialibrary_a_QML = \
 	medialibrary/qml/MLContextMenu.qml \
 	medialibrary/qml/MLDragItem.qml \
 	medialibrary/qml/MLTableColumns.qml \
-	medialibrary/qml/ScanProgressBar.qml
+	medialibrary/qml/ScanProgressBar.qml \
+	medialibrary/qml/PlaylistsDisplay.qml \
+	medialibrary/qml/RecentDisplay.qml
 libqml_module_medialibrary_a_Singleton_QML =
 libqml_module_medialibrary_a_SOURCES = $(QML_MODULE_medialibrary_SRC)
 nodist_libqml_module_medialibrary_a_SOURCES = medialibrary/qmlassets.cpp $(QML_MODULE_medialibrary_NODIST_EXTRA)

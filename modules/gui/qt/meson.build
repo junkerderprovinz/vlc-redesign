@@ -645,6 +645,8 @@ qml_modules += {
         qml_maininterface_extra_files,
         'maininterface/qml/SideNavigationPane.qml',
         'maininterface/qml/SideNavigationDelegate.qml',
+        'maininterface/qml/AddMediaMenu.qml',
+        'maininterface/qml/LibraryPanel.qml',
     ),
 }
 qml_modules += {
@@ -692,6 +694,8 @@ qml_modules += {
         'medialibrary/qml/MLDragItem.qml',
         'medialibrary/qml/MLTableColumns.qml',
         'medialibrary/qml/ScanProgressBar.qml',
+        'medialibrary/qml/PlaylistsDisplay.qml',
+        'medialibrary/qml/RecentDisplay.qml',
     ),
 }
 

@@ -30,32 +30,35 @@ import VLC.Util
 T.Pane {
     id: root
 
-    signal itemClicked(uri : var, item : Item)
+    // The PageLoader that shows the selected section.
+    property Item pageLoader: null
 
-    //safe area margins for delegate content,
-    //so the background of the delegates fills the available space
-    //but the content remains within the safe area
-    property int safeAreaLeftMargin: 0
-    property int safeAreaRightMargin: 0
+    // Icons only, as a rail beside the player or when the window is narrow.
+    property bool compact: false
 
-    property bool useAcrylic: true
-
-    property bool delegateShowText: true
+    // The navigation sits on a rounded card next to the full library, and
+    // directly on the window background as a rail.
+    property bool card: true
 
     property alias model: navigationModel
 
-    readonly property int minimumWidth: VLCStyle.expandNavigationPaneWidth + safeAreaLeftMargin + safeAreaRightMargin
+    readonly property real cardPadding: card ? VLCStyle.margin_xsmall : 0
 
-    implicitWidth: Math.max(implicitBackgroundWidth + leftInset + rightInset,
-                            implicitContentWidth + leftPadding + rightPadding)
+    implicitWidth: compact ? (card ? VLCStyle.dp(66, VLCStyle.scale) : VLCStyle.dp(50, VLCStyle.scale))
+                           : VLCStyle.dp(217, VLCStyle.scale)
     implicitHeight: Math.max(implicitBackgroundHeight + topInset + bottomInset,
                              implicitContentHeight + topPadding + bottomPadding)
 
-    padding: VLCStyle.margin_normal
+    padding: cardPadding
 
     readonly property ColorContext colorContext: ColorContext {
         id: theme
         colorSet: ColorContext.Window
+    }
+
+    ColorContext {
+        id: viewTheme
+        colorSet: ColorContext.View
     }
 
     Accessible.name: qsTr("Sidebar")
@@ -88,25 +91,63 @@ T.Pane {
         }
     }
 
-    background: Widgets.AcrylicBackground {
-        enabled: root.useAcrylic
-        tintColor: theme.bg.primary
+    background: Rectangle {
+        color: root.card ? viewTheme.bg.primary : theme.bg.secondary
     }
 
-    contentItem:  Item {
+    AddMediaMenu {
+        id: addMediaMenu
+    }
+
+    NavigationBarContextMenu {
+        id: navigationBarContextMenu
+
+        ctx: MainCtx
+
+        model: navigationModel
+
+        onPageRequested: (uri) => root._open(uri)
+    }
+
+    function _open(uri) {
+        if ((root.pageLoader && root.pageLoader.isDefaulLoadedForPath([...uri])) ||
+            (uri.length > 0 && History.exactMatch(History.viewPath, uri))) {
+            root.pageLoader?.positionContentAtBeginning()
+            return
+        }
+
+        History.push(uri)
+    }
+
+    contentItem: Rectangle {
         id: contentItemId
+
+        color: root.card ? theme.bg.secondary : "transparent"
+        radius: root.card ? VLCStyle.dp(6, VLCStyle.scale) : 0
+
+        readonly property real horizontalPadding: root.compact ? (width - addButton.iconWidth) / 2
+                                                               : VLCStyle.margin_normal
+        readonly property real verticalPadding: root.card ? VLCStyle.margin_small : VLCStyle.margin_xsmall
 
         //don't use Layout as top item as items put as children of the Control
         //would be parented (and layouted) to the Layout
         ColumnLayout {
             anchors.fill: parent
-            spacing: VLCStyle.margin_xsmall
+            anchors.leftMargin: contentItemId.horizontalPadding
+            anchors.rightMargin: contentItemId.horizontalPadding
+            anchors.topMargin: contentItemId.verticalPadding
+            anchors.bottomMargin: contentItemId.verticalPadding
+
+            spacing: 0
 
             Widgets.ListViewExt {
                 id: listView
 
                 Layout.fillWidth: true
-                Layout.fillHeight: true
+                Layout.preferredHeight: Math.min(contentHeight, parent.height - addButton.height)
+
+                // Delegates carry the gap below them, so that hidden sub entries take no room.
+                readonly property real gap: VLCStyle.dp(14, VLCStyle.scale)
 
                 clip: !fadingEdge.implicitClipping && (height < contentHeight)
                 focus: true
@@ -122,8 +163,7 @@ T.Pane {
 
                 colorContext.colorSet: ColorContext.Window
 
-                fadingEdge.backgroundColor:  (root.background && (root.background.color.a >= 1.0)) ? root.background.color
-                                                                                                   : "transparent"
+                fadingEdge.backgroundColor: "transparent"
 
                 component DelegateAnimation : NumberAnimation {
                     easing.type: Easing.InOutSine
@@ -155,7 +195,7 @@ T.Pane {
                 }
 
                 Navigation.parentItem: root
-                Navigation.downItem: preferenceButton
+                Navigation.downItem: addButton
 
                 delegate: SideNavigationDelegate {
                     id: delegate
@@ -163,18 +203,16 @@ T.Pane {
                     width: ListView.view.contentWidth
                     height: preferredHeight
 
-                    property real preferredHeight: shouldShow ? VLCStyle.buttonHeightNavigationPane : 0.0
+                    property real preferredHeight: shouldShow ? VLCStyle.heightBar_normal + listView.gap : 0.0
 
-                    leftPadding: root.safeAreaLeftMargin + VLCStyle.margin_xsmall
-                    rightPadding: root.safeAreaRightMargin
-
-                    leftInset: root.safeAreaLeftMargin + implicitLeftInset
-                    rightInset: root.safeAreaRightMargin + implicitRightInset
+                    bottomInset: listView.gap
+                    bottomPadding: listView.gap
 
                     iconTxt: icon_alias
                     text: title
 
-                    showText: root.delegateShowText
+                    showText: !root.compact
+                    indented: (depth > 0)
 
                     required property string title
                     required property var uri
@@ -202,7 +240,12 @@ T.Pane {
                     checked: (!showText || !expanded) && highlighted
 
                     onClicked: {
-                        itemClicked(uri, this)
+                        // Without labels the sub entries of the current section are in a menu.
+                        if (root.compact && expandable && highlighted)
+                            navigationBarContextMenu.popup(index, mapToGlobal(width, 0), !hovered)
+                        else
+                            root._open(uri)
+
                         listView.currentIndex = index
                         listView.forceActiveFocus(focusReason)
                     }
@@ -235,52 +278,20 @@ T.Pane {
                 }
             }
 
-            Loader {
-                id: loaderProgress
-
-                Layout.fillWidth: true
-
-                active: (MainCtx.mediaLibraryAvailable && MainCtx.mediaLibrary.idle === false)
-                visible: active
-
-                source: "qrc:///qt/qml/VLC/MediaLibrary/ScanProgressBar.qml"
-
-                onLoaded: {
-                    if (item.background) {
-                        item.background.opacity = 0.6
-                        item.background.radius = Qt.binding(() => VLCStyle.dp(4, VLCStyle.scale))
-                    }
-
-                    item.leftPadding = Qt.binding(function() { return root.safeAreaLeftMargin + VLCStyle.margin_small })
-                    item.rightPadding = Qt.binding(function() { return root.safeAreaRightMargin + VLCStyle.margin_small })
-
-                    item.leftInset = Qt.binding(() => { return VLCStyle.margin_xxsmall + root.safeAreaLeftMargin })
-                    item.rightInset = Qt.binding(() => { return VLCStyle.margin_xxsmall + root.safeAreaRightMargin })
-                }
-            }
-
             SideNavigationDelegate {
-                id: preferenceButton
+                id: addButton
 
-                AccessibleCompat.id: "preferencesButton"
+                AccessibleCompat.id: "addItemButton"
 
                 Layout.fillWidth: true
-                Layout.preferredHeight: VLCStyle.buttonHeightNavigationPane
+                Layout.preferredHeight: VLCStyle.heightBar_normal
 
-                leftPadding: root.safeAreaLeftMargin + VLCStyle.margin_xsmall
-                rightPadding: root.safeAreaRightMargin
+                iconTxt: VLCIcons.add
+                text: qsTr("Add item")
 
-                leftInset: root.safeAreaLeftMargin + implicitLeftInset
-                rightInset: root.safeAreaRightMargin + implicitRightInset
+                showText: !root.compact
 
-                iconTxt: VLCIcons.settings
-                text: qsTr("Preferences")
-
-                checked: DialogsProvider.prefsDialogVisible
-
-                showText: root.delegateShowText
-
-                onClicked: DialogsProvider.prefsDialog()
+                onClicked: addMediaMenu.show(addButton)
 
                 //SideNavigationDelegate is an ItemDelegate and has NoFocus by default
                 focusPolicy: Qt.StrongFocus
@@ -293,6 +304,27 @@ T.Pane {
                 Keys.onReleased: (e) => Navigation.defaultKeyReleaseAction(e)
             }
 
+            Item {
+                Layout.fillHeight: true
+            }
+
+            Loader {
+                id: loaderProgress
+
+                Layout.fillWidth: true
+
+                active: !root.compact && (MainCtx.mediaLibraryAvailable && MainCtx.mediaLibrary.idle === false)
+                visible: active
+
+                source: "qrc:///qt/qml/VLC/MediaLibrary/ScanProgressBar.qml"
+
+                onLoaded: {
+                    if (item.background) {
+                        item.background.opacity = 0.6
+                        item.background.radius = Qt.binding(() => VLCStyle.dp(4, VLCStyle.scale))
+                    }
+                }
+            }
         }
     }
 }
