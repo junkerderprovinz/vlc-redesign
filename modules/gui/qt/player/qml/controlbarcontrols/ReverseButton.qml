@@ -26,7 +26,7 @@ import VLC.Player
 import VLC.Style
 import VLC.Util
 
-Widgets.IconToolButton {
+ControlButton {
     enabled: Player.rewindable
 
     text: VLCIcons.play_reverse

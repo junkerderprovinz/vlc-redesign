@@ -23,7 +23,7 @@ import VLC.Style
 import VLC.Dialogs
 import VLC.Util
 
-Widgets.IconToolButton {
+ControlButton {
     id: extdSettingsBtn
 
     text: VLCIcons.effect_filter

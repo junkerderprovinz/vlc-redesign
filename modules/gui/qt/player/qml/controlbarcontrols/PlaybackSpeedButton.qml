@@ -50,9 +50,15 @@ PopupIconToolButton {
         }
     }
 
+    // The speed glyph while playing at normal speed, the rate otherwise.
+    readonly property bool _normalRate: root.paintOnly || Math.abs(Player.rate - 1.0) < 0.01
+
+    horizontalPadding: VLCStyle.dp(3, VLCStyle.scale)
+    verticalPadding: VLCStyle.dp(4, VLCStyle.scale)
+
     contentItem: Item {
-        implicitHeight: label.implicitHeight
-        implicitWidth: textMetrics.width
+        implicitHeight: VLCStyle.icon_toolbar
+        implicitWidth: root._normalRate ? VLCStyle.icon_toolbar : textMetrics.width
 
         TextMetrics {
             id: textMetrics
@@ -61,20 +67,30 @@ PopupIconToolButton {
             text: "0.00x-"
         }
 
+        IconLabel {
+            anchors.centerIn: parent
+
+            visible: root._normalRate
+
+            text: VLCIcons.speed
+            color: root.color
+            font.pixelSize: VLCStyle.icon_toolbar
+        }
+
         Text {
             id: label
 
             anchors.fill: parent
 
+            visible: !root._normalRate
+
             verticalAlignment: Text.AlignVCenter
             horizontalAlignment: Text.AlignHCenter
 
-            font.pixelSize: VLCStyle.fontSize_normal
+            font.pixelSize: VLCStyle.fontSize_large
 
-            text: !root.paintOnly ? qsTr("%1x").arg(+Player.rate.toFixed(2))
-                                  : qsTr("1x")
-
-            color: root.color
+            text: qsTr("%1x").arg(+Player.rate.toFixed(2))
+            color: root.colorContext.accent
         }
     }
 

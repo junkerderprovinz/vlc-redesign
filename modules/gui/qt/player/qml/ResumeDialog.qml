@@ -15,7 +15,6 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
-
 import QtQuick
 import QtQuick.Layouts
 import QtQuick.Templates as T
@@ -27,18 +26,21 @@ import VLC.Style
 import VLC.Widgets as Widgets
 import VLC.Util
 
-FocusScope {
+T.Pane {
     id: resumePanel
 
-    property int maxWidth
+    implicitWidth: Math.max(implicitBackgroundWidth + leftInset + rightInset,
+                            implicitContentWidth + leftPadding + rightPadding)
+    implicitHeight: Math.max(implicitBackgroundHeight + topInset + bottomInset,
+                             implicitContentHeight + topPadding + bottomPadding)
 
-    implicitHeight: continueBtn.y + continueBtn.implicitHeight
-    implicitWidth: maxWidth
-
-    baselineOffset: label.baselineOffset
+    padding: VLCStyle.dp(10, VLCStyle.scale)
+    leftPadding: VLCStyle.dp(20, VLCStyle.scale)
 
     visible: false
     enabled: visible
+
+    focusPolicy: Qt.NoFocus
 
     Accessible.role: Accessible.Dialog
     Accessible.name: qsTr("Resume dialog")
@@ -79,11 +81,12 @@ FocusScope {
         }
     }
 
+    readonly property var _tokens: theme.palette ?? VLCStyle.palette
+
     readonly property ColorContext colorContext: ColorContext {
         id: theme
         colorSet: ColorContext.Window
     }
-
 
     Component.onCompleted: {
         if (Player.canRestorePlayback) {
@@ -95,107 +98,101 @@ FocusScope {
         hideResumePanel()
     }
 
-    TextMetrics {
-        id: textMetrics
+    background: Rectangle {
+        radius: VLCStyle.dp(16, VLCStyle.scale)
+        color: resumePanel._tokens.bgA3Glass
 
-        font: label.font
-        text: label.text
+        Widgets.RoundedRectangleShadow {
+            z: -1
+            color: Qt.rgba(0, 0, 0, resumePanel._tokens.isDark ? 0.46 : 0.18)
+            yOffset: VLCStyle.dp(8, VLCStyle.scale)
+            blurRadius: VLCStyle.dp(15, VLCStyle.scale)
+        }
     }
 
-    //FIXME use the right xxxLabel class
-    T.Label {
-        id: label
+    contentItem: RowLayout {
+        spacing: VLCStyle.dp(60, VLCStyle.scale)
 
-        anchors.topMargin: VLCStyle.margin_small
-        anchors.top: parent.top
-        anchors.left: parent.left
+        T.Label {
+            id: label
 
-        color: theme.fg.primary
-        font.pixelSize: VLCStyle.fontSize_normal
-        font.bold: true
-        wrapMode: Text.Wrap
+            Layout.fillWidth: true
 
-        text: qsTr("Do you want to restart the playback where you left off?")
-    }
+            color: resumePanel._tokens.fg2
+            font.pixelSize: VLCStyle.fontSize_xlarge
+            elide: Text.ElideRight
 
-    Widgets.ButtonExt {
-        id: continueBtn
-
-        anchors.verticalCenter: label.verticalCenter
-        anchors.left: label.right
-        anchors.leftMargin: VLCStyle.margin_xsmall
-
-        text: qsTr("Continue")
-
-        AccessibleCompat.id: "resumeContinueButton"
-
-        font.bold: true
-        color: theme.fg.primary
-        focus: true
-        onClicked: {
-            Player.restorePlaybackPos()
-            hideResumePanel()
+            text: qsTr("You already watched part of this video.")
         }
 
-        Navigation.parentItem: resumePanel
-        Navigation.rightItem: closeBtn
-        Keys.priority: Keys.AfterItem
-        Keys.onPressed: (event) =>  continueBtn.Navigation.defaultKeyAction(event)
-    }
+        RowLayout {
+            spacing: VLCStyle.dp(10, VLCStyle.scale)
 
-    Widgets.ButtonExt {
-        id: closeBtn
+            T.Button {
+                id: continueBtn
 
-        anchors.verticalCenter: label.verticalCenter
-        anchors.left: continueBtn.right
+                implicitWidth: implicitContentWidth + leftPadding + rightPadding
+                implicitHeight: VLCStyle.dp(32, VLCStyle.scale)
 
-        text: qsTr("Dismiss")
+                horizontalPadding: VLCStyle.margin_xsmall
 
-        AccessibleCompat.id: "resumeDismissButton"
+                text: qsTr("Continue Watching")
 
-        font.bold: true
-        color: theme.fg.primary
-        onClicked: hideResumePanel()
+                AccessibleCompat.id: "resumeContinueButton"
 
-        Navigation.parentItem: resumePanel
-        Navigation.leftItem: continueBtn
-        Keys.priority: Keys.AfterItem
-        Keys.onPressed: (event) => closeBtn.Navigation.defaultKeyAction(event)
-    }
+                focus: true
 
-    states: [
-        State {
-            name: "small"
+                readonly property ColorContext colorContext: ColorContext {
+                    id: accentTheme
+                    colorSet: ColorContext.ButtonAccent
+                    hovered: continueBtn.hovered
+                    focused: continueBtn.visualFocus
+                    pressed: continueBtn.down
+                }
 
-            PropertyChanges {
-                target: label
+                background: Rectangle {
+                    radius: VLCStyle.dp(6, VLCStyle.scale)
+                    color: accentTheme.bg.primary
+                }
 
-                width: resumePanel.maxWidth
+                contentItem: T.Label {
+                    text: continueBtn.text
+                    color: accentTheme.fg.primary
+                    font.pixelSize: VLCStyle.fontSize_large
+                    verticalAlignment: Text.AlignVCenter
+                    horizontalAlignment: Text.AlignHCenter
+                }
+
+                onClicked: {
+                    Player.restorePlaybackPos()
+                    hideResumePanel()
+                }
+
+                Navigation.parentItem: resumePanel
+                Navigation.rightItem: closeBtn
+                Keys.priority: Keys.AfterItem
+                Keys.onPressed: (event) =>  continueBtn.Navigation.defaultKeyAction(event)
             }
 
-            PropertyChanges {
-                target: continueBtn
+            Widgets.IconToolButton {
+                id: closeBtn
 
-                anchors.leftMargin: -VLCStyle.margin_xsmall
-            }
+                implicitWidth: VLCStyle.dp(44, VLCStyle.scale)
+                implicitHeight: VLCStyle.dp(32, VLCStyle.scale)
 
-            AnchorChanges {
-                target: continueBtn
+                radius: VLCStyle.dp(6, VLCStyle.scale)
+                backgroundColor: resumePanel._tokens.bgA1
 
-                anchors.top: label.bottom
-                anchors.verticalCenter: undefined
-                anchors.left: parent.left
-            }
+                text: VLCIcons.close
+                description: qsTr("Dismiss")
 
-            AnchorChanges {
-                target: closeBtn
+                AccessibleCompat.id: "resumeDismissButton"
 
-                anchors.top: label.bottom
-                anchors.verticalCenter: undefined
+                onClicked: hideResumePanel()
+
+                Navigation.parentItem: resumePanel
+                Navigation.leftItem: continueBtn
             }
         }
-    ]
-
-    state: (textMetrics.width + VLCStyle.margin_xsmall + continueBtn.width + closeBtn.width
-            > maxWidth) ? "small" : ""
+    }
 }

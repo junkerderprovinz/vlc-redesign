@@ -30,25 +30,39 @@ import VLC.Util
 T.Popup {
     id: root
 
+    enum Tab {
+        Video,
+        Audio,
+        Subtitles
+    }
+
+    property int currentTab: TracksMenu.Tab.Subtitles
+
     // Settings
-    property var preferredWidth : stackView.currentItem.preferredWidth
 
-    width: Math.min((typeof preferredWidth !== "undefined")
-                          ? preferredWidth : Number.MAX_VALUE
-                    , root.parent.width)
+    width: Math.min(VLCStyle.dp(400, VLCStyle.scale), root.parent.width)
 
-    height: VLCStyle.dp(296, VLCStyle.scale)
+    height: Math.min(VLCStyle.dp(524, VLCStyle.scale), root.parent.height - VLCStyle.dp(40, VLCStyle.scale))
 
-    // Animations
+    padding: 0
 
-    Behavior on width {
-        SmoothedAnimation {
+    onCurrentTabChanged: stackView.pop(null)
+
+    onClosed: stackView.pop(null, T.StackView.Immediate)
+
+    enter: Transition {
+        NumberAnimation {
+            property: "opacity"
+            from: 0.0
+            to: 1.0
             duration: VLCStyle.duration_veryShort
-            easing.type: Easing.InOutSine
         }
     }
 
     // Children
+
+    // the colour context has no palette until it is attached
+    readonly property var _tokens: popupTheme.palette ?? VLCStyle.palette
 
     readonly property ColorContext colorContext: ColorContext {
         id: popupTheme
@@ -56,63 +70,184 @@ T.Popup {
     }
 
     background: Rectangle {
-        // NOTE: The opacity should be stronger on a light background for readability.
-        color: popupTheme.bg.primary.alpha(popupTheme.palette.isDark ? 0.8 : 0.96)
+        radius: VLCStyle.dp(10, VLCStyle.scale)
+        color: root._tokens.bgB1Glass
 
-        Rectangle {
-            anchors.left: parent.left
-            anchors.right: parent.right
-
-            height: VLCStyle.margin_xxxsmall
-
-            color: popupTheme.border
+        Widgets.RoundedRectangleShadow {
+            z: -1
+            color: Qt.rgba(0, 0, 0, root._tokens.isDark ? 0.46 : 0.18)
+            yOffset: VLCStyle.dp(8, VLCStyle.scale)
+            blurRadius: VLCStyle.dp(15, VLCStyle.scale)
         }
     }
 
-    contentItem: T.StackView {
-        id: stackView
-
-        focus: true
-        clip: true
-
-        //erf, popup are weird, content is not parented to the root
-        //so, duplicate the context here for the childrens
+    contentItem: Item {
+        // popups are not parented to the root, so the context is duplicated for the children
         readonly property ColorContext colorContext: ColorContext {
             id: theme
             colorSet: popupTheme.colorSet
             palette: popupTheme.palette
         }
 
-        initialItem: TracksListPage {
-            trackMenuController: trackMenuController
+        clip: true
+
+        Rectangle {
+            id: tabBar
+
+            anchors.left: parent.left
+            anchors.right: parent.right
+            anchors.top: parent.top
+
+            height: VLCStyle.dp(50, VLCStyle.scale)
+
+            radius: VLCStyle.dp(10, VLCStyle.scale)
+
+            color: root._tokens.bgB2
+
+            // square off the bottom corners
+            Rectangle {
+                anchors.left: parent.left
+                anchors.right: parent.right
+                anchors.bottom: parent.bottom
+
+                height: parent.radius
+                color: parent.color
+            }
+
+            RowLayout {
+                anchors.fill: parent
+                anchors.leftMargin: VLCStyle.dp(6, VLCStyle.scale)
+                anchors.rightMargin: VLCStyle.dp(6, VLCStyle.scale)
+
+                spacing: 0
+
+                TabButton {
+                    tab: TracksMenu.Tab.Video
+                    glyph: VLCIcons.video
+                    text: qsTr("Video")
+                }
+
+                TabButton {
+                    tab: TracksMenu.Tab.Audio
+                    glyph: VLCIcons.audio
+                    text: qsTr("Audio")
+                }
+
+                TabButton {
+                    tab: TracksMenu.Tab.Subtitles
+                    glyph: VLCIcons.subtitles
+                    text: qsTr("Subtitles")
+                }
+            }
         }
 
-        pushEnter: Transition {
-            OpacityAnimator {
-                from: 0
-                to: 1
-                duration: VLCStyle.duration_long
+        T.StackView {
+            id: stackView
+
+            anchors.left: parent.left
+            anchors.right: parent.right
+            anchors.top: tabBar.bottom
+            anchors.topMargin: VLCStyle.dp(1, VLCStyle.scale)
+            anchors.bottom: parent.bottom
+
+            focus: true
+            clip: true
+
+            initialItem: TracksListPage {
+                tab: root.currentTab
+                trackMenuController: trackMenuController
+            }
+
+            pushEnter: Transition {
+                OpacityAnimator {
+                    from: 0
+                    to: 1
+                    duration: VLCStyle.duration_long
+                }
+            }
+            pushExit: Transition {
+                OpacityAnimator {
+                    from: 1
+                    to: 0
+                    duration: VLCStyle.duration_long
+                }
+            }
+            popEnter: Transition {
+                OpacityAnimator {
+                    from: 0
+                    to: 1
+                    duration: VLCStyle.duration_long
+                }
+            }
+            popExit: Transition {
+                OpacityAnimator {
+                    from: 1
+                    to: 0
+                    duration: VLCStyle.duration_long
+                }
             }
         }
-        pushExit: Transition {
-            OpacityAnimator {
-                from: 1
-                to: 0
-                duration: VLCStyle.duration_long
+    }
+
+    component TabButton : T.TabButton {
+        id: tabButton
+
+        required property int tab
+        required property string glyph
+
+        readonly property bool selected: root.currentTab === tab
+
+        Layout.fillWidth: true
+        Layout.fillHeight: true
+
+        hoverEnabled: true
+        focusPolicy: Qt.TabFocus
+
+        Accessible.role: Accessible.PageTab
+        Accessible.name: text
+
+        onClicked: root.currentTab = tab
+
+        background: Item {
+            Rectangle {
+                anchors.left: parent.left
+                anchors.right: parent.right
+                anchors.bottom: parent.bottom
+                anchors.leftMargin: VLCStyle.margin_xsmall
+                anchors.rightMargin: VLCStyle.margin_xsmall
+
+                height: VLCStyle.dp(2, VLCStyle.scale)
+
+                visible: tabButton.selected
+                color: popupTheme.accent
             }
         }
-        popEnter: Transition {
-            OpacityAnimator {
-                from: 0
-                to: 1
-                duration: VLCStyle.duration_long
-            }
-        }
-        popExit: Transition {
-            OpacityAnimator {
-                from: 1
-                to: 0
-                duration: VLCStyle.duration_long
+
+        contentItem: Item {
+            Row {
+                anchors.centerIn: parent
+                anchors.verticalCenterOffset: VLCStyle.dp(2, VLCStyle.scale)
+
+                spacing: VLCStyle.margin_xsmall
+
+                Widgets.IconLabel {
+                    anchors.verticalCenter: parent.verticalCenter
+
+                    text: tabButton.glyph
+                    font.pixelSize: VLCStyle.dp(20, VLCStyle.scale)
+                    color: tabButton.selected ? popupTheme.accent : label.color
+                }
+
+                T.Label {
+                    id: label
+
+                    anchors.verticalCenter: parent.verticalCenter
+
+                    text: tabButton.text
+                    font.pixelSize: VLCStyle.dp(12, VLCStyle.scale)
+                    color: (tabButton.selected || tabButton.hovered || tabButton.visualFocus)
+                           ? root._tokens.fgA2 : root._tokens.fgA3
+                }
             }
         }
     }
@@ -124,9 +259,14 @@ T.Popup {
       signal requestSubtitlePage()
       signal requestPlaybackSpeedPage()
       signal requestBack()
+      signal requestClose()
 
       onRequestBack: {
           stackView.pop()
+      }
+
+      onRequestClose: {
+          root.close()
       }
 
       onRequestAudioPage: {

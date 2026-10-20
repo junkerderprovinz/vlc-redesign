@@ -52,6 +52,7 @@ FocusScope {
         visible: MainCtx.hasEmbededVideo
 
         anchors.fill: parent
+        anchors.margins: VLCStyle.dp(10, VLCStyle.scale)
 
         onMouseMoved: {
             mouseAutoHide.restart()
@@ -79,6 +80,15 @@ FocusScope {
                 root._csdOnVideo = false
             }
         }
+    }
+
+    VideoFrame {
+        anchors.fill: parent
+
+        visible: MainCtx.hasEmbededVideo
+
+        target: videoSurface
+        color: theme.bg.primary
     }
 
     // TODO: `ViewBlockingRectangle` (`AcrylicBackground`) is not necessary

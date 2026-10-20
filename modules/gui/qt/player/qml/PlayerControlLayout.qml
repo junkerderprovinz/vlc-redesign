@@ -18,6 +18,7 @@
 
 import QtQuick
 import QtQuick.Layouts
+import QtQml.Models
 
 
 import VLC.MainInterface
@@ -30,9 +31,11 @@ FocusScope {
 
     // Properties
 
-    property real spacing: VLCStyle.margin_normal // spacing between controls
+    property real spacing: VLCStyle.margin_xsmall // spacing between controls
 
-    property real layoutSpacing: VLCStyle.margin_xxlarge // spacing between layouts (left, center, and right)
+    property real rightSpacing: VLCStyle.margin_small // spacing between controls of the right layout
+
+    property real layoutSpacing: VLCStyle.dp(20, VLCStyle.scale) // spacing between layouts (left, center, and right)
 
     property int identifier: -1
 
@@ -42,6 +45,40 @@ FocusScope {
         else
             return null
     }
+
+    readonly property bool hasPositionWidget: _positionWidgetCount > 0
+
+    property int _positionWidgetCount: 0
+
+    // The center layout takes the room left by the side layouts when it can grow,
+    // which is the case of the seek bar.
+    readonly property bool _centerFills: {
+        const item = loaderCenter.item
+        return !!item && (loaderLeft.active || loaderRight.active)
+                && (item.Layout.maximumWidth > item.Layout.minimumWidth)
+    }
+
+    component PositionWidgetCounter : Instantiator {
+        delegate: QtObject {
+            required property var model
+
+            readonly property bool isPositionWidget: model.id === ControlListModel.POSITION_WIDGET
+
+            Component.onCompleted: {
+                if (isPositionWidget)
+                    ++playerControlLayout._positionWidgetCount
+            }
+
+            Component.onDestruction: {
+                if (isPositionWidget)
+                    --playerControlLayout._positionWidgetCount
+            }
+        }
+    }
+
+    PositionWidgetCounter { model: playerControlLayout.model?.left ?? null }
+    PositionWidgetCounter { model: playerControlLayout.model?.center ?? null }
+    PositionWidgetCounter { model: playerControlLayout.model?.right ?? null }
 
     readonly property ColorContext colorContext: ColorContext {
         id: theme
@@ -219,10 +256,17 @@ FocusScope {
         id: loaderCenter
 
         anchors {
-            horizontalCenter: parent.horizontalCenter
             top: parent.top
             bottom: parent.bottom
         }
+
+        readonly property real _leftWidth: (loaderLeft.active && loaderLeft.item)
+                                           ? Math.max(0, loaderLeft.item.implicitWidth - playerControlLayout.spacing) : 0
+        readonly property real _rightWidth: (loaderRight.active && loaderRight.item)
+                                            ? Math.max(0, loaderRight.item.implicitWidth - playerControlLayout.rightSpacing) : 0
+
+        x: playerControlLayout._centerFills ? (_leftWidth > 0 ? _leftWidth + playerControlLayout.layoutSpacing : 0)
+                                            : (parent.width - width) / 2
 
         // TODO: "ControlListFilter"'s count......
         active: !!playerControlLayout.model && !!playerControlLayout.model.center && (playerControlLayout.model.center.count > 0)
@@ -236,7 +280,10 @@ FocusScope {
                 const minimumWidth = (item && item.Layout.minimumWidth > 0) ? item.Layout.minimumWidth : implicitWidth
                 const maximumWidth = (item && item.Layout.maximumWidth > 0) ? item.Layout.maximumWidth : implicitWidth
 
-                if ((loaderLeft.active && (loaderLeft.width > 0)) || (loaderRight.active && (loaderRight.width > 0))) {
+                if (playerControlLayout._centerFills) {
+                    const right = loaderCenter._rightWidth > 0 ? loaderCenter._rightWidth + playerControlLayout.layoutSpacing : 0
+                    return Math.max(minimumWidth, loaderCenter.parent.width - loaderCenter.x - right)
+                } else if ((loaderLeft.active && (loaderLeft.width > 0)) || (loaderRight.active && (loaderRight.width > 0))) {
                     return minimumWidth
                 } else {
                     return Math.min(loaderCenter.parent.width, maximumWidth)
@@ -288,7 +335,7 @@ FocusScope {
             bottom: parent.bottom
 
             // Spacing for the filler item acts as padding
-            leftMargin: layoutSpacing - spacing
+            leftMargin: layoutSpacing - rightSpacing
         }
 
         active: !!playerControlLayout.model && !!playerControlLayout.model.right && (playerControlLayout.model.right.count > 0) &&
@@ -306,7 +353,7 @@ FocusScope {
 
             alignment: (Qt.AlignVCenter | Qt.AlignRight)
 
-            spacing: playerControlLayout.spacing
+            spacing: playerControlLayout.rightSpacing
 
             focus: true
 

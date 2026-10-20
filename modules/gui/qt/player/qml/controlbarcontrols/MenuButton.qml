@@ -24,7 +24,7 @@ import VLC.Style
 import VLC.Menus
 import VLC.Util
 
-Widgets.IconToolButton {
+ControlButton {
     id: menuBtn
 
     signal requestLockUnlockAutoHide(bool lock)

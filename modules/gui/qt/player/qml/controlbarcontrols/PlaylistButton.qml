@@ -24,13 +24,18 @@ import VLC.Style
 import VLC.Util
 
 
-Widgets.IconToolButton {
+ControlButton {
     id: playlistBtn
 
-    text: VLCIcons.playlist
+    // Set apart from the buttons before it.
+    leftInset: VLCStyle.margin_xsmall
+    leftPadding: leftInset + horizontalPadding
+
+    text: VLCIcons.lists
     onClicked: {
         MainCtx.playqueuePanel.visible = !MainCtx.playqueuePanel.visible
-        if (MainCtx.playqueuePanel.visible && MainCtx.playqueuePanel.docked) {
+        if (MainCtx.playqueuePanel.visible && MainCtx.playqueuePanel.docked
+                && (typeof playlistWidget !== "undefined")) {
             playlistWidget.gainFocus(playlistBtn)
         }
     }

@@ -15,7 +15,6 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
-
 import QtQuick
 
 
@@ -24,10 +23,13 @@ import VLC.Style
 import VLC.Player
 import VLC.Util
 
-Widgets.IconToolButton {
+ControlButton {
     id: root
 
     // Proprerties
+
+    // Tab of the track menu that the button opens.
+    property int tab: TracksMenu.Tab.Subtitles
 
     readonly property var _parentItem: {
         if ((typeof rootPlayer !== 'undefined') && (rootPlayer !== null))
@@ -36,6 +38,10 @@ Widgets.IconToolButton {
             return g_mainDisplay
     }
 
+    readonly property bool _menuOpened: menuLoader.status === Loader.Ready
+                                        && menuLoader.item.opened
+                                        && menuLoader.item.currentTab === root.tab
+
     // Signals
 
     signal requestLockUnlockAutoHide(bool lock)
@@ -43,30 +49,42 @@ Widgets.IconToolButton {
 
     // Settings
 
-    text: VLCIcons.audiosub
+    text: VLCIcons.subtitles
 
-    enabled: menuLoader.status === Loader.Ready
+    checked: _menuOpened
 
-    description: qsTr("Languages and tracks")
+    enabled: menuLoader.status === Loader.Ready || paintOnly
+
+    description: qsTr("Subtitles")
 
     AccessibleCompat.id: "langButton"
 
     // Events
 
-    onClicked: menuLoader.item.open()
+    onClicked: {
+        const menu = menuLoader.item
+        if (menu.opened && menu.currentTab === root.tab) {
+            menu.close()
+        } else {
+            menu.currentTab = root.tab
+            menu.open()
+        }
+    }
 
     // Children
 
     Loader {
         id: menuLoader
 
+        active: !root.paintOnly
+
         sourceComponent: TracksMenu {
             id: menu
 
             parent: root._parentItem
 
-            x: 0
-            y: (parent.positionSliderY - height)
+            x: parent.width - width - VLCStyle.dp(20, VLCStyle.scale)
+            y: parent.positionSliderY - height - VLCStyle.dp(20, VLCStyle.scale)
             z: 1
 
             focus: true

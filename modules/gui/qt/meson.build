@@ -759,6 +759,8 @@ qml_modules += {
        'player/qml/ControlLayout.qml',
        'player/qml/ControlRepeater.qml',
        'player/qml/NavigationBox.qml',
+       'player/qml/VideoFrame.qml',
+       'player/qml/QueuePanel.qml',
    ),
    'singletons' : files(
        'player/qml/PlayerControlbarControls.qml',
@@ -815,6 +817,9 @@ qml_modules += {
        'player/qml/controlbarcontrols/TeletextWidget.qml',
        'player/qml/controlbarcontrols/VolumeWidget.qml',
        'player/qml/controlbarcontrols/Fallback.qml',
+       'player/qml/controlbarcontrols/ControlButton.qml',
+       'player/qml/controlbarcontrols/PositionWidget.qml',
+       'player/qml/controlbarcontrols/AudioTrackButton.qml',
    ),
 }
 

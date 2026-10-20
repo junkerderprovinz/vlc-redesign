@@ -50,10 +50,6 @@ FocusScope {
             return VLCStyle.noArtAlbumCover
     }
 
-    // Only applicable in video mode:
-    property bool displayFadeRectangles: !_controlsUnderVideo && (height > (implicitFadeRectangleHeight * 3))
-    property real implicitFadeRectangleHeight: VLCStyle.dp(206, VLCStyle.scale)
-
     // Private
 
     property bool _controlsUnderVideo: (MainCtx.pinVideoControls
@@ -119,6 +115,8 @@ FocusScope {
 
         History.previous()
     }
+
+    readonly property var _tokens: windowTheme.palette ?? VLCStyle.palette
 
     //we draw both the view and the window here
     ColorContext {
@@ -252,14 +250,26 @@ FocusScope {
             id: videoComponent
 
             FocusScope {
+                id: videoScope
+
                 // Video
 
                 focus: true
+
+                // The video sits in a rounded frame of the window colour, except between
+                // the bars of the light theme, where it fills the space.
+                readonly property bool framed: !rootPlayer._controlsUnderVideo || windowTheme.palette.isDark
+                readonly property real frameWidth: framed ? VLCStyle.dp(10, VLCStyle.scale) : 0
 
                 VideoSurface {
                     id: videoSurface
 
                     anchors.fill: parent
+                    anchors.leftMargin: videoScope.frameWidth
+                    anchors.rightMargin: videoScope.frameWidth
+                    anchors.topMargin: rootPlayer._controlsUnderVideo ? (videoScope.framed ? VLCStyle.dp(1, VLCStyle.scale) : 0)
+                                                                      : videoScope.frameWidth
+                    anchors.bottomMargin: rootPlayer._controlsUnderVideo ? 0 : videoScope.frameWidth
 
                     // With regard to `ViewBlockingRectangle`, we
                     // do not need to prevent painting anything
@@ -302,46 +312,12 @@ FocusScope {
                     }
                 }
 
-                component FadeRectangle : Rectangle {
-                    implicitHeight: rootPlayer.implicitFadeRectangleHeight
+                VideoFrame {
+                    anchors.fill: parent
 
-                    SGManipulator {
-                        // The rectangle is the bottom-most item in the interface,
-                        // it does not need blending even though it is not opaque.
-                        // Since `Rectangle` does not provide explicit control over
-                        // blending, we are using `SGManipulator`:
-                        blending: false
-                    }
-                }
-
-                FadeRectangle {
-                    anchors.top: parent.top
-                    anchors.left: parent.left
-                    anchors.right: parent.right
-
-                    opacity: topBar.opacity
-                    visible: rootPlayer.displayFadeRectangles && !topBarAcrylicBg.visible
-
-                    gradient: Gradient {
-                        GradientStop { position: 0; color: Qt.rgba(0, 0, 0, .8) }
-                        GradientStop { position: 1; color: "transparent" }
-                    }
-                }
-
-                FadeRectangle {
-                    anchors.bottom: parent.bottom
-                    anchors.left: parent.left
-                    anchors.right: parent.right
-
-                    opacity: controlBar.opacity
-
-                    gradient: Gradient {
-                        GradientStop { position: 0; color: "transparent" }
-                        GradientStop { position: .64; color: Qt.rgba(0, 0, 0, .8) }
-                        GradientStop { position: 1; color: "black" }
-                    }
-
-                    visible: rootPlayer.displayFadeRectangles && !(controlBar.background && controlBar.background.visible)
+                    target: videoSurface
+                    frameWidth: videoScope.frameWidth
+                    color: windowTheme.bg.primary
                 }
             }
         }
@@ -357,6 +333,10 @@ FocusScope {
 
                 property real topPadding: playerSpecializationLoader.topPadding
                 property real bottomPadding: playerSpecializationLoader.bottomPadding
+
+                HoverHandler {
+                    id: audioHover
+                }
 
                 // Whether the full lyrics view is active
                 readonly property bool lyricsMode: MainCtx.lyricsMode
@@ -588,22 +568,22 @@ FocusScope {
 
                         Item {
                             id: coverItem
-                            Layout.preferredHeight: rootPlayer.height / sizeConstant
+
+                            readonly property real gap: Math.min(VLCStyle.dp(74, VLCStyle.scale), rootPlayer.height * 0.0685)
+
+                            Layout.preferredHeight: Math.max(VLCStyle.icon_xlarge,
+                                                             Math.min(VLCStyle.dp(738, VLCStyle.scale),
+                                                                      centerContent.height - VLCStyle.dp(175, VLCStyle.scale) - gap))
                             Layout.preferredWidth: cover.paintedWidth
                             Layout.maximumHeight: centerContent.height
                             Layout.alignment: Qt.AlignHCenter
-
-                            readonly property real sizeConstant: 2.7182
 
                             Image {
                                 id: cover
 
                                 //source aspect ratio
                                 readonly property real sar: paintedWidth / paintedHeight
-                                readonly property int maximumWidth: Helpers.alignUp((Screen.desktopAvailableWidth * eDPR / coverItem.sizeConstant), 32)
-                                readonly property int maximumHeight: Helpers.alignUp((Screen.desktopAvailableHeight * eDPR / coverItem.sizeConstant), 32)
-
-                                readonly property int maximumSize: Math.min(maximumWidth, maximumHeight)
+                                readonly property int maximumSize: Helpers.alignUp(VLCStyle.dp(738, VLCStyle.scale) * eDPR, 32)
 
                                 readonly property real eDPR: MainCtx.effectiveDevicePixelRatio(Window.window)
 
@@ -617,6 +597,9 @@ FocusScope {
                                 mipmap: true
                                 cache: false
                                 asynchronous: true
+
+                                // Drawn through `roundedCover`, which rounds its corners.
+                                visible: false
 
                                 onTargetSourceChanged: {
                                     cover.source = targetSource
@@ -634,9 +617,6 @@ FocusScope {
 
                                 sourceSize: Qt.size(maximumSize, maximumSize)
 
-                                Accessible.role: Accessible.Graphic
-                                Accessible.name: qsTr("Cover")
-
                                 Component.onCompleted: {
                                     // After the update on source change, there can be another update when the mipmaps are generated.
                                     // We intentionally do not wait for this, initially using non-mipmapped source should be okay. As
@@ -652,63 +632,51 @@ FocusScope {
                                                                                                                   }
                                                                                                               })
                                 }
+                            }
+
+                            Widgets.ImageExt {
+                                id: roundedCover
+
+                                anchors.centerIn: cover
+
+                                width: cover.paintedWidth
+                                height: cover.paintedHeight
+
+                                unboundTextureProviderItem: cover
+                                fillMode: Image.Stretch
+                                radius: VLCStyle.dp(20, VLCStyle.scale)
+
+                                Accessible.role: Accessible.Graphic
+                                Accessible.name: qsTr("Cover")
 
                                 Widgets.RoundedRectangleShadow {
-                                    color: Qt.rgba(0, 0, 0, .18)
-                                    yOffset: VLCStyle.dp(24, VLCStyle.scale)
-                                    blurRadius: VLCStyle.dp(54, VLCStyle.scale)
-                                }
-
-                                Widgets.RoundedRectangleShadow {
-                                    color: Qt.rgba(0, 0, 0, .22)
-                                    yOffset: VLCStyle.dp(5, VLCStyle.scale)
-                                    blurRadius: VLCStyle.dp(14, VLCStyle.scale)
+                                    color: Qt.rgba(1, 1, 1, .03)
+                                    blurRadius: VLCStyle.dp(90, VLCStyle.scale)
                                 }
                             }
                         }
 
                         Widgets.SubtitleLabel {
-                            id: albumLabel
+                            id: titleLabel
 
                             Layout.alignment: Qt.AlignHCenter
-                            Layout.topMargin: VLCStyle.margin_xxlarge
+                            Layout.topMargin: coverItem.gap
+                            Layout.maximumWidth: centerContent.width - VLCStyle.margin_xlarge * 2
 
                             Binding on visible {
                                 delayed: true
-                                when: albumLabel.componentCompleted
-                                value: centerContent.height > (albumLabel.y + albumLabel.height)
+                                when: titleLabel.componentCompleted
+                                value: centerContent.height > (titleLabel.y + titleLabel.height)
                             }
 
-                            text: Player.album
-                            font.pixelSize: VLCStyle.fontSize_xxlarge
+                            text: (Player.artist !== "") ? qsTr("%1 - %2").arg(Player.title).arg(Player.artist)
+                                                          : Player.title
+                            font.pixelSize: VLCStyle.fontSize_xxxlarge
+                            font.weight: Font.Medium
+                            elide: Text.ElideRight
                             horizontalAlignment: Text.AlignHCenter
-                            color: centerTheme.fg.primary
-                            Accessible.description: qsTr("album")
-
-                            property bool componentCompleted: false
-
-                            Component.onCompleted: {
-                                componentCompleted = true
-                            }
-                        }
-
-                        Widgets.MenuLabel {
-                            id: artistLabel
-
-                            Layout.alignment: Qt.AlignHCenter
-                            Layout.topMargin: VLCStyle.margin_small
-
-                            Binding on visible {
-                                delayed: true
-                                when: artistLabel.componentCompleted
-                                value: centerContent.height > (artistLabel.y + artistLabel.height)
-                            }
-
-                            text: Player.artist
-                            font.weight: Font.Light
-                            horizontalAlignment: Text.AlignHCenter
-                            color: centerTheme.fg.primary
-                            Accessible.description: qsTr("artist")
+                            color: rootPlayer._tokens.fgA1
+                            Accessible.description: qsTr("title")
 
                             property bool componentCompleted: false
 
@@ -778,67 +746,65 @@ FocusScope {
                             Accessible.description: text
                         }
 
-                        Widgets.NavigableRow {
-                            id: audioControls
-
+                        // These buttons take no room in the column, which keeps the cover centred,
+                        // and only show up on hover or focus.
+                        Item {
                             Layout.alignment: Qt.AlignHCenter
-                            Layout.topMargin: VLCStyle.margin_large
+                            Layout.preferredWidth: audioControls.implicitWidth
+                            Layout.preferredHeight: 0
 
-                            Binding on visible {
-                                delayed: true
-                                when: audioControls.componentCompleted
-                                value: Player.videoTracks.count === 0 && centerContent.height > (audioControls.y + audioControls.height)
-                            }
+                            Widgets.NavigableRow {
+                                id: audioControls
 
-                            focus: true
-                            spacing: VLCStyle.margin_xxsmall
-                            Navigation.parentItem: rootPlayer
-                            Navigation.upItem: topBar
-                            Navigation.downItem: syncToPlaybackCheckBox
+                                anchors.horizontalCenter: parent.horizontalCenter
+                                y: VLCStyle.margin_normal
 
-                            property bool componentCompleted: false
+                                Binding on visible {
+                                    delayed: true
+                                    when: audioControls.componentCompleted
+                                    value: Player.videoTracks.count === 0 && centerContent.height > (audioControls.parent.y + audioControls.y + audioControls.height)
+                                }
 
-                            Component.onCompleted: {
-                                componentCompleted = true
-                            }
+                                opacity: (audioHover.hovered || audioControls.activeFocus) ? 1.0 : 0.0
 
-                            Widgets.IconToolButton {
-                                text: VLCIcons.skip_back
-                                font.pixelSize: VLCStyle.icon_audioPlayerButton
-                                onClicked: Player.jumpBwd()
-                                description: qsTr("Step back")
+                                Behavior on opacity {
+                                    NumberAnimation {
+                                        duration: VLCStyle.duration_short
+                                    }
+                                }
 
-                                AccessibleCompat.id: "audioStepBackButton"
-                            }
+                                focus: true
+                                spacing: VLCStyle.margin_xxsmall
+                                Navigation.parentItem: rootPlayer
+                                Navigation.upItem: topBar
+                                Navigation.downItem: syncToPlaybackCheckBox
 
-                            Widgets.IconToolButton {
-                                text: VLCIcons.visualization
-                                font.pixelSize: VLCStyle.icon_audioPlayerButton
-                                onClicked: Player.toggleVisualization()
-                                description: qsTr("Visualization")
+                                property bool componentCompleted: false
 
-                                AccessibleCompat.id: "audioVisualizationButton"
-                            }
+                                Component.onCompleted: {
+                                    componentCompleted = true
+                                }
 
-                            Widgets.IconToolButton {
-                                text: VLCIcons.topbar_music
-                                font.pixelSize: VLCStyle.icon_audioPlayerButton
-                                checked: MainCtx.lyricsMode
-                                onClicked: MainCtx.lyricsMode = !MainCtx.lyricsMode
-                                description: qsTr("Lyrics")
+                                Widgets.IconToolButton {
+                                    text: VLCIcons.visualization
+                                    font.pixelSize: VLCStyle.icon_normal
+                                    onClicked: Player.toggleVisualization()
+                                    description: qsTr("Visualization")
 
-                                Accessible.role: Accessible.Button
-                                Accessible.name: qsTr("Toggle lyrics view")
-                                AccessibleCompat.id: "audioLyricsButton"
-                            }
+                                    AccessibleCompat.id: "audioVisualizationButton"
+                                }
 
-                            Widgets.IconToolButton{
-                                text: VLCIcons.skip_for
-                                font.pixelSize: VLCStyle.icon_audioPlayerButton
-                                onClicked: Player.jumpFwd()
-                                description: qsTr("Step forward")
+                                Widgets.IconToolButton {
+                                    text: VLCIcons.topbar_music
+                                    font.pixelSize: VLCStyle.icon_normal
+                                    checked: MainCtx.lyricsMode
+                                    onClicked: MainCtx.lyricsMode = !MainCtx.lyricsMode
+                                    description: qsTr("Lyrics")
 
-                                AccessibleCompat.id: "audioStepForwardButton"
+                                    Accessible.role: Accessible.Button
+                                    Accessible.name: qsTr("Toggle lyrics view")
+                                    AccessibleCompat.id: "audioLyricsButton"
+                                }
                             }
                         }
 
@@ -974,22 +940,17 @@ FocusScope {
         topMargin: VLCStyle.applicationVerticalMargin
         sideMargin: VLCStyle.applicationHorizontalMargin
 
-        textWidth: playlistVisibility.isPlaylistVisible
-                 ? rootPlayer.width - playlistpopup.width
-                 : rootPlayer.width
-
         // NOTE: With pinned controls, the top controls are hidden when switching to
-        //       fullScreen. Except when resume is visible
+        //       fullScreen.
         visible: (MainCtx.pinVideoControls === false
                   ||
-                  MainCtx.intfMainWindow.visibility !== Window.FullScreen
-                  ||
-                  resumeVisible)
+                  MainCtx.intfMainWindow.visibility !== Window.FullScreen)
 
         focus: true
         title: Player.title
 
         pinControls: MainCtx.pinVideoControls
+        overVideo: MainCtx.hasEmbededVideo && !rootPlayer._controlsUnderVideo
 
         showCSD: MainCtx.clientSideDecoration && (MainCtx.intfMainWindow.visibility !== Window.FullScreen)
         showToolbar: MainCtx.hasToolbarMenu && (MainCtx.intfMainWindow.visibility !== Window.FullScreen)
@@ -997,7 +958,7 @@ FocusScope {
 
         plListView: {
             if (playlistpopup.active)
-                return playlistpopup.item
+                return playlistpopup.item?.playlistView ?? null
             else if (playlistWindowLoader?.status === Loader.Ready)
                 return playlistWindowLoader.item.playlistView
             else
@@ -1034,47 +995,62 @@ FocusScope {
             MainCtx.playerView = false
         }
 
+        sidebarVisible: MainCtx.libraryPanel?.visible ?? false
+
+        onToggleSidebar: {
+            if (MainCtx.libraryPanel)
+                MainCtx.libraryPanel.visible = !MainCtx.libraryPanel.visible
+            else
+                backRequested()
+        }
+
+        onFolderClicked: backRequested()
+
         FadeControllerStateGroup {
             target: topBar
         }
+    }
 
-        // TODO: Make TopBar a Control and use background
-        Widgets.AcrylicBackground {
-            id: topBarAcrylicBg
+    ResumeDialog {
+        id: resumeDialog
 
-            z: -1
+        anchors.horizontalCenter: parent.horizontalCenter
+        anchors.bottom: controlBar.top
+        anchors.bottomMargin: VLCStyle.margin_large
 
-            anchors.fill: parent
+        width: Math.min(implicitWidth, parent.width - 2 * VLCStyle.margin_large)
 
-            opacity: {
-                if (MainCtx.hasEmbededVideo && !MainCtx.pinVideoControls && !rootPlayer.displayFadeRectangles) {
-                    return 0.6
-                } else if (MainCtx.intfMainWindow.visibility === Window.FullScreen && MainCtx.hasEmbededVideo) {
-                    return MainCtx.pinOpacity
-                } else {
-                    return 1.0
-                }
-            }
+        z: 2
 
-            tintColor: windowTheme.bg.primary
+        colorContext.palette: windowTheme.palette
 
-            visible: MainCtx.pinVideoControls || (MainCtx.hasEmbededVideo && !rootPlayer.displayFadeRectangles)
+        Navigation.parentItem: rootPlayer
+        Navigation.downItem: controlBar
+
+        onHidden: {
+            if (activeFocus)
+                controlBar.forceActiveFocus()
         }
+
+        onVisibleChanged: rootPlayer.lockUnlockAutoHide(visible)
     }
 
     Loader {
         id: playlistpopup
 
         anchors {
-            // NOTE: When the controls are pinned we display the playqueue under the topBar.
-            top: (rootPlayer._controlsUnderVideo) ? topBar.bottom
-                                                  : parent.top
-
+            top: topBar.visible ? topBar.bottom : parent.top
             right: parent.right
             bottom: parent.bottom
 
-            bottomMargin: parent.height - rootPlayer.positionSliderY
+            topMargin: VLCStyle.dp(20, VLCStyle.scale)
+            rightMargin: VLCStyle.applicationHorizontalMargin + VLCStyle.dp(20, VLCStyle.scale)
+            bottomMargin: parent.height - rootPlayer.positionSliderY + VLCStyle.dp(20, VLCStyle.scale)
         }
+
+        width: implicitWidth
+
+        z: 1
 
         focus: false
 
@@ -1095,14 +1071,14 @@ FocusScope {
                 name: "expanded"
                 PropertyChanges {
                     target: playlistpopup
-                    width: playlistpopup.implicitWidth
+                    opacity: 1.0
                     visible: true
                 }
            }, State {
                 name: "retracted"
                 PropertyChanges {
                     target: playlistpopup
-                    width: 0
+                    opacity: 0.0
                     visible: false
                 }
            }
@@ -1119,43 +1095,27 @@ FocusScope {
                 PropertyAction { property: "visible" }
 
                 NumberAnimation {
-                    property: "width"
+                    property: "opacity"
                     duration: VLCStyle.duration_short
                     easing.type: Easing.InOutSine
                 }
             }
         }
 
-        sourceComponent: PlaylistPane {
-            id: playlistView
+        sourceComponent: QueuePanel {
+            id: queuePanel
 
-            property real maximumWidth: (rootPlayer.width + playlistView.rightPadding) / 2
+            property real minimumWidth: Math.max(VLCStyle.dp(400, VLCStyle.scale), playlistView.minimumWidth)
+            property real maximumWidth: rootPlayer.width / 2
 
             implicitWidth: Helpers.clamp(MainCtx.playqueuePanel.width
-                                 , playlistView.minimumWidth
-                                 , playlistView.maximumWidth)
+                                 , queuePanel.minimumWidth
+                                 , Math.max(queuePanel.minimumWidth, queuePanel.maximumWidth))
             height: playlistpopup.height
 
-            useAcrylic: false
             focus: true
 
-            wheelEnabled: true
-
-            rightPadding: VLCStyle.applicationHorizontalMargin
-            topPadding:  {
-                if (rootPlayer._controlsUnderVideo)
-                    return VLCStyle.margin_normal
-                else
-                    // NOTE: We increase the padding accordingly to avoid overlapping the TopBar.
-                    return topBar.reservedHeight
-            }
-            bottomPadding: 0
-
-            background: Rectangle {
-                color: windowTheme.bg.primary.alpha(0.8)
-            }
-
-            view.fadingEdge.pixelAlignedForDPR: !controlBar.visible
+            playlistView.view.fadingEdge.pixelAlignedForDPR: !controlBar.visible
 
             Navigation.parentItem: rootPlayer
             Navigation.upItem: topBar
@@ -1165,19 +1125,15 @@ FocusScope {
 
             function closePlaylist() {
                 playlistVisibility.togglePlaylistVisibility()
-                if (audioControls.visible)
-                    audioControls.forceActiveFocus()
-                else
-                    controlBar.forceActiveFocus()
+                controlBar.forceActiveFocus()
             }
-
 
             Widgets.HorizontalResizeHandle {
                 id: resizeHandle
 
                 property bool _inhibitMainCtxUpdate: false
 
-                parent: playlistView
+                parent: queuePanel
 
                 anchors {
                     top: parent.top
@@ -1188,8 +1144,8 @@ FocusScope {
                 atRight: false
                 currentWidth: playlistpopup.width
 
-                maximumWidth: playlistView.maximumWidth
-                minimumWidth: playlistView.minimumWidth
+                maximumWidth: queuePanel.maximumWidth
+                minimumWidth: queuePanel.minimumWidth
 
                 onRequestedWidthChanged: {
                     if (!_inhibitMainCtxUpdate)
@@ -1325,9 +1281,10 @@ FocusScope {
 
         focus: true
 
-        rightPadding: VLCStyle.applicationHorizontalMargin
-        leftPadding: VLCStyle.applicationHorizontalMargin
-        bottomPadding: VLCStyle.applicationVerticalMargin + VLCStyle.margin_xsmall
+        rightPadding: VLCStyle.applicationHorizontalMargin + (inlinePosition ? VLCStyle.dp(20, VLCStyle.scale) : 0)
+        leftPadding: rightPadding
+        bottomPadding: VLCStyle.applicationVerticalMargin + (inlinePosition ? VLCStyle.dp(11, VLCStyle.scale)
+                                                                             : VLCStyle.margin_xsmall)
 
         textPosition: (MainCtx.pinVideoControls)
                       ? ControlBar.TimeTextPosition.LeftRightSlider
@@ -1365,26 +1322,6 @@ FocusScope {
                                             : PlayerControlbarModel.Audioplayer
 
         onHoveredChanged: rootPlayer.lockUnlockAutoHide(hovered)
-
-        background: Rectangle {
-            id: controlBarBackground
-
-            visible: !MainCtx.hasEmbededVideo || MainCtx.pinVideoControls || !rootPlayer.displayFadeRectangles
-
-            opacity: {
-                if (MainCtx.hasEmbededVideo && !MainCtx.pinVideoControls && !rootPlayer.displayFadeRectangles) {
-                    return 0.6
-                } else if ((Window.visibility === Window.FullScreen) && MainCtx.hasEmbededVideo) {
-                    return MainCtx.pinOpacity
-                } else if (AcrylicController.enabled || !MainCtx.hasEmbededVideo) {
-                    return 0.7
-                } else {
-                    return 1.0
-                }
-            }
-
-            color: windowTheme.bg.primary
-        }
 
         FadeControllerStateGroup {
             target: controlBar

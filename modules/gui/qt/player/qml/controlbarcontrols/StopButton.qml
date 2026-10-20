@@ -25,7 +25,7 @@ import VLC.Playlist
 import VLC.Util
 
 
-Widgets.IconToolButton {
+ControlButton {
     id: stopBtn
 
     enabled: Player.isStarted

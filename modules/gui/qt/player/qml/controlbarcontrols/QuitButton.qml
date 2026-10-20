@@ -24,7 +24,7 @@ import VLC.Style
 import VLC.Util
 
 
-Widgets.IconToolButton {
+ControlButton {
     id: quitBtn
 
     text: VLCIcons.clear

@@ -42,16 +42,22 @@ T.Pane {
     implicitHeight: Math.max(implicitBackgroundHeight + bottomInset,
                              implicitContentHeight + topPadding + bottomPadding)
 
-    topInset: sliderY
+    topInset: inlinePosition ? 0 : sliderY
 
-    bottomPadding: VLCStyle.margin_xsmall
+    topPadding: inlinePosition ? VLCStyle.dp(11, VLCStyle.scale) : 0
+    bottomPadding: inlinePosition ? VLCStyle.dp(11, VLCStyle.scale) : VLCStyle.margin_xsmall
 
-    readonly property real sliderY: mapFromItem(contentItem, 0, contentItem.sliderY).y
+    readonly property real sliderY: inlinePosition ? 0 : mapFromItem(contentItem, 0, contentItem.sliderY).y
     property int textPosition: ControlBar.TimeTextPosition.AboveSlider
     property int identifier: -1
-    property real sliderHeight: VLCStyle.heightBar_xxsmall
+    property real sliderHeight: VLCStyle.dp(16, VLCStyle.scale)
     property real bookmarksHeight: VLCStyle.controlBarBookmarksHeight
     property bool showRemainingTime: true
+
+    // The layout places the seek bar itself, next to the buttons.
+    readonly property bool inlinePosition: contentItem.playerControlLayout.hasPositionWidget
+
+    readonly property int _textPosition: inlinePosition ? ControlBar.TimeTextPosition.Hide : textPosition
 
     property var menu: undefined
 
@@ -94,6 +100,9 @@ T.Pane {
             menu.close()
     }
 
+    // the colour context has no palette until it is attached
+    readonly property var _tokens: theme.palette ?? VLCStyle.palette
+
     readonly property ColorContext colorContext: ColorContext {
         id: theme
         colorSet: ColorContext.Window
@@ -101,7 +110,7 @@ T.Pane {
 
     TextMetrics {
         id: timeTextMetrics
-        font.pixelSize: (textPosition === ControlBar.TimeTextPosition.LeftRightSlider) ? VLCStyle.fontSize_small
+        font.pixelSize: (_textPosition === ControlBar.TimeTextPosition.LeftRightSlider) ? VLCStyle.fontSize_small
                                                                                        : VLCStyle.fontSize_normal
         text: {
             // This text metrics is used for both the time and length, as we want them to have the same width.
@@ -113,7 +122,16 @@ T.Pane {
     }
 
     background: Rectangle {
-        color: theme.bg.primary
+        color: _tokens.bgA3Glass
+
+        Rectangle {
+            anchors.left: parent.left
+            anchors.right: parent.right
+            anchors.top: parent.top
+
+            height: VLCStyle.dp(1, VLCStyle.scale)
+            color: _tokens.dividerDim
+        }
     }
 
     contentItem: ColumnLayout {
@@ -131,7 +149,7 @@ T.Pane {
             T.Label {
                 id: mediaTime
 
-                Layout.preferredWidth: (textPosition === ControlBar.TimeTextPosition.LeftRightSlider) ? timeTextMetrics.width : -1
+                Layout.preferredWidth: (_textPosition === ControlBar.TimeTextPosition.LeftRightSlider) ? timeTextMetrics.width : -1
 
                 text: {
                     const length = Player.length
@@ -156,7 +174,7 @@ T.Pane {
             T.Label {
                 id: mediaRemainingTime
 
-                Layout.preferredWidth: (textPosition === ControlBar.TimeTextPosition.LeftRightSlider) ? timeTextMetrics.width : -1
+                Layout.preferredWidth: (_textPosition === ControlBar.TimeTextPosition.LeftRightSlider) ? timeTextMetrics.width : -1
 
                 readonly property bool showRemainingTime: (MainCtx.showRemainingTime && Player.remainingTime.valid())
 
@@ -241,7 +259,7 @@ T.Pane {
                 id: bookmarksLoader
 
                 parent: root
-                active: MainCtx.mediaLibraryAvailable
+                active: MainCtx.mediaLibraryAvailable && !root.inlinePosition
                 source: "qrc:///qt/qml/VLC/MediaLibrary/Bookmarks.qml"
 
                 x: root.leftPadding + trackPositionSlider.x + row2.Layout.leftMargin
@@ -273,7 +291,7 @@ T.Pane {
             visible: children.length > 0
 
             children: {
-                switch (textPosition) {
+                switch (_textPosition) {
                 case ControlBar.TimeTextPosition.AboveSlider:
                     return [mediaTime, mediaRemainingTime]
                 case ControlBar.TimeTextPosition.Hide:
@@ -288,7 +306,10 @@ T.Pane {
             id: row2
 
             children: {
-                switch (textPosition) {
+                if (root.inlinePosition)
+                    return []
+
+                switch (_textPosition) {
                 case ControlBar.TimeTextPosition.Hide:
                 case ControlBar.TimeTextPosition.AboveSlider:
                     return [trackPositionSlider]
@@ -305,7 +326,7 @@ T.Pane {
 
             Layout.fillWidth: true
             Layout.fillHeight: false
-            Layout.leftMargin: (textPosition === ControlBar.TimeTextPosition.LeftRightSlider) ? VLCStyle.margin_xsmall
+            Layout.leftMargin: (_textPosition === ControlBar.TimeTextPosition.LeftRightSlider) ? VLCStyle.margin_xsmall
                                                                                               : 0
 
             Layout.rightMargin: Layout.leftMargin
@@ -316,17 +337,22 @@ T.Pane {
 
             Layout.fillWidth: true
             Layout.fillHeight: true
-            Layout.leftMargin: VLCStyle.margin_large
-            Layout.rightMargin: VLCStyle.margin_large
+            Layout.leftMargin: root.inlinePosition ? 0 : VLCStyle.margin_large
+            Layout.rightMargin: Layout.leftMargin
 
             identifier: root.identifier
 
-            implicitHeight: MainCtx.pinVideoControls ? VLCStyle.controlLayoutHeightPinned
-                                                     : VLCStyle.controlLayoutHeight
+            implicitHeight: {
+                if (root.inlinePosition)
+                    return VLCStyle.dp(32, VLCStyle.scale)
+                return MainCtx.pinVideoControls ? VLCStyle.controlLayoutHeightPinned
+                                                : VLCStyle.controlLayoutHeight
+            }
 
             visible: !model?.empty ?? false
 
-            Navigation.upItem: trackPositionSlider.enabled ? trackPositionSlider : root.Navigation.upItem
+            Navigation.upItem: (trackPositionSlider.enabled && !root.inlinePosition) ? trackPositionSlider
+                                                                                      : root.Navigation.upItem
 
             onRequestLockUnlockAutoHide: (lock) => root.requestLockUnlockAutoHide(lock)
 

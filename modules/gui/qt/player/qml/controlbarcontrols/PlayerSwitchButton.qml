@@ -23,7 +23,7 @@ import VLC.Style
 import VLC.Util
 
 
-Widgets.IconToolButton {
+ControlButton {
     text: VLCIcons.fullscreen
 
     onClicked: {

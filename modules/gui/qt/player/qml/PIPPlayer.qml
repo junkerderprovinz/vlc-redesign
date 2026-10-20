@@ -39,6 +39,11 @@ T.Control {
 
     property int textStyle: Text.Outline
 
+    // The mini player card of the main display shows the video while it is there.
+    readonly property bool docked: parent?.hasMiniPlayer ?? false
+
+    opacity: docked ? 0.0 : 1.0
+
     // `hideControls` being `false` does not necessarily mean that the buttons are shown:
     property bool hideControls: MainCtx.usingTouch // By default controls are hidden with touch
 
@@ -59,6 +64,8 @@ T.Control {
 
     DoubleClickIgnoringItem {
         anchors.fill: parent
+
+        enabled: !root.docked
 
         TapHandler {
             gesturePolicy: TapHandler.WithinBounds
@@ -112,7 +119,7 @@ T.Control {
 
     background: VideoSurface {
         id: videoSurface
-        videoSurfaceProvider: MainCtx.videoSurfaceProvider
+        videoSurfaceProvider: root.docked ? null : MainCtx.videoSurfaceProvider
 
         color: (hoverHandler.hovered ||
                 playButton?.hovered ||

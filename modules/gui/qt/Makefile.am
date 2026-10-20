@@ -1399,7 +1399,9 @@ libqml_module_player_a_QML = \
 	player/qml/TracksListPage.qml \
 	player/qml/ControlLayout.qml \
 	player/qml/ControlRepeater.qml \
-	player/qml/NavigationBox.qml
+	player/qml/NavigationBox.qml \
+	player/qml/VideoFrame.qml \
+	player/qml/QueuePanel.qml
 
 libqml_module_player_a_Singleton_QML = \
 	player/qml/PlayerControlbarControls.qml
@@ -1456,7 +1458,10 @@ libqml_module_playercontrols_a_QML = \
 	player/qml/controlbarcontrols/TeletextColorButton.qml \
 	player/qml/controlbarcontrols/TeletextWidget.qml \
 	player/qml/controlbarcontrols/VolumeWidget.qml \
-	player/qml/controlbarcontrols/Fallback.qml
+	player/qml/controlbarcontrols/Fallback.qml \
+	player/qml/controlbarcontrols/ControlButton.qml \
+	player/qml/controlbarcontrols/PositionWidget.qml \
+	player/qml/controlbarcontrols/AudioTrackButton.qml
 libqml_module_playercontrols_a_Singleton_QML =
 libqml_module_playercontrols_a_SOURCES = $(QML_MODULE_playercontrols_SRC)
 nodist_libqml_module_playercontrols_a_SOURCES = playercontrols/qmlassets.cpp $(QML_MODULE_playercontrols_NODIST_EXTRA)

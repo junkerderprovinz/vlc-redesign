@@ -23,7 +23,7 @@ import VLC.Style
 import VLC.Player
 import VLC.Util
 
-Widgets.IconToolButton {
+ControlButton {
     id: stepBackBtn
 
     enabled: Player.seekable

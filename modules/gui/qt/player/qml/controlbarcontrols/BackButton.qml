@@ -23,7 +23,7 @@ import VLC.Style
 import VLC.Util
 
 
-Widgets.IconToolButton {
+ControlButton {
     id: backBtn
 
     text: VLCIcons.back

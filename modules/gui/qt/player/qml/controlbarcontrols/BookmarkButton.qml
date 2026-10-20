@@ -27,7 +27,7 @@ import VLC.Widgets as Widgets
 import VLC.Style
 import VLC.Util
 
-Widgets.IconToolButton {
+ControlButton {
     id: root
 
     signal requestLockUnlockAutoHide(bool lock)

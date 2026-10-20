@@ -26,7 +26,7 @@ import VLC.Player
 import VLC.Util
 
 
-Widgets.IconToolButton {
+ControlButton {
 
     enabled: Player.hasMenu
 

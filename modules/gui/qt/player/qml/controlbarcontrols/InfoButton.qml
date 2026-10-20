@@ -24,7 +24,7 @@ import VLC.Player
 import VLC.Dialogs
 import VLC.Util
 
-Widgets.IconToolButton {
+ControlButton {
     id: infoBtn
 
     enabled: Player.isStarted

@@ -56,7 +56,12 @@ Repeater {
 
         Layout.fillWidth: (item && item.Layout.minimumWidth > 0)
         Layout.minimumWidth: Layout.fillWidth ? item.Layout.minimumWidth : (item ? item.implicitWidth : -1)
-        Layout.maximumWidth: Layout.fillWidth ? (item ? item.implicitWidth : -1) : -1
+        Layout.maximumWidth: {
+            if (!Layout.fillWidth || !item)
+                return -1
+            // Controls asking to fill the row may grow past their implicit width.
+            return item.Layout.fillWidth ? Number.POSITIVE_INFINITY : item.implicitWidth
+        }
 
         Layout.minimumHeight: 0
         Layout.maximumHeight: Math.min((item && item.implicitHeight <= 0) ? Number.MAX_VALUE : item.implicitHeight, repeater.availableHeight)

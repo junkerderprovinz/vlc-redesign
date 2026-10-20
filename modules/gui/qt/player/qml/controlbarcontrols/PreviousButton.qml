@@ -23,7 +23,7 @@ import VLC.Style
 import VLC.Playlist
 import VLC.Util
 
-Widgets.IconToolButton {
+ControlButton {
     id: prevBtn
 
     text: VLCIcons.previous

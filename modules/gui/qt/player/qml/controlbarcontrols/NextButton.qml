@@ -23,7 +23,7 @@ import VLC.Style
 import VLC.Playlist
 import VLC.Util
 
-Widgets.IconToolButton {
+ControlButton {
     id: nextBtn
 
     text: VLCIcons.next
