@@ -410,7 +410,7 @@ T.Pane {
 
                     text: Player.title
                     color: theme.tokens.fgA1
-                    font.pixelSize: VLCStyle.fontSize_xlarge
+                    font.pixelSize: VLCStyle.fontSize_large
                     elide: Text.ElideRight
                 }
 
@@ -494,7 +494,7 @@ T.Pane {
 
             text: chip.text
             color: theme.tokens.fgA1
-            font.pixelSize: VLCStyle.fontSize_xlarge
+            font.pixelSize: VLCStyle.fontSize_large
             elide: Text.ElideRight
         }
     }
