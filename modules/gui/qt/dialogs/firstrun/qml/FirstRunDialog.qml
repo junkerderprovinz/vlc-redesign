@@ -50,14 +50,16 @@ ModalDialog {
 
     property bool _done: false
 
-    // given the overlay as parent after its creation, so it is centred by hand
+    // given the overlay as parent after its creation, so it is centred by hand;
+    // the popup positioner takes x and y as the top left corner of the scaled popup
     anchors.centerIn: undefined
-    x: parent ? (parent.width - width) / 2 : 0
-    y: parent ? (parent.height - height) / 2 : 0
+    x: parent ? (parent.width - width * scale) / 2 : 0
+    y: parent ? (parent.height - height * scale) / 2 : 0
 
     width: baseWidth
     height: baseHeight
     scale: fitScale
+    transformOrigin: Popup.TopLeft
 
     topPadding: 0
     bottomPadding: 0
