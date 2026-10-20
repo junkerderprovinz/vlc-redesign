@@ -66,7 +66,7 @@ FramelessDialog {
             model: [
                 { text: qsTr("To This File"), value: SubtitlesModel.TARGET_FILE },
                 { text: qsTr("To This Folder"), value: SubtitlesModel.TARGET_FOLDER },
-                { text: qsTr("To This Playlist"), value: SubtitlesModel.TARGET_QUEUE }
+                { text: qsTr("To the Play Queue"), value: SubtitlesModel.TARGET_QUEUE }
             ]
 
             Accessible.name: qsTr("Add subtitles to")
@@ -144,11 +144,11 @@ FramelessDialog {
 
             text: {
                 if (!subtitles.pairing && !subtitles.hasMedia)
-                    return qsTr("Nothing is playing. Play a file first, or add subtitles to a folder or to the playlist.")
+                    return qsTr("Nothing is playing. Play a file first, or add subtitles to a folder or to the play queue.")
                 if (subtitles.origin === SubtitlesModel.ORIGIN_LINK)
                     return qsTr("Paste a link to a subtitle file (.srt, .vtt, .ass).")
                 if (subtitles.target === SubtitlesModel.TARGET_QUEUE)
-                    return qsTr("The playlist is empty.")
+                    return qsTr("The play queue is empty.")
                 if (subtitles.target === SubtitlesModel.TARGET_FOLDER)
                     return qsTr("No videos in this folder.")
                 return qsTr("No subtitles found.")

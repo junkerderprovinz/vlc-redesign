@@ -39,7 +39,7 @@
 
 namespace
 {
-    // two-tone icon of the design, its second color is the accent color
+    // two-tone icon drawn in the text and accent colors
     QIcon libraryIcon(const QMenu *menu, const MainCtx *ctx, const QString &name)
     {
         return ColorizedSvgIcon(QStringLiteral(":/icons/figma/%1.svg").arg(name),
@@ -915,7 +915,7 @@ void PlaylistMediaContextMenu::popup(const QModelIndexList & selected, QPoint po
     });
 
     if (options.contains("information") && options["information"].typeId() == QMetaType::Int) {
-        action = menu->addAction(libraryIcon(menu, m_ctx, "info-duo"), qtr("Info"));
+        action = menu->addAction(libraryIcon(menu, m_ctx, "info-duo"), qtr("Media Information"));
 
         QSignalMapper * mapper = new QSignalMapper(menu);
 
@@ -951,12 +951,12 @@ void NetworkMediaContextMenu::popup(const QModelIndexList& selected, QPoint pos)
     auto menu = newMenu();
     QAction* action;
 
-    action = menu->addAction( libraryIcon(menu, m_ctx, "playback-duo"), qtr("Play") );
+    action = menu->addAction(libraryIcon(menu, m_ctx, "playback-duo"), qtr("Play"));
     connect(action, &QAction::triggered, [this, selected]( ) {
         m_model->addAndPlay(selected);
     });
 
-    action = menu->addAction( libraryIcon(menu, m_ctx, "queue-duo"), qtr("Add to Queue") );
+    action = menu->addAction(libraryIcon(menu, m_ctx, "queue-duo"), qtr("Add to Queue"));
     connect(action, &QAction::triggered, [this, selected]( ) {
         m_model->addToPlaylist(selected);
     });
@@ -991,7 +991,7 @@ void NetworkMediaContextMenu::popup(const QModelIndexList& selected, QPoint pos)
         });
     }
 
-    action = menu->addAction( libraryIcon(menu, m_ctx, "info-duo"), qtr("Properties && Metadata") );
+    action = menu->addAction(libraryIcon(menu, m_ctx, "info-duo"), qtr("Properties && Metadata"));
     connect(action, &QAction::triggered, [this, selected]( ) {
         if (selected.isEmpty()) return;
 
@@ -1020,17 +1020,17 @@ void NetworkDeviceContextMenu::popup(const QModelIndexList& selected, QPoint pos
     auto menu = newMenu();
     QAction* action;
 
-    action = menu->addAction( libraryIcon(menu, m_ctx, "playback-duo"), qtr("Play") );
+    action = menu->addAction(libraryIcon(menu, m_ctx, "playback-duo"), qtr("Play"));
     connect(action, &QAction::triggered, [this, selected]( ) {
         m_model->addAndPlay(selected);
     });
 
-    action = menu->addAction( libraryIcon(menu, m_ctx, "queue-duo"), qtr("Add to Queue") );
+    action = menu->addAction(libraryIcon(menu, m_ctx, "queue-duo"), qtr("Add to Queue"));
     connect(action, &QAction::triggered, [this, selected]( ) {
         m_model->addToPlaylist(selected);
     });
 
-    action = menu->addAction( libraryIcon(menu, m_ctx, "info-duo"), qtr("Properties && Metadata") );
+    action = menu->addAction(libraryIcon(menu, m_ctx, "info-duo"), qtr("Properties && Metadata"));
     connect(action, &QAction::triggered, [this, selected]( ) {
         if (selected.isEmpty()) return;
 

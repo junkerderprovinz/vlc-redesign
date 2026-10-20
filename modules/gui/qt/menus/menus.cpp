@@ -63,6 +63,8 @@
 #include <QActionGroup>
 #include <QSignalMapper>
 
+#include <algorithm>
+
 using namespace vlc::playlist;
 
 /*
@@ -158,8 +160,8 @@ static QAction* addMPLStaticEntry( qt_intf_t *p_intf,
 }
 
 /**
- * Two-tone icon of the interface design, its second color is the accent
- * color. Without the main interface, the classic icon is used.
+ * Two-tone icon drawn in the text and accent colors. Without the main
+ * interface, the classic icon is used.
  **/
 static QIcon entryIcon( qt_intf_t *p_intf, const QMenu *menu, const char *name,
                         const char *legacyIcon = nullptr )
@@ -325,7 +327,7 @@ void VLCMenuBar::ToolsMenu( qt_intf_t *p_intf, QMenu *menu )
             "", &DialogsProvider::keyboardShortcutsDialog );
     }
 
-    addDPStaticEntry( menu, qtr( "&Preferences" ),
+    addDPStaticEntry( menu, qtr( "&Global Settings..." ),
         ":/menu/preferences.svg", &DialogsProvider::prefsDialog, "Ctrl+P", QAction::PreferencesRole );
 }
 
@@ -411,7 +413,25 @@ void VLCMenuBar::ViewMenu(qt_intf_t *p_intf, QMenu *menu)
     action->setCheckable( true );
     action->setChecked( mi->hasGridView() );
 
-    menu->addMenu( new CheckableListMenu(qtr( "&Color Scheme" ), mi->getColorScheme(), QActionGroup::ExclusionPolicy::Exclusive, menu) );
+    /* The model lists the system scheme first, the menu lists it last */
+    ColorSchemeModel *colorScheme = mi->getColorScheme();
+    const QVector<ColorSchemeModel::Item> schemes = colorScheme->getSchemes();
+    QMenu *themeMenu = menu->addMenu( qtr( "&Theme" ) );
+    QActionGroup *themeGroup = new QActionGroup( themeMenu );
+    for( const ColorSchemeModel::ColorScheme scheme :
+         { ColorSchemeModel::Day, ColorSchemeModel::Night, ColorSchemeModel::System } )
+    {
+        const auto item = std::find_if( schemes.cbegin(), schemes.cend(),
+            [scheme]( const ColorSchemeModel::Item &i ) { return i.scheme == scheme; } );
+        const int row = item - schemes.cbegin();
+        action = themeMenu->addAction( item->text );
+        action->setCheckable( true );
+        action->setChecked( row == colorScheme->currentIndex() );
+        action->setActionGroup( themeGroup );
+        connect( action, &QAction::triggered, colorScheme, [colorScheme, row]() {
+            colorScheme->setCurrentIndex( row );
+        });
+    }
 
     menu->addSeparator();
 
@@ -878,7 +898,7 @@ void VLCMenuBar::AppMenu( qt_intf_t *p_intf, QMenu *menu )
         ->setIcon( entryIcon( p_intf, menu, "hotkeys-duo" ) );
     addDPStaticEntry( menu, qtr( "Customize Player" ), "", &DialogsProvider::showToolbarEditorDialog )
         ->setIcon( entryIcon( p_intf, menu, "paint-duo" ) );
-    addDPStaticEntry( menu, qtr( "Settings" ), "", &DialogsProvider::prefsDialog, "Ctrl+P",
+    addDPStaticEntry( menu, qtr( "Global Settings..." ), "", &DialogsProvider::prefsDialog, "Ctrl+P",
                       QAction::PreferencesRole )->setIcon( entryIcon( p_intf, menu, "settings-duo" ) );
     addDPStaticEntry( menu, qtr( "About VLC" ), "", &DialogsProvider::aboutDialog, "Shift+F1",
                       QAction::AboutRole )->setIcon( entryIcon( p_intf, menu, "info-duo" ) );
@@ -1011,7 +1031,7 @@ QMenu* VLCMenuBar::PopupMenu( qt_intf_t *p_intf, bool show )
         action = menu->addMenu( settingsMenu );
         action->setIcon( entryIcon( p_intf, menu, "settings-duo" ) );
 
-        QMenu* playlistMenu = new QMenu( qtr( "Playlist" ), menu );
+        QMenu* playlistMenu = new QMenu( qtr( "Play Queue" ), menu );
         PlaylistMenu( p_intf, playlistMenu );
         action = menu->addMenu( playlistMenu );
         action->setIcon( entryIcon( p_intf, menu, "playlist-duo" ) );
@@ -1022,7 +1042,7 @@ QMenu* VLCMenuBar::PopupMenu( qt_intf_t *p_intf, bool show )
         action = menu->addMenu( openMenu );
         action->setIcon( entryIcon( p_intf, menu, "file-duo" ) );
 
-        addDPStaticEntry( menu, qtr( "Quit VLC" ), "", &DialogsProvider::quit, "Ctrl+Q",
+        addDPStaticEntry( menu, qtr( "Quit" ), "", &DialogsProvider::quit, "Ctrl+Q",
                           QAction::QuitRole )->setIcon( entryIcon( p_intf, menu, "quit-duo" ) );
 
         if( show )

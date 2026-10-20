@@ -49,7 +49,7 @@ ExtendedDialog::ExtendedDialog( qt_intf_t *_p_intf )
 #endif
 
     setWindowOpacity( var_InheritFloat( p_intf, "qt-opacity" ) );
-    setWindowTitle( qtr( "Adjustments and Effects" ) );
+    setWindowTitle( qtr( "Effects and Filters" ) );
     setWindowRole( "vlc-extended" );
 
     QVBoxLayout *layout = new QVBoxLayout( this );
