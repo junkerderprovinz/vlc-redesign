@@ -55,40 +55,40 @@ GridView {
         ControlListModel.WIDGET_DIVIDER
     ]
 
-    // Optional controls in the order of the design, then the ones the default
-    // layout uses, then everything else the player offers.
-    readonly property var entries: [
-        { id: ControlListModel.WIDGET_SPACER, text: qsTr("Spacer") },
-        { id: ControlListModel.WIDGET_DIVIDER, text: qsTr("Divider") },
-        { id: ControlListModel.PLAYBACK_SPEED_BUTTON, text: qsTr("Playback Speed"), glyph: VLCIcons.speed },
-        { id: ControlListModel.SKIP_FW_BUTTON, text: qsTr("Forward 10s"), glyph: VLCIcons.forward_10_sec },
-        { id: ControlListModel.SKIP_BACK_BUTTON, text: qsTr("Backward 10s"), glyph: VLCIcons.backward_10_sec },
-        { id: ControlListModel.SKIP_FW_15_BUTTON, text: qsTr("Forward 15s") },
-        { id: ControlListModel.SKIP_BACK_15_BUTTON, text: qsTr("Backward 15s") },
-        { id: ControlListModel.STOP_BUTTON, text: qsTr("Stop") },
-        { id: ControlListModel.LOOP_BUTTON, text: qsTr("Repeat"), glyph: VLCIcons.repeat_right },
-        { id: ControlListModel.RANDOM_BUTTON, text: qsTr("Shuffle"), glyph: VLCIcons.shuffle_right },
-        { id: ControlListModel.RECORD_BUTTON, text: qsTr("Record") },
-        { id: ControlListModel.SNAPSHOT_BUTTON, text: qsTr("Snapshot") },
-        { id: ControlListModel.QUIT_BUTTON, text: qsTr("Quit VLC"), glyph: VLCIcons.quit },
-        { id: ControlListModel.PREFERENCES_BUTTON, text: qsTr("VLC Settings") },
-        { id: ControlListModel.HOME_BUTTON, text: qsTr("Go Home") },
-        { id: ControlListModel.THUMBNAIL_WIDGET, text: qsTr("Thumbnail") },
-        { id: ControlListModel.TITLE_WIDGET, text: qsTr("File Name") },
-        { id: ControlListModel.ARTIST_WIDGET, text: qsTr("Artist Name") },
-        { id: ControlListModel.FOLDER_WIDGET, text: qsTr("Folder Name") },
-        { id: ControlListModel.INFO_BUTTON, text: qsTr("Properties") },
-        { id: ControlListModel.REPLAY_BUTTON, text: qsTr("Replay") },
-        { id: ControlListModel.BOOKMARK_BUTTON, text: qsTr("Bookmarks"), glyph: VLCIcons.bookmarks },
-        { id: ControlListModel.PLAYLISTS_BUTTON, text: qsTr("Playlists") },
-        { id: ControlListModel.PREVIOUS_BUTTON, text: qsTr("Previous") },
-        { id: ControlListModel.PLAY_BUTTON, text: qsTr("Play") },
-        { id: ControlListModel.NEXT_BUTTON, text: qsTr("Next") },
-        { id: ControlListModel.VOLUME, text: qsTr("Volume") },
-        { id: ControlListModel.AUDIO_TRACK_BUTTON, text: qsTr("Audio") },
-        { id: ControlListModel.LANG_BUTTON, text: qsTr("Subtitles") },
-        { id: ControlListModel.EXTENDED_BUTTON, text: qsTr("Player Settings"), glyph: VLCIcons.settings },
-        { id: ControlListModel.PLAYLIST_BUTTON, text: qsTr("Playlist"), glyph: VLCIcons.lists }
+    // The optional controls come first, then the ones of the default layout,
+    // then everything else the player offers.
+    readonly property var order: [
+        ControlListModel.WIDGET_SPACER,
+        ControlListModel.WIDGET_DIVIDER,
+        ControlListModel.PLAYBACK_SPEED_BUTTON,
+        ControlListModel.SKIP_FW_BUTTON,
+        ControlListModel.SKIP_BACK_BUTTON,
+        ControlListModel.SKIP_FW_15_BUTTON,
+        ControlListModel.SKIP_BACK_15_BUTTON,
+        ControlListModel.STOP_BUTTON,
+        ControlListModel.LOOP_BUTTON,
+        ControlListModel.RANDOM_BUTTON,
+        ControlListModel.RECORD_BUTTON,
+        ControlListModel.SNAPSHOT_BUTTON,
+        ControlListModel.QUIT_BUTTON,
+        ControlListModel.PREFERENCES_BUTTON,
+        ControlListModel.HOME_BUTTON,
+        ControlListModel.THUMBNAIL_WIDGET,
+        ControlListModel.TITLE_WIDGET,
+        ControlListModel.ARTIST_WIDGET,
+        ControlListModel.FOLDER_WIDGET,
+        ControlListModel.INFO_BUTTON,
+        ControlListModel.REPLAY_BUTTON,
+        ControlListModel.BOOKMARK_BUTTON,
+        ControlListModel.PLAYLISTS_BUTTON,
+        ControlListModel.PREVIOUS_BUTTON,
+        ControlListModel.PLAY_BUTTON,
+        ControlListModel.NEXT_BUTTON,
+        ControlListModel.VOLUME,
+        ControlListModel.AUDIO_TRACK_BUTTON,
+        ControlListModel.LANG_BUTTON,
+        ControlListModel.EXTENDED_BUTTON,
+        ControlListModel.PLAYLIST_BUTTON
     ]
 
     property int _revision: 0
@@ -109,12 +109,10 @@ GridView {
         // Evaluated again whenever the edited layout changes.
         root._revision
 
-        const known = entries.map((entry) => entry.id)
         const others = PlayerControlbarControls.controlList
-            .filter((control) => !known.includes(control.id) && control.id !== ControlListModel.POSITION_WIDGET)
-            .map((control) => ({ id: control.id, text: control.text }))
+            .filter((control) => !order.includes(control.id) && control.id !== ControlListModel.POSITION_WIDGET)
 
-        const all = entries.concat(others)
+        const all = order.map((id) => PlayerControlbarControls.control(id)).concat(others)
         if (!barModel)
             return all
 
@@ -167,7 +165,7 @@ GridView {
         required property var modelData
 
         readonly property int mIndex: modelData.id
-        readonly property string glyph: modelData.glyph ?? PlayerControlbarControls.control(mIndex).label ?? ""
+        readonly property string glyph: modelData.label ?? ""
 
         readonly property bool narrow: (mIndex === ControlListModel.WIDGET_SPACER)
                                        || (mIndex === ControlListModel.WIDGET_DIVIDER)
@@ -247,7 +245,8 @@ GridView {
             anchors.top: box.bottom
             anchors.topMargin: VLCStyle.margin_normal
 
-            width: VLCStyle.dp(86, VLCStyle.scale)
+            x: -VLCStyle.margin_xxsmall
+            width: VLCStyle.dp(86, VLCStyle.scale) + 2 * VLCStyle.margin_xxsmall
 
             text: tile.modelData.text.replace(/ (\d+s)$/, "\n$1")
             color: tile.active ? tileTheme.palette.fg1 : tileTheme.palette.fgA2

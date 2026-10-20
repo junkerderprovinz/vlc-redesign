@@ -236,7 +236,7 @@ FocusScope {
                                 Accessible.name: qsTr("Player")
 
                                 Repeater {
-                                    // The mini player of the design has no control bar.
+                                    // The mini player has fixed controls, there is no layout to edit.
                                     model: PlayerListModel.model.filter(
                                                (entry) => entry.identifier !== PlayerControlbarModel.Miniplayer)
 
@@ -352,7 +352,7 @@ FocusScope {
                     readonly property int columns: Math.max(1, Math.floor(width / cellWidth))
                     readonly property real tileHeight: VLCStyle.dp(82, VLCStyle.scale)
 
-                    // The design shows four rows; the rest scrolls.
+                    // At most four rows, the rest scrolls.
                     implicitHeight: Math.min(Math.ceil(count / columns), 4) * cellHeight - (cellHeight - tileHeight)
 
                     anchors.fill: parent
