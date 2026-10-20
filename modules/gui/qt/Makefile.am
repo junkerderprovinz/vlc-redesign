@@ -1595,6 +1595,7 @@ libqml_module_widgets_a_QML = \
 	widgets/qml/ComboBoxExt.qml \
 	widgets/qml/AcrylicBackground.qml \
 	widgets/qml/FloatingNotification.qml \
+	widgets/qml/FloatingPanel.qml \
 	widgets/qml/AnimatedBackground.qml \
 	widgets/qml/CSDThemeButton.qml \
 	widgets/qml/CSDThemeButtonSet.qml \

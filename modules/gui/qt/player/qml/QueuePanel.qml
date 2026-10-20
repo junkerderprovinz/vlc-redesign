@@ -31,7 +31,7 @@ import VLC.Dialogs
 
 // Floating panel of the player with the play queue, the bookmarks and the
 // chapters of the current media.
-T.Pane {
+Widgets.FloatingPanel {
     id: root
 
     enum Tab {
@@ -40,265 +40,136 @@ T.Pane {
         Chapters
     }
 
-    property int currentTab: QueuePanel.Tab.Queue
-
     property alias playlistView: playlistView
 
-    implicitWidth: Math.max(implicitBackgroundWidth + leftInset + rightInset,
-                            implicitContentWidth + leftPadding + rightPadding)
-    implicitHeight: Math.max(implicitBackgroundHeight + topInset + bottomInset,
-                             implicitContentHeight + topPadding + bottomPadding)
+    currentTab: QueuePanel.Tab.Queue
 
-    padding: 0
+    tabs: [
+        { text: qsTr("Play Queue"), iconTxt: VLCIcons.queue },
+        { text: qsTr("Bookmarks"), iconTxt: VLCIcons.bookmarks },
+        { text: qsTr("Chapters"), iconTxt: VLCIcons.chapters }
+    ]
 
-    focusPolicy: Qt.NoFocus
+    onTabClicked: (index) => root.currentTab = index
 
-    readonly property var _tokens: theme.palette ?? VLCStyle.palette
+    StackLayout {
+        anchors.fill: parent
 
-    readonly property ColorContext colorContext: ColorContext {
-        id: theme
-        colorSet: ColorContext.Window
-    }
+        currentIndex: root.currentTab
 
-    background: Rectangle {
-        radius: VLCStyle.dp(10, VLCStyle.scale)
-        color: root._tokens.bgB1Glass
-
-        Widgets.RoundedRectangleShadow {
-            z: -1
-            color: Qt.rgba(0, 0, 0, root._tokens.isDark ? 0.46 : 0.18)
-            yOffset: VLCStyle.dp(8, VLCStyle.scale)
-            blurRadius: VLCStyle.dp(15, VLCStyle.scale)
+        readonly property ColorContext colorContext: ColorContext {
+            id: theme
+            colorSet: ColorContext.Window
         }
-    }
 
-    contentItem: ColumnLayout {
-        spacing: VLCStyle.dp(1, VLCStyle.scale)
+        PlaylistPane {
+            id: playlistView
 
-        Rectangle {
-            id: tabBar
+            useAcrylic: false
+            focus: true
 
-            Layout.fillWidth: true
-            Layout.preferredHeight: VLCStyle.dp(50, VLCStyle.scale)
+            wheelEnabled: true
 
-            radius: VLCStyle.dp(10, VLCStyle.scale)
-            color: root._tokens.bgB2
+            topPadding: 0
+            bottomPadding: 0
 
-            // square off the bottom corners
-            Rectangle {
-                anchors.left: parent.left
-                anchors.right: parent.right
-                anchors.bottom: parent.bottom
+            background: null
+        }
 
-                height: parent.radius
-                color: parent.color
-            }
+        ColumnLayout {
+            spacing: 0
 
             RowLayout {
-                anchors.fill: parent
-                anchors.leftMargin: VLCStyle.dp(6, VLCStyle.scale)
-                anchors.rightMargin: VLCStyle.dp(6, VLCStyle.scale)
+                Layout.fillWidth: true
+                Layout.topMargin: VLCStyle.dp(20, VLCStyle.scale)
+                Layout.bottomMargin: VLCStyle.dp(8, VLCStyle.scale)
+                Layout.leftMargin: VLCStyle.dp(28, VLCStyle.scale)
+                Layout.rightMargin: VLCStyle.dp(20, VLCStyle.scale)
 
-                spacing: 0
+                spacing: VLCStyle.margin_small
 
-                TabButton {
-                    tab: QueuePanel.Tab.Queue
-                    glyph: VLCIcons.queue
-                    text: qsTr("Queue")
+                T.Label {
+                    Layout.fillWidth: true
+
+                    text: qsTr("%1 Bookmark", "%1 Bookmarks", bookmarkList.count).arg(bookmarkList.count)
+                    color: theme.tokens.fgA3
+                    font.pixelSize: VLCStyle.fontSize_large
+                    elide: Text.ElideRight
                 }
 
-                TabButton {
-                    tab: QueuePanel.Tab.Bookmarks
-                    glyph: VLCIcons.bookmarks
-                    text: qsTr("Bookmarks")
+                Widgets.IconToolButton {
+                    font.pixelSize: VLCStyle.icon_normal
+
+                    text: VLCIcons.edit
+                    description: qsTr("Manage bookmarks")
+
+                    onClicked: DialogsProvider.bookmarksDialog()
                 }
 
-                TabButton {
-                    tab: QueuePanel.Tab.Chapters
-                    glyph: VLCIcons.chapters
-                    text: qsTr("Chapters")
+                Widgets.IconToolButton {
+                    font.pixelSize: VLCStyle.icon_normal
+
+                    enabled: MainCtx.mediaLibraryAvailable && Player.isStarted
+                    text: VLCIcons.add
+                    description: qsTr("Add bookmark")
+
+                    onClicked: bookmarkLoader.item?.add()
                 }
             }
-        }
 
-        StackLayout {
-            Layout.fillWidth: true
-            Layout.fillHeight: true
+            Loader {
+                id: bookmarkLoader
 
-            currentIndex: root.currentTab
+                active: MainCtx.mediaLibraryAvailable
 
-            PlaylistPane {
-                id: playlistView
-
-                useAcrylic: false
-                focus: true
-
-                wheelEnabled: true
-
-                topPadding: 0
-                bottomPadding: 0
-
-                background: null
-            }
-
-            ColumnLayout {
-                spacing: 0
-
-                RowLayout {
-                    Layout.fillWidth: true
-                    Layout.topMargin: VLCStyle.dp(20, VLCStyle.scale)
-                    Layout.bottomMargin: VLCStyle.dp(8, VLCStyle.scale)
-                    Layout.leftMargin: VLCStyle.dp(28, VLCStyle.scale)
-                    Layout.rightMargin: VLCStyle.dp(20, VLCStyle.scale)
-
-                    spacing: VLCStyle.margin_small
-
-                    T.Label {
-                        Layout.fillWidth: true
-
-                        text: qsTr("%1 Bookmark", "%1 Bookmarks", bookmarkList.count).arg(bookmarkList.count)
-                        color: root._tokens.fgA3
-                        font.pixelSize: VLCStyle.fontSize_large
-                        elide: Text.ElideRight
-                    }
-
-                    Widgets.IconToolButton {
-                        font.pixelSize: VLCStyle.icon_normal
-
-                        text: VLCIcons.edit
-                        description: qsTr("Manage bookmarks")
-
-                        onClicked: DialogsProvider.bookmarksDialog()
-                    }
-
-                    Widgets.IconToolButton {
-                        font.pixelSize: VLCStyle.icon_normal
-
-                        enabled: MainCtx.mediaLibraryAvailable && Player.isStarted
-                        text: VLCIcons.add
-                        description: qsTr("Add bookmark")
-
-                        onClicked: bookmarkLoader.item?.add()
-                    }
-                }
-
-                Loader {
-                    id: bookmarkLoader
-
-                    active: MainCtx.mediaLibraryAvailable
-
-                    sourceComponent: MLBookmarkModel {
-                        player: Player
-                        ml: MediaLib
-                    }
-                }
-
-                ChoiceList {
-                    id: bookmarkList
-
-                    Layout.fillWidth: true
-                    Layout.fillHeight: true
-
-                    model: bookmarkLoader.item
-
-                    emptyText: MainCtx.mediaLibraryAvailable ? qsTr("Add a bookmark to jump back to this moment later.")
-                                                             : qsTr("Bookmarks need the media library.")
-
-                    delegate: MarkRow {
-                        required property var model
-                        required property int index
-
-                        name: model.name
-                        trailing: model.time
-
-                        onClicked: bookmarkLoader.item.select(bookmarkLoader.item.index(index, 0))
-                    }
+                sourceComponent: MLBookmarkModel {
+                    player: Player
+                    ml: MediaLib
                 }
             }
 
             ChoiceList {
-                id: chapterList
+                id: bookmarkList
 
-                topMargin: VLCStyle.dp(20, VLCStyle.scale)
+                Layout.fillWidth: true
+                Layout.fillHeight: true
 
-                model: Player.chapters
+                model: bookmarkLoader.item
 
-                emptyText: qsTr("This media has no chapters.")
+                emptyText: MainCtx.mediaLibraryAvailable ? qsTr("Add a bookmark to jump back to this moment later.")
+                                                         : qsTr("Bookmarks need the media library.")
 
                 delegate: MarkRow {
                     required property var model
                     required property int index
 
-                    number: index + 1
-                    name: model.display
-                    trailing: model.time.formatHMS()
-                    current: model.checked
+                    name: model.name
+                    trailing: model.time
 
-                    onClicked: Player.chapters.selectChapter(index)
+                    onClicked: bookmarkLoader.item.select(bookmarkLoader.item.index(index, 0))
                 }
             }
         }
-    }
 
-    component TabButton : T.TabButton {
-        id: tabButton
+        ChoiceList {
+            id: chapterList
 
-        required property int tab
-        required property string glyph
+            topMargin: VLCStyle.dp(20, VLCStyle.scale)
 
-        readonly property bool selected: root.currentTab === tab
+            model: Player.chapters
 
-        Layout.fillWidth: true
-        Layout.fillHeight: true
+            emptyText: qsTr("This media has no chapters.")
 
-        hoverEnabled: true
-        focusPolicy: Qt.TabFocus
+            delegate: MarkRow {
+                required property var model
+                required property int index
 
-        Accessible.role: Accessible.PageTab
-        Accessible.name: text
+                number: index + 1
+                name: model.display
+                trailing: model.time.formatHMS()
+                current: model.checked
 
-        onClicked: root.currentTab = tab
-
-        background: Item {
-            Rectangle {
-                anchors.left: parent.left
-                anchors.right: parent.right
-                anchors.bottom: parent.bottom
-                anchors.leftMargin: VLCStyle.margin_xsmall
-                anchors.rightMargin: VLCStyle.margin_xsmall
-
-                height: VLCStyle.dp(2, VLCStyle.scale)
-
-                visible: tabButton.selected
-                color: theme.accent
-            }
-        }
-
-        contentItem: Item {
-            Row {
-                anchors.centerIn: parent
-                anchors.verticalCenterOffset: VLCStyle.dp(2, VLCStyle.scale)
-
-                spacing: VLCStyle.margin_xsmall
-
-                Widgets.IconLabel {
-                    anchors.verticalCenter: parent.verticalCenter
-
-                    text: tabButton.glyph
-                    font.pixelSize: VLCStyle.dp(20, VLCStyle.scale)
-                    color: tabButton.selected ? theme.accent : label.color
-                }
-
-                T.Label {
-                    id: label
-
-                    anchors.verticalCenter: parent.verticalCenter
-
-                    text: tabButton.text
-                    font.pixelSize: VLCStyle.fontSize_normal
-                    color: (tabButton.selected || tabButton.hovered || tabButton.visualFocus)
-                           ? root._tokens.fgA2 : root._tokens.fgA3
-                }
+                onClicked: Player.chapters.selectChapter(index)
             }
         }
     }
@@ -327,7 +198,7 @@ T.Pane {
             visible: list.count === 0
 
             text: list.emptyText
-            color: root._tokens.fgA3
+            color: theme.tokens.fgA3
             font.pixelSize: VLCStyle.fontSize_large
             wrapMode: Text.WordWrap
         }
@@ -352,7 +223,7 @@ T.Pane {
 
         background: Rectangle {
             radius: VLCStyle.dp(6, VLCStyle.scale)
-            color: (row.hovered || row.visualFocus) ? Qt.alpha(root._tokens.fg1, 0.06) : "transparent"
+            color: (row.hovered || row.visualFocus) ? theme.tokens.hover : "transparent"
         }
 
         contentItem: RowLayout {
@@ -373,14 +244,14 @@ T.Pane {
                 Layout.fillWidth: true
 
                 text: row.name
-                color: row.current ? theme.accent : root._tokens.fgA1
+                color: row.current ? theme.accent : theme.tokens.fgA1
                 font.pixelSize: VLCStyle.fontSize_large
                 elide: Text.ElideRight
             }
 
             T.Label {
                 text: row.trailing
-                color: root._tokens.fgA3
+                color: theme.tokens.fgA3
                 font.pixelSize: VLCStyle.fontSize_large
             }
         }

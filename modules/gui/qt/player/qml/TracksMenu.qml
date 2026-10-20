@@ -18,7 +18,6 @@
  *****************************************************************************/
 import QtQuick
 import QtQuick.Templates as T
-import QtQuick.Layouts
 import QtQml.Models
 
 
@@ -61,94 +60,31 @@ T.Popup {
 
     // Children
 
-    // the colour context has no palette until it is attached
-    readonly property var _tokens: popupTheme.palette ?? VLCStyle.palette
-
     readonly property ColorContext colorContext: ColorContext {
         id: popupTheme
         colorSet: ColorContext.Window
     }
 
-    background: Rectangle {
-        radius: VLCStyle.dp(10, VLCStyle.scale)
-        color: root._tokens.bgB1Glass
+    background: null
 
-        Widgets.RoundedRectangleShadow {
-            z: -1
-            color: Qt.rgba(0, 0, 0, root._tokens.isDark ? 0.46 : 0.18)
-            yOffset: VLCStyle.dp(8, VLCStyle.scale)
-            blurRadius: VLCStyle.dp(15, VLCStyle.scale)
-        }
-    }
+    contentItem: Widgets.FloatingPanel {
+        // popups are not parented to the root, so the palette is passed on to the children
+        colorContext.palette: popupTheme.palette
 
-    contentItem: Item {
-        // popups are not parented to the root, so the context is duplicated for the children
-        readonly property ColorContext colorContext: ColorContext {
-            id: theme
-            colorSet: popupTheme.colorSet
-            palette: popupTheme.palette
-        }
+        currentTab: root.currentTab
 
-        clip: true
+        tabs: [
+            { text: qsTr("Video"), iconTxt: VLCIcons.video },
+            { text: qsTr("Audio"), iconTxt: VLCIcons.audio },
+            { text: qsTr("Subtitles"), iconTxt: VLCIcons.subtitles }
+        ]
 
-        Rectangle {
-            id: tabBar
-
-            anchors.left: parent.left
-            anchors.right: parent.right
-            anchors.top: parent.top
-
-            height: VLCStyle.dp(50, VLCStyle.scale)
-
-            radius: VLCStyle.dp(10, VLCStyle.scale)
-
-            color: root._tokens.bgB2
-
-            // square off the bottom corners
-            Rectangle {
-                anchors.left: parent.left
-                anchors.right: parent.right
-                anchors.bottom: parent.bottom
-
-                height: parent.radius
-                color: parent.color
-            }
-
-            RowLayout {
-                anchors.fill: parent
-                anchors.leftMargin: VLCStyle.dp(6, VLCStyle.scale)
-                anchors.rightMargin: VLCStyle.dp(6, VLCStyle.scale)
-
-                spacing: 0
-
-                TabButton {
-                    tab: TracksMenu.Tab.Video
-                    glyph: VLCIcons.video
-                    text: qsTr("Video")
-                }
-
-                TabButton {
-                    tab: TracksMenu.Tab.Audio
-                    glyph: VLCIcons.audio
-                    text: qsTr("Audio")
-                }
-
-                TabButton {
-                    tab: TracksMenu.Tab.Subtitles
-                    glyph: VLCIcons.subtitles
-                    text: qsTr("Subtitles")
-                }
-            }
-        }
+        onTabClicked: (index) => root.currentTab = index
 
         T.StackView {
             id: stackView
 
-            anchors.left: parent.left
-            anchors.right: parent.right
-            anchors.top: tabBar.bottom
-            anchors.topMargin: VLCStyle.dp(1, VLCStyle.scale)
-            anchors.bottom: parent.bottom
+            anchors.fill: parent
 
             focus: true
             clip: true
@@ -184,69 +120,6 @@ T.Popup {
                     from: 1
                     to: 0
                     duration: VLCStyle.duration_long
-                }
-            }
-        }
-    }
-
-    component TabButton : T.TabButton {
-        id: tabButton
-
-        required property int tab
-        required property string glyph
-
-        readonly property bool selected: root.currentTab === tab
-
-        Layout.fillWidth: true
-        Layout.fillHeight: true
-
-        hoverEnabled: true
-        focusPolicy: Qt.TabFocus
-
-        Accessible.role: Accessible.PageTab
-        Accessible.name: text
-
-        onClicked: root.currentTab = tab
-
-        background: Item {
-            Rectangle {
-                anchors.left: parent.left
-                anchors.right: parent.right
-                anchors.bottom: parent.bottom
-                anchors.leftMargin: VLCStyle.margin_xsmall
-                anchors.rightMargin: VLCStyle.margin_xsmall
-
-                height: VLCStyle.dp(2, VLCStyle.scale)
-
-                visible: tabButton.selected
-                color: popupTheme.accent
-            }
-        }
-
-        contentItem: Item {
-            Row {
-                anchors.centerIn: parent
-                anchors.verticalCenterOffset: VLCStyle.dp(2, VLCStyle.scale)
-
-                spacing: VLCStyle.margin_xsmall
-
-                Widgets.IconLabel {
-                    anchors.verticalCenter: parent.verticalCenter
-
-                    text: tabButton.glyph
-                    font.pixelSize: VLCStyle.dp(20, VLCStyle.scale)
-                    color: tabButton.selected ? popupTheme.accent : label.color
-                }
-
-                T.Label {
-                    id: label
-
-                    anchors.verticalCenter: parent.verticalCenter
-
-                    text: tabButton.text
-                    font.pixelSize: VLCStyle.dp(12, VLCStyle.scale)
-                    color: (tabButton.selected || tabButton.hovered || tabButton.visualFocus)
-                           ? root._tokens.fgA2 : root._tokens.fgA3
                 }
             }
         }
