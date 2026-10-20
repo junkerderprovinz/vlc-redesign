@@ -1,8 +1,6 @@
 /*****************************************************************************
  * Copyright (C) 2019 VLC authors and VideoLAN
  *
- * Authors: Benjamin Arnaud <bunjee@omega.gg>
- *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
@@ -30,26 +28,18 @@ T.Switch {
 
     // Style
 
-    property int animationDuration: VLCStyle.duration_long
+    property int animationDuration: VLCStyle.duration_short
 
-    property color color: (checked) ? theme.bg.secondary
-                                    : theme.bg.primary
+    property color color: checked ? colorContext.bg.secondary : colorContext.bg.highlight
 
-    property color colorHandle: (checked) ? theme.fg.secondary
-                                          : theme.fg.primary
+    property color colorHandle: checked ? colorContext.accent : colorContext.indicator
 
-
-    property color colorBorder:  (checked) ? "transparent"
-                                           : theme.border
-
-    // Private
-
-    property bool _update: true
+    property color colorBorder: "transparent"
 
     // Settings
 
-    width : VLCStyle.checkButton_width
-    height: VLCStyle.checkButton_height
+    implicitWidth: indicator.implicitWidth
+    implicitHeight: indicator.implicitHeight
 
     T.ToolTip.visible: (T.ToolTip.text && (hovered || visualFocus))
 
@@ -65,140 +55,32 @@ T.Switch {
 
     // Accessible
 
-    Accessible.onPressAction: control.clicked()
-    Accessible.onToggleAction: control.toggle()
-
-    // Events
-
-    onWidthChanged: {
-        animation.stop()
-
-        if (checked)
-            handle.x = handle.drag.maximumX
-        else
-            handle.x = 0
-    }
-
-    onCheckedChanged: {
-        if (_update === false)
-            return
-
-        const from = handle.x
-        let to
-
-        if (checked)
-            to = handle.drag.maximumX
-        else
-            to = 0
-
-        _animate(from, to)
-    }
-
-    // Functions
-
-    // Private
-
-    function _applyX(x) {
-        const from = handle.x
-        let to
-
-        _update = false
-
-        if (x < width / 2) {
-            to = 0
-
-            checked = false
-        } else {
-            to = handle.drag.maximumX
-
-            checked = true
-        }
-
-        _update = true
-
-        _animate(from, to)
-    }
-
-    function _animate(from, to) {
-        if (from === to)
-            return
-
-        animation.from = from
-        animation.to   = to
-
-        animation.restart()
-    }
-
-    // Animations
-
-    NumberAnimation {
-        id: animation
-
-        target: handle
-
-        property: "x"
-
-        duration: VLCStyle.duration_short
-
-        easing.type: Easing.OutQuad
-    }
+    Accessible.onPressAction: root.toggle()
+    Accessible.onToggleAction: root.toggle()
 
     // Children
 
-    readonly property ColorContext colorContext: ColorContext {
-        id: theme
-        colorSet: ColorContext.Switch
+    readonly property ColorContext colorContext: indicator.colorContext
 
-        enabled: root.enabled
-        focused: root.visualFocus
-        hovered: root.hovered
-        pressed: root.down
-    }
+    indicator: ToggleIndicator {
+        id: indicator
 
-    background: AnimatedBackground {
-        enabled: theme.initialized
-        border.color: root.visualFocus ? theme.visualFocus : Qt.alpha(theme.visualFocus, 0.0)
-    }
-
-    indicator: Rectangle {
         anchors.fill: parent
 
-        anchors.margins: VLCStyle.checkButton_margins
+        enabled: root.enabled
 
-        radius: height / 2
+        checked: root.checked
+        position: root.visualPosition
 
-        color: root.color
+        animated: !root.down
+        animationDuration: root.animationDuration
 
-        border.color: root.colorBorder
-        border.width: VLCStyle.border
-        border.pixelAligned: (radius < Number.EPSILON)
+        visualFocus: root.visualFocus
 
-        MouseArea {
-            id: handle
+        plateColor: root.color
+        knobColor: root.colorHandle
 
-            width: Math.round(root.height - VLCStyle.checkButton_margins * 2)
-            height: width
-
-            drag.target: handle
-            drag.axis  : Drag.XAxis
-
-            drag.minimumX: 0
-            drag.maximumX: parent.width - width
-
-            onClicked: root.toggle()
-
-            // NOTE: We update the position when the drag has ended.
-            drag.onActiveChanged: if (drag.active === false) root._applyX(x + width / 2)
-
-            Rectangle {
-                anchors.fill: parent
-
-                anchors.margins: VLCStyle.checkButton_handle_margins
-
-                radius: height / 2
-
-                color: root.colorHandle
-            }
-        }
+        border.color: root.visualFocus ? colorContext.visualFocus : root.colorBorder
+        border.width: (root.visualFocus || root.colorBorder.a > 0) ? VLCStyle.focus_border : 0
     }
 }

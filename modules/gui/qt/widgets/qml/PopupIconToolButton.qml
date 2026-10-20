@@ -96,13 +96,19 @@ Widgets.IconToolButton {
             ColorContext {
                 id: popupTheme
                 palette: control.colorContext.palette
-                colorSet: ColorContext.Window
+                colorSet: ColorContext.ComboBox
             }
 
-            radius: VLCStyle.dp(8, VLCStyle.scale)
+            radius: VLCStyle.dp(10, VLCStyle.scale)
 
-            // NOTE: The opacity should be stronger on a light background for readability.
-            color: popupTheme.bg.primary.alpha(popupTheme.palette.isDark ? 0.8 : 0.96)
+            color: popupTheme.bg.neutral
+
+            Widgets.RoundedRectangleShadow {
+                yOffset: VLCStyle.margin_xsmall
+                blurRadius: VLCStyle.dp(8, VLCStyle.scale)
+
+                color: popupTheme.shadow
+            }
         }
     }
 

@@ -98,15 +98,35 @@ Window {
         DialogButtonBox {
             id: buttonBox
 
-            padding: 0
-            spacing: VLCStyle.margin_small
+            padding: VLCStyle.dp(20, VLCStyle.scale) - layout.anchors.margins
+            spacing: VLCStyle.dp(20, VLCStyle.scale)
 
             Layout.fillWidth: true
             Layout.minimumHeight: VLCStyle.icon_normal
 
             standardButtons: DialogButtonBox.Ok | DialogButtonBox.Cancel
 
+            buttonLayout: DialogButtonBox.GnomeLayout
+
             background: null
+
+            // with two buttons, Cancel goes to the left edge and the other one to the right edge
+            contentItem: ListView {
+                implicitWidth: contentWidth
+                implicitHeight: VLCStyle.dp(32, VLCStyle.scale)
+
+                model: buttonBox.contentModel
+                orientation: ListView.Horizontal
+                interactive: false
+
+                spacing: {
+                    if (count !== 2)
+                        return buttonBox.spacing
+                    const buttonsWidth = buttonBox.contentModel.get(0).implicitWidth
+                                         + buttonBox.contentModel.get(1).implicitWidth
+                    return Math.max(buttonBox.spacing, width - buttonsWidth)
+                }
+            }
 
             onAccepted: root.accepted()
             onRejected: root.rejected(true)
@@ -115,8 +135,10 @@ Window {
             onReset: root.reset()
 
 
-            delegate: Widgets.ButtonExt {
-
+            delegate: Widgets.DialogButton {
+                primary: DialogButtonBox.buttonRole === DialogButtonBox.AcceptRole
+                         || DialogButtonBox.buttonRole === DialogButtonBox.YesRole
+                         || DialogButtonBox.buttonRole === DialogButtonBox.ApplyRole
             }
         }
     }

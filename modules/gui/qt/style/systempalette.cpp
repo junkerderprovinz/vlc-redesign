@@ -521,6 +521,191 @@ QColor textOnColor(const QColor& background, const QColor& dark, const QColor& l
     return (darkRatio >= lightRatio) ? dark : light;
 }
 
+void setControlColors(SystemPalette& palette, const DesignTokens& t, bool dark)
+{
+    typedef ColorContext C;
+
+    // every state, so that the values of the base palette do not show through
+    const auto setColorAll = [&palette](C::ColorSet set, C::ColorSection section, C::ColorName name,
+                                        const QColor& color) {
+        for (C::ColorState state : { C::Normal, C::Disabled, C::Pressed, C::Hovered, C::Focused })
+            palette.setColor(set, section, name, state, color);
+    };
+
+    // FG/A4 is darker than FG/A2 in the light theme, it can not mark a disabled text there
+    const QColor fgDisabled = dark ? t.fgA4 : setColorAlpha(t.fgA2, 0.45);
+    const QColor hoverTint = setColorAlpha(dark ? Qt::white : Qt::black, 0.06);
+
+    //Standard Buttons, secondary is the cancel button of dialogs
+    {
+        C::ColorSet CS = C::ButtonStandard;
+        setColorAll(CS, C::Bg, C::Primary, t.bgB2);
+        palette.setColor(CS, C::Bg, C::Primary, C::Hovered, t.bgA4);
+        palette.setColor(CS, C::Bg, C::Primary, C::Focused, t.bgA4);
+        palette.setColor(CS, C::Bg, C::Primary, C::Pressed, t.bgA3);
+
+        setColorAll(CS, C::Bg, C::Secondary, t.bgA3);
+        palette.setColor(CS, C::Bg, C::Secondary, C::Hovered, t.bgA1);
+        palette.setColor(CS, C::Bg, C::Secondary, C::Focused, t.bgA1);
+        palette.setColor(CS, C::Bg, C::Secondary, C::Pressed, t.bgA2);
+
+        setColorAll(CS, C::Fg, C::Primary, t.fgA2);
+        palette.setColor(CS, C::Fg, C::Primary, C::Normal, t.fgA3);
+        palette.setColor(CS, C::Fg, C::Primary, C::Disabled, fgDisabled);
+
+        setColorAll(CS, C::Fg, C::Secondary, t.fgA2);
+        palette.setColor(CS, C::Fg, C::Secondary, C::Disabled, fgDisabled);
+
+        setColorAll(CS, C::Decoration, C::Border, Qt::transparent);
+        setColorAll(CS, C::Decoration, C::Accent, t.accent);
+    }
+
+    //Accent Buttons, secondary is the primary button of dialogs
+    {
+        C::ColorSet CS = C::ButtonAccent;
+        setColorAll(CS, C::Bg, C::Primary, t.accentBright);
+        palette.setColor(CS, C::Bg, C::Primary, C::Normal, t.accent);
+        palette.setColor(CS, C::Bg, C::Primary, C::Pressed, t.accentDim);
+        palette.setColor(CS, C::Bg, C::Primary, C::Disabled, t.bgAccentBright);
+
+        setColorAll(CS, C::Fg, C::Primary, t.fgOnAccent);
+        palette.setColor(CS, C::Fg, C::Primary, C::Disabled, t.accent);
+
+        setColorAll(CS, C::Bg, C::Secondary, mixColor(t.accent, t.bgAccentBright, 0.14f));
+        palette.setColor(CS, C::Bg, C::Secondary, C::Normal, t.bgAccentBright);
+        palette.setColor(CS, C::Bg, C::Secondary, C::Disabled, setColorAlpha(t.bgAccentBright, 0.5));
+
+        setColorAll(CS, C::Fg, C::Secondary, t.accent);
+        palette.setColor(CS, C::Fg, C::Secondary, C::Disabled, setColorAlpha(t.accent, 0.5));
+
+        setColorAll(CS, C::Decoration, C::Border, Qt::transparent);
+        setColorAll(CS, C::Decoration, C::Accent, t.accent);
+    }
+
+    //tool button
+    {
+        C::ColorSet CS = C::ToolButton;
+        setColorAll(CS, C::Bg, C::Primary, hoverTint);
+        palette.setColor(CS, C::Bg, C::Primary, C::Normal, Qt::transparent);
+        palette.setColor(CS, C::Bg, C::Primary, C::Disabled, Qt::transparent);
+        setColorAll(CS, C::Bg, C::Secondary, t.bgB2);
+
+        setColorAll(CS, C::Fg, C::Primary, t.fg2);
+        palette.setColor(CS, C::Fg, C::Primary, C::Normal, t.fgA2);
+        palette.setColor(CS, C::Fg, C::Primary, C::Disabled, fgDisabled);
+        setColorAll(CS, C::Fg, C::Secondary, t.fg2);
+
+        setColorAll(CS, C::Decoration, C::Border, Qt::transparent);
+        setColorAll(CS, C::Decoration, C::Accent, t.accent);
+    }
+
+    //tab button
+    {
+        C::ColorSet CS = C::TabButton;
+        setColorAll(CS, C::Bg, C::Primary, hoverTint);
+        palette.setColor(CS, C::Bg, C::Primary, C::Normal, Qt::transparent);
+        palette.setColor(CS, C::Bg, C::Primary, C::Disabled, Qt::transparent);
+
+        setColorAll(CS, C::Fg, C::Primary, t.fgA2);
+        palette.setColor(CS, C::Fg, C::Primary, C::Normal, t.fgA3);
+        palette.setColor(CS, C::Fg, C::Primary, C::Disabled, fgDisabled);
+        setColorAll(CS, C::Fg, C::Secondary, t.fgA2);
+
+        setColorAll(CS, C::Decoration, C::Accent, t.accent);
+    }
+
+    //tooltip
+    {
+        C::ColorSet CS = C::Tooltip;
+        setColorAll(CS, C::Bg, C::Primary, t.bgA1);
+        setColorAll(CS, C::Fg, C::Primary, t.fg2);
+        setColorAll(CS, C::Decoration, C::Border, t.dividerDim);
+    }
+
+    //slider, the border is the thumb of scroll bars
+    {
+        C::ColorSet CS = C::Slider;
+        setColorAll(CS, C::Bg, C::Primary, t.bgB2);
+        setColorAll(CS, C::Bg, C::Secondary, t.bgAccentBright);
+        setColorAll(CS, C::Fg, C::Primary, t.accent);
+        setColorAll(CS, C::Fg, C::Secondary, t.accentDim);
+        setColorAll(CS, C::Decoration, C::Indicator, t.bgAccentDark);
+
+        setColorAll(CS, C::Decoration, C::Border, t.fgA3);
+        palette.setColor(CS, C::Decoration, C::Border, C::Normal, t.dividerBright);
+    }
+
+    //popups: combo boxes, menus and dialogs
+    {
+        C::ColorSet CS = C::ComboBox;
+        setColorAll(CS, C::Bg, C::Primary, t.bgB2);
+
+        setColorAll(CS, C::Bg, C::Secondary, t.bgA2);
+        palette.setColor(CS, C::Bg, C::Secondary, C::Normal, t.bgA4);
+        palette.setColor(CS, C::Bg, C::Secondary, C::Disabled, t.bgA4);
+
+        setColorAll(CS, C::Bg, C::Highlight, t.bgA2);
+        setColorAll(CS, C::Bg, C::Neutral, t.bgA3Glass);
+
+        setColorAll(CS, C::Fg, C::Primary, t.fgA2);
+        palette.setColor(CS, C::Fg, C::Primary, C::Disabled, fgDisabled);
+        setColorAll(CS, C::Fg, C::Secondary, t.fgA3);
+        setColorAll(CS, C::Fg, C::Highlight, t.fg1);
+
+        setColorAll(CS, C::Decoration, C::Border, Qt::transparent);
+        setColorAll(CS, C::Decoration, C::Separator, t.dividerDim);
+        setColorAll(CS, C::Decoration, C::Shadow, t.shadow);
+        setColorAll(CS, C::Decoration, C::Accent, t.accent);
+    }
+
+    //TextField and SpinBox, the secondary background is the search field
+    for (C::ColorSet CS : { C::TextField, C::SpinBox })
+    {
+        setColorAll(CS, C::Bg, C::Primary, t.bgB2);
+        setColorAll(CS, C::Bg, C::Secondary, dark ? t.bgA5 : t.bgA2);
+
+        setColorAll(CS, C::Fg, C::Primary, t.fgA2);
+        palette.setColor(CS, C::Fg, C::Primary, C::Disabled, fgDisabled);
+        setColorAll(CS, C::Fg, C::Secondary, t.fgA4);
+
+        setColorAll(CS, C::Bg, C::Highlight, t.bgAccentBright);
+        setColorAll(CS, C::Fg, C::Highlight, t.accent);
+
+        setColorAll(CS, C::Decoration, C::Border, t.bgA4);
+        palette.setColor(CS, C::Decoration, C::Border, C::Hovered, t.bgA2);
+        palette.setColor(CS, C::Decoration, C::Border, C::Focused, t.accentDim);
+
+        setColorAll(CS, C::Decoration, C::Indicator, t.fgA3);
+        setColorAll(CS, C::Decoration, C::Accent, t.accent);
+    }
+
+    //SpinBox arrows
+    {
+        C::ColorSet CS = C::SpinBox;
+        setColorAll(CS, C::Fg, C::Secondary, t.fgA2);
+        palette.setColor(CS, C::Fg, C::Secondary, C::Normal, t.fgA3);
+        palette.setColor(CS, C::Fg, C::Secondary, C::Disabled, fgDisabled);
+    }
+
+    //Switch, also used by segmented controls
+    {
+        C::ColorSet CS = C::Switch;
+        setColorAll(CS, C::Bg, C::Primary, t.bgB2);
+        setColorAll(CS, C::Bg, C::Secondary, t.bgAccentBright);
+        setColorAll(CS, C::Bg, C::Highlight, t.bgA4);
+
+        setColorAll(CS, C::Fg, C::Primary, t.fgA2);
+        palette.setColor(CS, C::Fg, C::Primary, C::Normal, t.fgA3);
+        palette.setColor(CS, C::Fg, C::Primary, C::Disabled, fgDisabled);
+        setColorAll(CS, C::Fg, C::Secondary, t.accent);
+        setColorAll(CS, C::Fg, C::Highlight, t.fgA3);
+
+        setColorAll(CS, C::Decoration, C::Accent, t.accentDim);
+        setColorAll(CS, C::Decoration, C::Indicator, t.fgA4);
+        setColorAll(CS, C::Decoration, C::Border, Qt::transparent);
+    }
+}
+
 }
 
 DesignTokens DesignTokens::dark(const QColor& accent)
@@ -641,7 +826,6 @@ void SystemPalette::makeDesignPalette()
     // hover feedback is translucent so it works on any background
     const QColor ink = m_isDark ? Qt::white : Qt::black;
     const QColor hoverOverlay = setColorAlpha(ink, 0.06);
-    const QColor pressedOverlay = setColorAlpha(ink, 0.1);
     const QColor disabledText = setColorAlpha(t.fgA2, 0.4);
 
     m_colorMap.clear();
@@ -701,42 +885,6 @@ void SystemPalette::makeDesignPalette()
         setColor(CS, C::Fg, C::Primary, C::Normal, t.fg1);
     }
 
-    //tab button
-    {
-        C::ColorSet CS = C::TabButton;
-        setColor(CS, C::Bg, C::Primary, C::Normal, Qt::transparent);
-        setColor(CS, C::Bg, C::Primary, C::Focused, hoverOverlay);
-        setColor(CS, C::Bg, C::Primary, C::Hovered, hoverOverlay);
-        setColor(CS, C::Bg, C::Primary, C::Pressed, pressedOverlay);
-
-        setColor(CS, C::Fg, C::Primary, C::Normal, t.fgA3);
-        setColor(CS, C::Fg, C::Primary, C::Focused, t.fgA2);
-        setColor(CS, C::Fg, C::Primary, C::Hovered, t.fgA2);
-        setColor(CS, C::Fg, C::Primary, C::Disabled, disabledText);
-        setColor(CS, C::Fg, C::Secondary, C::Normal, t.fg1);
-    }
-
-    //tool button
-    {
-        C::ColorSet CS = C::ToolButton;
-        setColor(CS, C::Bg, C::Primary, C::Normal, Qt::transparent);
-        setColor(CS, C::Bg, C::Primary, C::Focused, hoverOverlay);
-        setColor(CS, C::Bg, C::Primary, C::Hovered, hoverOverlay);
-        setColor(CS, C::Bg, C::Primary, C::Pressed, pressedOverlay);
-        setColor(CS, C::Bg, C::Secondary, C::Normal, t.bgA4);
-
-        setColor(CS, C::Fg, C::Primary, C::Normal, t.fgA2);
-        setColor(CS, C::Fg, C::Primary, C::Focused, t.fg2);
-        setColor(CS, C::Fg, C::Primary, C::Hovered, t.fg2);
-        setColor(CS, C::Fg, C::Primary, C::Disabled, disabledText);
-        setColor(CS, C::Fg, C::Secondary, C::Normal, t.fg1);
-
-        setColor(CS, C::Decoration, C::Border, C::Normal, Qt::transparent);
-        setColor(CS, C::Decoration, C::Border, C::Focused, Qt::transparent);
-        setColor(CS, C::Decoration, C::Border, C::Hovered, Qt::transparent);
-        setColor(CS, C::Decoration, C::Border, C::Disabled, Qt::transparent);
-    }
-
     //menubar
     {
         C::ColorSet CS = C::MenuBar;
@@ -767,60 +915,9 @@ void SystemPalette::makeDesignPalette()
         setColor(CS, C::Decoration, C::Indicator, C::Normal, t.accent);
     }
 
-    //Accent Buttons
-    {
-        C::ColorSet CS = C::ButtonAccent;
-        setColor(CS, C::Bg, C::Primary, C::Normal, t.accent);
-        setColor(CS, C::Bg, C::Primary, C::Focused, t.accentBright);
-        setColor(CS, C::Bg, C::Primary, C::Hovered, t.accentBright);
-        setColor(CS, C::Bg, C::Primary, C::Pressed, t.accentDim);
-        setColor(CS, C::Bg, C::Primary, C::Disabled, t.bgA4);
-
-        setColor(CS, C::Fg, C::Primary, C::Normal, t.fgOnAccent);
-        setColor(CS, C::Fg, C::Primary, C::Disabled, disabledText);
-
-        setColor(CS, C::Decoration, C::Border, C::Normal, Qt::transparent);
-        setColor(CS, C::Decoration, C::Border, C::Focused, Qt::transparent);
-        setColor(CS, C::Decoration, C::Border, C::Hovered, Qt::transparent);
-        setColor(CS, C::Decoration, C::Border, C::Disabled, Qt::transparent);
-    }
-
-    //Standard Buttons
-    {
-        C::ColorSet CS = C::ButtonStandard;
-        setColor(CS, C::Bg, C::Primary, C::Normal, t.bgB2);
-        setColor(CS, C::Bg, C::Primary, C::Focused, t.bgA4);
-        setColor(CS, C::Bg, C::Primary, C::Hovered, t.bgA4);
-        setColor(CS, C::Bg, C::Primary, C::Pressed, t.bgA1);
-        setColor(CS, C::Bg, C::Secondary, C::Normal, t.bgA4);
-
-        setColor(CS, C::Fg, C::Primary, C::Normal, t.fgA3);
-        setColor(CS, C::Fg, C::Primary, C::Focused, t.fgA2);
-        setColor(CS, C::Fg, C::Primary, C::Hovered, t.fgA2);
-        setColor(CS, C::Fg, C::Primary, C::Disabled, disabledText);
-
-        setColor(CS, C::Decoration, C::Border, C::Normal, Qt::transparent);
-        setColor(CS, C::Decoration, C::Border, C::Focused, Qt::transparent);
-        setColor(CS, C::Decoration, C::Border, C::Hovered, Qt::transparent);
-        setColor(CS, C::Decoration, C::Border, C::Disabled, Qt::transparent);
-    }
-
-    //tooltip
-    {
-        C::ColorSet CS = C::Tooltip;
-        setColor(CS, C::Bg, C::Primary, C::Normal, t.bgA3Glass);
-        setColor(CS, C::Fg, C::Primary, C::Normal, t.fg2);
-        setColor(CS, C::Decoration, C::Border, C::Normal, t.dividerDim);
-    }
-
     //slider
     {
         C::ColorSet CS = C::Slider;
-        setColor(CS, C::Bg, C::Primary, C::Normal, t.bgB2);
-        setColor(CS, C::Bg, C::Secondary, C::Normal, t.bgA4);
-
-        setColor(CS, C::Fg, C::Primary, C::Normal, t.bgAccentBright);
-        setColor(CS, C::Fg, C::Secondary, C::Normal, t.accentDim);
         setColor(CS, C::Decoration, C::Accent, C::Normal, t.accent);
 
         setColor(CS, C::Fg, C::Positive, C::Normal, t.positive);
@@ -828,65 +925,7 @@ void SystemPalette::makeDesignPalette()
         setColor(CS, C::Fg, C::Negative, C::Normal, t.negative);
     }
 
-    //Combo box
-    {
-        C::ColorSet CS = C::ComboBox;
-        setColor(CS, C::Fg, C::Primary, C::Normal, t.fgA2);
-        setColor(CS, C::Bg, C::Primary, C::Normal, t.bgA4);
-        setColor(CS, C::Bg, C::Primary, C::Focused, t.bgA2);
-        setColor(CS, C::Bg, C::Primary, C::Hovered, t.bgA2);
-        setColor(CS, C::Bg, C::Secondary, C::Normal, t.bgA4);
-        setColor(CS, C::Bg, C::Highlight, C::Normal, t.bgA2);
-
-        setColor(CS, C::Decoration, C::Border, C::Normal, t.bgB2);
-        setColor(CS, C::Decoration, C::Border, C::Disabled, Qt::transparent);
-    }
-
-    //TextField
-    {
-        C::ColorSet CS = C::TextField;
-        setColor(CS, C::Bg, C::Primary, C::Normal, t.bgB2);
-        setColor(CS, C::Fg, C::Primary, C::Normal, t.fgA2);
-        setColor(CS, C::Fg, C::Secondary, C::Normal, t.fgA4);
-
-        setColor(CS, C::Decoration, C::Border, C::Normal, t.dividerDim);
-        setColor(CS, C::Decoration, C::Border, C::Focused, t.accentDim);
-        setColor(CS, C::Decoration, C::Border, C::Hovered, t.dividerBright);
-        setColor(CS, C::Decoration, C::Border, C::Disabled, Qt::transparent);
-
-        setColor(CS, C::Bg, C::Highlight, C::Normal, t.bgAccentBright);
-        setColor(CS, C::Fg, C::Highlight, C::Normal, t.fg1);
-    }
-
-    //Switch
-    {
-        C::ColorSet CS = C::Switch;
-        setColor(CS, C::Bg, C::Primary, C::Normal, t.bgB2);
-        setColor(CS, C::Fg, C::Primary, C::Normal, t.fgA4);
-        setColor(CS, C::Decoration, C::Border, C::Normal, t.bgB2);
-
-        setColor(CS, C::Bg, C::Secondary, C::Normal, t.bgAccentBright);
-        setColor(CS, C::Fg, C::Secondary, C::Normal, t.accentDim);
-
-        setColor(CS, C::Bg, C::Highlight, C::Normal, t.bgA4);
-        setColor(CS, C::Fg, C::Highlight, C::Normal, t.fgA3);
-        setColor(CS, C::Decoration, C::Accent, C::Normal, t.accent);
-    }
-
-    //SpinBox
-    {
-        C::ColorSet CS = C::SpinBox;
-        setColor(CS, C::Bg, C::Primary, C::Normal, t.bgB2);
-        setColor(CS, C::Fg, C::Primary, C::Normal, t.fgA2);
-
-        setColor(CS, C::Decoration, C::Border, C::Normal, t.dividerDim);
-        setColor(CS, C::Decoration, C::Border, C::Focused, t.accentDim);
-        setColor(CS, C::Decoration, C::Border, C::Hovered, t.dividerBright);
-        setColor(CS, C::Decoration, C::Border, C::Disabled, Qt::transparent);
-
-        setColor(CS, C::Bg, C::Highlight, C::Normal, t.bgAccentBright);
-        setColor(CS, C::Fg, C::Highlight, C::Normal, t.fg1);
-    }
+    setControlColors(*this, m_tokens, m_isDark);
 }
 
 void SystemPalette::makeSystemPalette()
@@ -919,6 +958,7 @@ void SystemPalette::makeSystemPalette()
     {
         m_isDark = palette->isThemeDark();
         m_tokens = m_isDark ? DesignTokens::dark(accentColor()) : DesignTokens::light(accentColor());
+        setControlColors(*this, m_tokens, m_isDark);
     }
 
     m_palettePriv = std::move(palette);

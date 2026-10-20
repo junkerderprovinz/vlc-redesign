@@ -36,13 +36,14 @@ T.ToolTip {
                              implicitContentHeight + topPadding + bottomPadding)
 
     margins: VLCStyle.margin_xsmall
-    padding: VLCStyle.margin_xsmall
+    verticalPadding: VLCStyle.dp(6, VLCStyle.scale)
+    horizontalPadding: VLCStyle.dp(10, VLCStyle.scale)
 
     font.pixelSize: VLCStyle.fontSize_normal
 
     closePolicy: T.Popup.CloseOnEscape | T.Popup.CloseOnPressOutsideParent | T.Popup.CloseOnReleaseOutsideParent
 
-    property real radius: VLCStyle.dp(4, VLCStyle.scale)
+    property real radius: VLCStyle.dp(6, VLCStyle.scale)
 
     Component.onCompleted: {
         if (control.popupType !== undefined) {

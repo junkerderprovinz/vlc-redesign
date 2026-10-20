@@ -24,7 +24,7 @@ import VLC.MainInterface
 import VLC.Style
 import VLC.Widgets
 
-// Based on Qt Quick Basic Style:
+// Based on Qt Quick Basic Style, drawn as the ON/OFF toggle with the text on its left.
 T.CheckBox {
     id: control
 
@@ -35,7 +35,9 @@ T.CheckBox {
                              implicitIndicatorHeight + topPadding + bottomPadding)
 
     padding: VLCStyle.margin_xxsmall
-    spacing: VLCStyle.margin_xxsmall
+    spacing: VLCStyle.dp(10, VLCStyle.scale)
+
+    font.pixelSize: VLCStyle.fontSize_large
 
     Keys.priority: Keys.AfterItem
     Keys.onPressed: (event) => Navigation.defaultKeyAction(event)
@@ -50,55 +52,27 @@ T.CheckBox {
         pressed: control.down
     }
 
-    // keep in sync with CheckDelegate.qml (shared CheckIndicator.qml was removed for performance reasons)
-    indicator: Rectangle {
-        implicitWidth: control.contentItem ? implicitHeight : VLCStyle.dp(28, VLCStyle.scale)
-        implicitHeight: control.contentItem ? control.contentItem.implicitHeight : VLCStyle.dp(28, VLCStyle.scale)
-
-        x: control.text ? (control.mirrored ? control.width - width - control.rightPadding : control.leftPadding) : control.leftPadding + (control.availableWidth - width) / 2
+    indicator: ToggleIndicator {
+        x: control.text ? (control.mirrored ? control.leftPadding : control.width - width - control.rightPadding)
+                        : control.leftPadding + (control.availableWidth - width) / 2
         y: control.topPadding + (control.availableHeight - height) / 2
 
-        color: control.down ? Qt.lighter(theme.accent) : theme.bg.primary
-        border.width: control.visualFocus ? VLCStyle.dp(2, VLCStyle.scale) : VLCStyle.dp(1, VLCStyle.scale)
-        border.color: control.visualFocus ? theme.accent : theme.fg.primary
-        border.pixelAligned: (radius < Number.EPSILON)
+        enabled: control.enabled
 
-        Rectangle {
-            anchors.centerIn: parent
-            anchors.alignWhenCentered: false
+        checked: (control.checkState !== Qt.Unchecked)
+        position: (control.checkState === Qt.PartiallyChecked) ? 0.5 : (checked ? 1.0 : 0.0)
 
-            width: Math.min(parent.width, parent.height) / 1.618 // golden ratio
-            height: width
-
-            color: theme.accent
-
-            visible: (control.checkState === Qt.PartiallyChecked)
-        }
-
-        Text {
-            anchors.fill: parent
-
-            horizontalAlignment: Text.AlignHCenter
-            verticalAlignment: Text.AlignVCenter
-
-            font.pixelSize: Math.min(width, height)
-            font.weight: Font.DemiBold
-            minimumPixelSize: 1
-            fontSizeMode: Text.Fit
-
-            color: theme.accent
-
-            text: "✓"
-
-            visible: (control.checkState === Qt.Checked)
-        }
+        visualFocus: control.visualFocus
     }
 
     contentItem: ListLabel {
-        leftPadding: control.indicator && !control.mirrored ? control.indicator.width + control.spacing : 0
-        rightPadding: control.indicator && control.mirrored ? control.indicator.width + control.spacing : 0
+        leftPadding: control.indicator && control.mirrored ? control.indicator.width + control.spacing : 0
+        rightPadding: control.indicator && !control.mirrored ? control.indicator.width + control.spacing : 0
+
+        verticalAlignment: Text.AlignVCenter
 
         text: control.text
+        font: control.font
         color: theme.fg.primary
     }
 }

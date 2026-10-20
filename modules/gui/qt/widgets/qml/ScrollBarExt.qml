@@ -29,7 +29,7 @@ T.ScrollBar {
     implicitHeight: Math.max(implicitBackgroundHeight + topInset + bottomInset,
                              implicitContentHeight + topPadding + bottomPadding)
 
-    padding: VLCStyle.dp(2, VLCStyle.scale)
+    padding: VLCStyle.dp(3, VLCStyle.scale)
     visible: policy !== T.ScrollBar.AlwaysOff && ((background && background.opacity > 0.0) || (contentItem && contentItem.opacity > 0.0))
     minimumSize: horizontal ? (height / width) : (width / height)
 
@@ -43,29 +43,21 @@ T.ScrollBar {
 
     readonly property ColorContext colorContext: ColorContext {
         id: theme
-        colorSet: ColorContext.Item
+        colorSet: ColorContext.Slider
 
         // focused: control.activeFocus // irrelevant
         enabled: control.enabled
 
-        // Do not change the colors when pressed or hovered, similar to WinUI3:
-        pressed: false
-        hovered: true
-    }
-
-    background: Rectangle {
-        color: theme.bg.primary
-        radius: (control.horizontal ? height : width) / 2
-
-        visible: (control._shown && control.interacting)
+        pressed: control.pressed
+        hovered: control.interacting
     }
 
     contentItem: Rectangle {
-        implicitWidth: control.interacting ? VLCStyle.scrollBarInteractingSize : VLCStyle.scrollBarNonInteractingSize
-        implicitHeight: control.interacting ? VLCStyle.scrollBarInteractingSize : VLCStyle.scrollBarNonInteractingSize
+        implicitWidth: control.interacting ? VLCStyle.dp(6, VLCStyle.scale) : VLCStyle.margin_xxsmall
+        implicitHeight: control.interacting ? VLCStyle.dp(6, VLCStyle.scale) : VLCStyle.margin_xxsmall
 
         radius: (control.horizontal ? height : width) / 2
-        color: theme.fg.secondary
+        color: theme.border
 
         visible: control._shown
 

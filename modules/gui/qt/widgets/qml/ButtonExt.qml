@@ -40,9 +40,10 @@ T.Button {
 
     property string iconTxt: ""
 
-    property int iconSize: VLCStyle.icon_normal
+    property int iconSize: VLCStyle.dp(20, VLCStyle.scale)
 
     property color color: theme.fg.primary
+    property color backgroundColor: theme.bg.primary
     property color colorFocus: theme.visualFocus
 
     property int radius: VLCStyle.button_radius
@@ -65,9 +66,12 @@ T.Button {
                              implicitContentHeight + topPadding + bottomPadding)
 
     padding: VLCStyle.margin_xsmall
-    spacing: VLCStyle.margin_xsmall
+    leftPadding: showText ? VLCStyle.margin_normal : padding
+    rightPadding: showText ? VLCStyle.margin_normal : padding
+    spacing: VLCStyle.dp(6, VLCStyle.scale)
 
-    font.pixelSize: VLCStyle.fontSize_normal
+    font.pixelSize: VLCStyle.fontSize_large
+    font.weight: (colorContext.colorSet === ColorContext.ButtonAccent) ? Font.DemiBold : Font.Normal
 
     // Keys
 
@@ -104,7 +108,9 @@ T.Button {
     background: Widgets.AnimatedBackground {
         enabled: theme.initialized && !root.extBackgroundAnimation
 
-        color: theme.bg.primary
+        implicitHeight: VLCStyle.dp(32, VLCStyle.scale)
+
+        color: root.backgroundColor
         border.color: root.visualFocus ? root.colorFocus
                                        : (theme.border.a > 0.0 ? theme.border : color)
 
@@ -123,6 +129,8 @@ T.Button {
             width: root.contentItem?.implicitWidth ?? implicitWidth
 
             radius: parent.radius
+
+            color: theme.accent
 
             visible: (width > 0 && root.checked)
         }
@@ -170,8 +178,8 @@ T.Button {
 
         elide: Text.ElideRight
 
-        font.pixelSize: VLCStyle.fontSize_normal
-        font.weight: Font.DemiBold
+        font.pixelSize: control.font.pixelSize
+        font.weight: control.font.weight
 
         textFormat: Text.PlainText
 
@@ -205,7 +213,7 @@ T.Button {
             Layout.fillWidth: true
             Layout.fillHeight: true
             Layout.maximumWidth: implicitWidth + 1
-            Layout.leftMargin: iconLabel.visible ? VLCStyle.margin_xsmall : 0
+            Layout.leftMargin: iconLabel.visible ? root.spacing : 0
         }
 
         Item {

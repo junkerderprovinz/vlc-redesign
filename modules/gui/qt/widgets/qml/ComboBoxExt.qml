@@ -34,97 +34,178 @@ T.ComboBox {
                              implicitContentHeight + topPadding + bottomPadding,
                              implicitIndicatorHeight + topPadding + bottomPadding)
 
-    padding: VLCStyle.margin_xxsmall
+    // the field sits inside a frame of this width
+    readonly property real frameWidth: VLCStyle.margin_xxxsmall
+
+    padding: frameWidth
+    leftPadding: frameWidth + VLCStyle.dp(14, VLCStyle.scale)
+    rightPadding: frameWidth + VLCStyle.dp(14, VLCStyle.scale)
+    spacing: VLCStyle.dp(10, VLCStyle.scale)
+
     font.pixelSize: VLCStyle.fontSize_large
 
     readonly property ColorContext colorContext: ColorContext {
         id: theme
         colorSet: ColorContext.ComboBox
 
-        focused: control.activeFocus
+        focused: control.visualFocus
         enabled: control.enabled
         hovered: control.hovered
         pressed: control.pressed
     }
 
     property color color: theme.fg.primary
-    property color bgColor: theme.bg.primary
+    property color bgColor: theme.bg.secondary
+    property color frameColor: theme.bg.primary
     property color borderColor: theme.border
 
     Keys.priority: Keys.AfterItem
     Keys.onPressed: (event) => Navigation.defaultKeyAction(event)
 
     delegate: T.ItemDelegate {
-        width: control.width
-        height: implicitContentHeight + topPadding + bottomPadding
-        padding: VLCStyle.margin_xsmall
-        leftPadding: control.leftPadding
-        contentItem: Widgets.ListLabel {
-            text: control.textRole ? (Helpers.isArray(control.model) ? modelData[control.textRole] : model[control.textRole]) : modelData
-            color: control.color
-            elide: Text.ElideRight
-            verticalAlignment: Text.AlignVCenter
-        }
+        id: delegate
+
+        readonly property bool current: (index === control.currentIndex)
+
+        width: ListView.view ? ListView.view.width : control.width
+        implicitHeight: VLCStyle.dp(44, VLCStyle.scale)
+
+        leftPadding: VLCStyle.dp(14, VLCStyle.scale)
+        rightPadding: VLCStyle.dp(14, VLCStyle.scale)
+
         highlighted: control.highlightedIndex === index
+
+        font: control.font
+
+        background: Rectangle {
+            radius: VLCStyle.button_radius
+
+            color: (delegate.highlighted || delegate.current || delegate.hovered) ? popupTheme.bg.highlight
+                                                                                  : "transparent"
+        }
+
+        contentItem: Item {
+            implicitHeight: label.implicitHeight
+
+            T.Label {
+                id: label
+
+                anchors.left: parent.left
+                anchors.right: check.left
+                anchors.rightMargin: control.spacing
+                anchors.verticalCenter: parent.verticalCenter
+
+                text: control.textRole ? (Helpers.isArray(control.model) ? modelData[control.textRole] : model[control.textRole])
+                                       : modelData
+                color: control.color
+                font: delegate.font
+                elide: Text.ElideRight
+            }
+
+            Widgets.IconLabel {
+                id: check
+
+                anchors.right: parent.right
+                anchors.verticalCenter: parent.verticalCenter
+
+                width: VLCStyle.icon_normal
+
+                text: VLCIcons.check
+                color: popupTheme.accent
+                font.pixelSize: VLCStyle.icon_normal
+                horizontalAlignment: Text.AlignHCenter
+
+                visible: delegate.current
+            }
+        }
     }
 
     indicator: Widgets.IconLabel {
-        x: control.width - width - rightPadding
+        x: control.width - width - control.rightPadding
         y: control.topPadding + (control.availableHeight - height) / 2
         font.pixelSize: VLCStyle.icon_normal
-        font.bold: true
-        text: VLCIcons.expand
+        text: VLCIcons.chevron_down
         color: control.color
+        rotation: control.popup.visible ? 180 : 0
         verticalAlignment: Text.AlignVCenter
         horizontalAlignment: Text.AlignHCenter
     }
 
-    contentItem: Widgets.ListLabel {
+    contentItem: T.Label {
         rightPadding: control.spacing + control.indicator.width
 
         text: control.displayText
         color: control.color
+        font: control.font
         verticalAlignment: Text.AlignVCenter
         elide: Text.ElideRight
     }
 
-    background: Widgets.AnimatedBackground {
-        enabled: theme.initialized
-        color: control.bgColor
-        border.color: theme.border
-        border.width: VLCStyle.dp(2, VLCStyle.scale)
-        radius: VLCStyle.dp(2, VLCStyle.scale)
+    background: Rectangle {
+        implicitHeight: VLCStyle.dp(48, VLCStyle.scale)
+
+        radius: VLCStyle.dp(6, VLCStyle.scale)
+        color: control.frameColor
+
+        border.width: control.visualFocus ? VLCStyle.focus_border : 0
+        border.color: theme.visualFocus
+
+        Widgets.AnimatedBackground {
+            anchors.fill: parent
+            anchors.margins: control.frameWidth
+
+            enabled: theme.initialized
+
+            animationDuration: VLCStyle.duration_short
+
+            radius: VLCStyle.button_radius
+            color: control.bgColor
+            border.width: 0
+        }
     }
 
+    // like the design, the open list covers the field
     popup: Popup {
-        y: control.height - 1
+        y: 0
 
         // NOTE: This Popup should be on top of other Popup(s) most of the time.
         z: 100
 
         width: control.width
-        padding: 1
+        padding: control.frameWidth
+
+        ColorContext {
+            id: popupTheme
+            palette: theme.palette
+            colorSet: ColorContext.ComboBox
+            enabled: control.enabled
+        }
 
         contentItem: ListView {
             clip: true
             implicitHeight: contentHeight
+            spacing: control.frameWidth
             model: control.popup.visible ? control.delegateModel : null
             currentIndex: control.highlightedIndex
 
-            highlight: Widgets.AnimatedBackground {
-                enabled: theme.initialized
-                border.color: visualFocus ? theme.visualFocus : Qt.alpha(theme.visualFocus, 0.0)
-                color: theme.bg.secondary
+            ScrollBar.vertical: Widgets.ScrollBarExt {
+                colorContext.palette: popupTheme.palette
             }
-
-            ScrollIndicator.vertical: ScrollIndicator { }
         }
 
         background: Rectangle {
-            color: control.bgColor
+            color: popupTheme.bg.secondary
             border.color: control.borderColor
+            border.width: control.borderColor.a > 0 ? VLCStyle.border : 0
             border.pixelAligned: (radius < Number.EPSILON)
-            radius: 2
+            radius: VLCStyle.dp(6, VLCStyle.scale)
+
+            Widgets.RoundedRectangleShadow {
+                yOffset: VLCStyle.margin_xxsmall
+                blurRadius: VLCStyle.dp(7, VLCStyle.scale)
+
+                color: popupTheme.shadow
+            }
         }
     }
 }

@@ -1602,7 +1602,15 @@ libqml_module_widgets_a_QML = \
 	widgets/qml/VoronoiSnow.qml \
 	widgets/qml/DualKawaseBlur.qml \
 	widgets/qml/CheckBoxExt.qml \
-	widgets/qml/ProgressBarExt.qml
+	widgets/qml/ProgressBarExt.qml \
+	widgets/qml/ToggleIndicator.qml \
+	widgets/qml/SegmentButton.qml \
+	widgets/qml/SegmentedControl.qml \
+	widgets/qml/TabButtonExt.qml \
+	widgets/qml/MenuExt.qml \
+	widgets/qml/MenuItemExt.qml \
+	widgets/qml/MenuSeparatorExt.qml \
+	widgets/qml/DialogButton.qml
 libqml_module_widgets_a_Singleton_QML =
 libqml_module_widgets_a_SOURCES = $(QML_MODULE_widgets_SRC)
 nodist_libqml_module_widgets_a_SOURCES = widgets/qmlassets.cpp $(QML_MODULE_widgets_NODIST_EXTRA)

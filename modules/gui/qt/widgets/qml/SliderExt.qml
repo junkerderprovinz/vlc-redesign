@@ -1,8 +1,6 @@
 /*****************************************************************************
  * Copyright (C) 2023 VLC authors and VideoLAN
  *
- * Authors: Prince Gupta <guptaprince8832@gmail.com>
- *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
@@ -37,15 +35,25 @@ T.Slider {
         enabled: control.enabled
         focused: control.visualFocus
         hovered: control.hovered
+        pressed: control.pressed
     }
 
     // colors based on different parts and states
-    property color color: theme.fg.primary
+    property color color: (control.hovered || control.pressed || control.visualFocus) ? theme.fg.primary
+                                                                                     : theme.fg.secondary
     property color bgColor: theme.bg.primary
+    property color fillColor: theme.bg.secondary
+    property color tickColor: theme.indicator
 
-    property real handleWidth: VLCStyle.icon_xsmall
+    property real handleWidth: VLCStyle.margin_xsmall
 
-    property real radius: VLCStyle.dp(3, VLCStyle.scale)
+    property real radius: VLCStyle.dp(6, VLCStyle.scale)
+
+    // the fill grows from this value to the current value
+    property real fillOrigin: from
+
+    // number of equal steps marked on the track, no marks below 2
+    property int tickCount: 0
 
     // when set the tooltip will follow the mouse when control is hoverred
     // else tooltip will always be shown at current value.
@@ -67,6 +75,13 @@ T.Slider {
         return (handle.x + handle.width / 2) // handle center
     }
 
+    readonly property real _trackInset: VLCStyle.margin_xxxsmall
+
+    readonly property real _originPosition: {
+        const p = (to === from) ? 0 : Helpers.clamp((fillOrigin - from) / (to - from), 0, 1)
+        return (horizontal && !mirrored) ? p : 1 - p
+    }
+
     // find position under given x, can be used with Slider::valueAt()
     // x is coordinate in this control's coordinate space
     function positionAt(x) {
@@ -83,6 +98,11 @@ T.Slider {
     implicitHeight: Math.max(implicitBackgroundHeight + topInset + bottomInset,
                              implicitHandleHeight + topPadding + bottomPadding)
 
+    leftPadding: horizontal ? _trackInset : 0
+    rightPadding: horizontal ? _trackInset : 0
+    topPadding: horizontal ? 0 : _trackInset
+    bottomPadding: horizontal ? 0 : _trackInset
+
     handle: Rectangle {
         x: control.leftPadding + (control.horizontal
                                   ? control.visualPosition * (control.availableWidth - width)
@@ -92,39 +112,76 @@ T.Slider {
                                  ? (control.availableHeight - height) / 2
                                  : control.visualPosition * (control.availableHeight - height))
 
-        implicitWidth: control.handleWidth
-        implicitHeight: implicitWidth
+        implicitWidth: control.horizontal ? control.handleWidth : VLCStyle.margin_large
+        implicitHeight: control.horizontal ? VLCStyle.margin_large : control.handleWidth
 
-        width: control.handleWidth
-        height: width
-        radius: width / 2
+        radius: VLCStyle.margin_xxsmall
 
         color: control.color
-        visible: (control.visualFocus || control.pressed) && control.enabled
+
+        border.width: control.visualFocus ? VLCStyle.focus_border : 0
+        border.color: theme.visualFocus
     }
 
-    background: Rectangle {
-        x: control.leftPadding + (control.horizontal ? 0 : (control.availableWidth - width) / 2)
-        y: control.topPadding + (control.horizontal ? (control.availableHeight - height) / 2 : 0)
-
-        implicitWidth: control.horizontal ? VLCStyle.heightBar_xlarge : VLCStyle.heightBar_xxsmall
-        implicitHeight: control.horizontal ? VLCStyle.heightBar_xxsmall : VLCStyle.heightBar_xlarge
-
-        width: control.horizontal ? control.availableWidth : implicitWidth
-        height: control.horizontal ? implicitHeight : control.availableHeight
-
-        radius: control.radius
-
-        color: control.bgColor
-        scale: control.horizontal && control.mirrored ? -1 : 1
+    background: Item {
+        implicitWidth: control.horizontal ? VLCStyle.heightBar_xlarge : VLCStyle.margin_large
+        implicitHeight: control.horizontal ? VLCStyle.margin_large : VLCStyle.heightBar_xlarge
 
         Rectangle {
-            y: control.horizontal ? 0 : control.visualPosition * parent.height
-            width: control.horizontal ? control.position * parent.width : parent.height
-            height: control.horizontal ? parent.height : control.position * parent.height
+            id: track
+
+            readonly property real _thickness: VLCStyle.margin_normal
+
+            x: control.horizontal ? 0 : (parent.width - width) / 2
+            y: control.horizontal ? (parent.height - height) / 2 : 0
+
+            width: control.horizontal ? parent.width : _thickness
+            height: control.horizontal ? _thickness : parent.height
 
             radius: control.radius
-            color: control.color
+
+            color: control.bgColor
+
+            // like the handle, the fill travels inside the inset of the track
+            Rectangle {
+                readonly property real _start: Math.min(control.visualPosition, control._originPosition)
+                readonly property real _end: Math.max(control.visualPosition, control._originPosition)
+                readonly property real _travel: (control.horizontal ? track.width : track.height)
+                                                - control._trackInset * 2 - control.handleWidth
+
+                x: control.horizontal ? control._trackInset + _start * _travel : control._trackInset
+                y: control.horizontal ? control._trackInset : control._trackInset + _start * _travel
+
+                width: control.horizontal ? (_end - _start) * _travel + control.handleWidth
+                                          : track.width - control._trackInset * 2
+                height: control.horizontal ? track.height - control._trackInset * 2
+                                           : (_end - _start) * _travel + control.handleWidth
+
+                radius: VLCStyle.margin_xxsmall
+
+                color: control.fillColor
+            }
+
+            Repeater {
+                model: control.tickCount > 1 ? control.tickCount - 1 : 0
+
+                delegate: Rectangle {
+                    required property int index
+
+                    readonly property real _travel: (control.horizontal ? track.width : track.height)
+                                                    - control._trackInset * 2 - control.handleWidth
+                    readonly property real _center: control._trackInset + control.handleWidth / 2
+                                                    + (index + 1) / control.tickCount * _travel
+
+                    x: control.horizontal ? _center - width / 2 : (track.width - width) / 2
+                    y: control.horizontal ? (track.height - height) / 2 : _center - height / 2
+
+                    width: control.horizontal ? VLCStyle.margin_xxxsmall : VLCStyle.dp(6, VLCStyle.scale)
+                    height: control.horizontal ? VLCStyle.dp(6, VLCStyle.scale) : VLCStyle.margin_xxxsmall
+
+                    color: control.tickColor
+                }
+            }
         }
     }
 

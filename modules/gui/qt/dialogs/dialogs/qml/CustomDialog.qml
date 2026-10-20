@@ -37,7 +37,7 @@ ModalDialog {
     function ask(text, acceptCb, rejectCb, buttons) {
         //TODO: use a Promise here when dropping support of Qt 5.11
         let okTxt = qsTr("OK")
-        let cancelTxt = qsTr("cancel")
+        let cancelTxt = qsTr("Cancel")
         if (buttons) {
             if (buttons.cancel) {
                 cancelTxt = buttons.cancel
@@ -64,10 +64,14 @@ ModalDialog {
             _rejectCb()
     }
 
+    width: Math.max(implicitWidth, VLCStyle.dp(440, VLCStyle.scale))
+
     contentItem: Text {
         focus: false
-        font.pixelSize: VLCStyle.fontSize_normal
-        color: root.colorContext.fg.primary
+        font.pixelSize: VLCStyle.fontSize_large
+        lineHeight: VLCStyle.dp(25, VLCStyle.scale)
+        lineHeightMode: Text.FixedHeight
+        color: root.colorContext.fg.secondary
         wrapMode: Text.WordWrap
         text: root.text
     }
@@ -75,47 +79,49 @@ ModalDialog {
     footer: FocusScope {
         focus: true
         id: questionButtons
-        implicitHeight: VLCStyle.icon_normal
+
+        implicitWidth: buttonRow.implicitWidth + buttonRow.anchors.margins * 2
+        implicitHeight: buttonRow.implicitHeight + buttonRow.anchors.margins * 2
 
         readonly property ColorContext colorContext: ColorContext {
-            id: footerTheme
             palette: root.colorContext.palette
-            colorSet: ColorContext.Window
         }
 
-        Rectangle {
-            color: footerTheme.bg.primary
+        RowLayout {
+            id: buttonRow
+
             anchors.fill: parent
-            anchors.leftMargin: VLCStyle.margin_xxsmall
-            anchors.rightMargin: VLCStyle.margin_xxsmall
+            anchors.margins: VLCStyle.dp(20, VLCStyle.scale)
 
-            RowLayout {
-                anchors.fill: parent
+            spacing: VLCStyle.dp(20, VLCStyle.scale)
 
-                Widgets.ButtonExt {
-                    id: cancelBtn
-                    Layout.fillWidth: true
-                    focus: true
-                    visible: cancelBtn.text !== ""
+            Widgets.DialogButton {
+                id: cancelBtn
+                focus: true
+                visible: cancelBtn.text !== ""
 
-                    onClicked: root.reject()
+                onClicked: root.reject()
 
-                    Navigation.rightItem: okBtn
-                    Keys.priority: Keys.AfterItem
-                    Keys.onPressed: (event) => okBtn.Navigation.defaultKeyAction(event)
-                }
+                Navigation.rightItem: okBtn
+                Keys.priority: Keys.AfterItem
+                Keys.onPressed: (event) => okBtn.Navigation.defaultKeyAction(event)
+            }
 
-                Widgets.ButtonExt {
-                    id: okBtn
-                    Layout.fillWidth: true
-                    visible: okBtn.text !== ""
+            Item {
+                Layout.fillWidth: true
+            }
 
-                    onClicked: root.accept()
+            Widgets.DialogButton {
+                id: okBtn
+                visible: okBtn.text !== ""
 
-                    Navigation.leftItem: cancelBtn
-                    Keys.priority: Keys.AfterItem
-                    Keys.onPressed: (event) => cancelBtn.Navigation.defaultKeyAction(event)
-                }
+                primary: true
+
+                onClicked: root.accept()
+
+                Navigation.leftItem: cancelBtn
+                Keys.priority: Keys.AfterItem
+                Keys.onPressed: (event) => cancelBtn.Navigation.defaultKeyAction(event)
             }
         }
     }

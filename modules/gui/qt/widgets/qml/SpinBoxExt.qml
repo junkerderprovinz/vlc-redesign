@@ -30,7 +30,7 @@ T.SpinBox {
     property color textColor: theme.fg.primary
     property color bgColor: theme.bg.primary
     property color borderColor:  theme.border
-    property int borderWidth: VLCStyle.border
+    property int borderWidth: VLCStyle.dp(2, VLCStyle.scale)
 
     readonly property ColorContext colorContext: ColorContext {
         id: theme
@@ -44,9 +44,7 @@ T.SpinBox {
     font.pixelSize: VLCStyle.fontSize_large
 
     implicitWidth: Math.max(implicitBackgroundWidth + leftInset + rightInset,
-                              contentItem.implicitWidth + 2 * padding +
-                              up.implicitIndicatorWidth +
-                              down.implicitIndicatorWidth)
+                              contentItem.implicitWidth + leftPadding + rightPadding)
 
     implicitHeight: Math.max(implicitContentHeight + topPadding + bottomPadding,
                            implicitBackgroundHeight,
@@ -54,8 +52,8 @@ T.SpinBox {
                            down.implicitIndicatorHeight)
 
     padding: VLCStyle.margin_xxsmall
-    leftPadding: padding + (control.mirrored ? up.indicator.width : 0) + control.borderWidth
-    rightPadding: padding + (control.mirrored ? 0 : up.indicator.width) + control.borderWidth
+    leftPadding: VLCStyle.margin_small + (control.mirrored ? up.indicator.width : 0)
+    rightPadding: VLCStyle.margin_xxsmall + (control.mirrored ? 0 : up.indicator.width)
     topPadding: padding + control.borderWidth
     bottomPadding: padding + control.borderWidth
 
@@ -72,7 +70,9 @@ T.SpinBox {
     }
 
     background: Rectangle {
-        radius: VLCStyle.margin_xxxsmall
+        implicitHeight: VLCStyle.dp(36, VLCStyle.scale)
+
+        radius: VLCStyle.dp(6, VLCStyle.scale)
         border.color: control.borderColor
         border.width: control.borderWidth
         border.pixelAligned: (radius < Number.EPSILON)
@@ -88,10 +88,12 @@ T.SpinBox {
         text: control.textFromValue(control.value, control.locale)
 
         font: control.font
-        color: upTheme.fg.primary
+        color: control.textColor
+        selectionColor: theme.bg.highlight
+        selectedTextColor: theme.fg.highlight
 
         padding: 0
-        horizontalAlignment: Qt.AlignRight
+        horizontalAlignment: Qt.AlignLeft
         verticalAlignment: Qt.AlignVCenter
 
         selectByMouse: true
@@ -105,70 +107,57 @@ T.SpinBox {
         Navigation.parentItem: control
     }
 
-    up.indicator: Rectangle {
-        x: control.mirrored ? control.borderWidth : parent.width - width - control.borderWidth
-        height: parent.height / 2
-        implicitWidth: VLCStyle.dp(15, VLCStyle.scale)
-        implicitHeight: VLCStyle.dp(10, VLCStyle.scale)
-        anchors.top: parent.top
-        anchors.topMargin: control.borderWidth
+    component StepIndicator : Item {
+        id: indicator
 
-        color: upTheme.bg.primary
+        required property QtObject button
+        required property string iconTxt
+        required property bool available
+
+        x: control.mirrored ? control.borderWidth : control.width - width - control.borderWidth - VLCStyle.margin_xxsmall
+
+        implicitWidth: VLCStyle.icon_normal
+        implicitHeight: VLCStyle.dp(14, VLCStyle.scale)
+
+        height: (control.height - control.borderWidth * 2) / 2
 
         ColorContext {
-            id: upTheme
-            colorSet: ColorContext.ButtonStandard
+            id: stepTheme
+            colorSet: ColorContext.SpinBox
 
-            enabled: control.enabled
-            hovered: control.up.hovered
-            pressed: control.up.pressed
+            enabled: control.enabled && indicator.available
+            hovered: indicator.button.hovered
+            pressed: indicator.button.pressed
 
             // root control handles focused state
             focused: false
         }
 
         Widgets.IconLabel {
-            text: VLCIcons.chevron_up
-            font.pixelSize: control.font.pixelSize * 2
-            color: upTheme.fg.primary
-            font.bold: true
             anchors.fill: parent
-            fontSizeMode: Text.Fit
+
+            text: indicator.iconTxt
+            color: stepTheme.fg.secondary
+
+            font.pixelSize: VLCStyle.icon_small
             horizontalAlignment: Text.AlignHCenter
             verticalAlignment: Text.AlignVCenter
         }
     }
 
-    down.indicator: Rectangle {
-        x: control.mirrored ? control.borderWidth : parent.width - width - control.borderWidth
-        height: parent.height / 2
-        implicitWidth: VLCStyle.dp(15, VLCStyle.scale)
-        implicitHeight: VLCStyle.dp(10, VLCStyle.scale)
-        anchors.bottom: parent.bottom
-        anchors.bottomMargin: control.borderWidth
-        color: downTheme.bg.primary
+    up.indicator: StepIndicator {
+        y: control.borderWidth
 
-        ColorContext {
-            id: downTheme
-            colorSet: ColorContext.ButtonStandard
+        button: control.up
+        iconTxt: VLCIcons.chevron_up
+        available: control.wrap || control.value < Math.max(control.from, control.to)
+    }
 
-            enabled: control.enabled
-            hovered: control.down.hovered
-            pressed: control.down.pressed
+    down.indicator: StepIndicator {
+        y: control.height - height - control.borderWidth
 
-            // root control handles focused state
-            focused: false
-        }
-
-        Widgets.IconLabel {
-            text: VLCIcons.chevron_down
-            font.pixelSize: control.font.pixelSize * 2
-            color: downTheme.fg.primary
-            font.bold: true
-            anchors.fill: parent
-            fontSizeMode: Text.Fit
-            horizontalAlignment: Text.AlignHCenter
-            verticalAlignment: Text.AlignVCenter
-        }
+        button: control.down
+        iconTxt: VLCIcons.chevron_down
+        available: control.wrap || control.value > Math.min(control.from, control.to)
     }
 }

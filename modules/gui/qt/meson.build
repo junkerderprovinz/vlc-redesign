@@ -955,6 +955,14 @@ qml_modules += {
         'widgets/qml/DualKawaseBlur.qml',
         'widgets/qml/CheckBoxExt.qml',
         'widgets/qml/ProgressBarExt.qml',
+        'widgets/qml/ToggleIndicator.qml',
+        'widgets/qml/SegmentButton.qml',
+        'widgets/qml/SegmentedControl.qml',
+        'widgets/qml/TabButtonExt.qml',
+        'widgets/qml/MenuExt.qml',
+        'widgets/qml/MenuItemExt.qml',
+        'widgets/qml/MenuSeparatorExt.qml',
+        'widgets/qml/DialogButton.qml',
     ),
 }
 
