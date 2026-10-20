@@ -105,17 +105,16 @@ Widgets.PageLoader {
 
             BrowseDeviceView {
                 property var sortModel: [
-                    { text: qsTr("Alphabetic"), criteria: "name" },
-                    { text: qsTr("Url"),        criteria: "mrl"  }
+                    { text: qsTr("Title A-Z"), criteria: "name", order: Qt.AscendingOrder },
+                    { text: qsTr("Title Z-A"), criteria: "name", order: Qt.DescendingOrder },
+                    { text: qsTr("URI Ascending"), criteria: "mrl", order: Qt.AscendingOrder },
+                    { text: qsTr("URI Descending"), criteria: "mrl", order: Qt.DescendingOrder }
                 ]
 
                 anchors.fill: parent
 
                 displayMarginBeginning: root.displayMarginBeginning
                 displayMarginEnd: root.displayMarginEnd
-
-                enableBeginningFade: root.enableBeginningFade
-                enableEndFade: root.enableEndFade
 
                 model: StandardPathModel {
                     id: folderModel
@@ -144,8 +143,10 @@ Widgets.PageLoader {
             title: deviceModel.name
 
             sortModel: [
-                { text: qsTr("Alphabetic"), criteria: "name" },
-                { text: qsTr("Url"),        criteria: "mrl"  }
+                { text: qsTr("Title A-Z"), criteria: "name", order: Qt.AscendingOrder },
+                { text: qsTr("Title Z-A"), criteria: "name", order: Qt.DescendingOrder },
+                { text: qsTr("URI Ascending"), criteria: "mrl", order: Qt.AscendingOrder },
+                { text: qsTr("URI Descending"), criteria: "mrl", order: Qt.DescendingOrder }
             ]
 
             BrowseDeviceView {
@@ -155,9 +156,6 @@ Widgets.PageLoader {
 
                 displayMarginBeginning: root.displayMarginBeginning
                 displayMarginEnd: root.displayMarginEnd
-
-                enableBeginningFade: root.enableBeginningFade
-                enableEndFade: root.enableEndFade
 
                 model: NetworkDeviceModel {
                     id: deviceModel

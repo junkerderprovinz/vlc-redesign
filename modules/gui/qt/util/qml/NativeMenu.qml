@@ -38,6 +38,8 @@ QtObject {
         "visible" - (Boolean or function(dataList,options, indexes) -> Boolean) (optional) a boolean value or function which
                     controls whether the action is shown in the menu following 'popup' call
 
+        "icon" - (string) (optional) path of an svg icon shown next to the text
+
        e.g see MLContextMenu.qml
     **/
 
@@ -91,7 +93,10 @@ QtObject {
                     || (typeof action.visible === "boolean" && action.visible)
                     || (typeof action.visible === "function" && action.visible(_dataList, _options, _indexes))) {
                 _effectiveActions.push(action)
-                textStrings.push(action.text)
+                if (action.icon)
+                    textStrings.push({ "text": action.text, "icon_svg": action.icon })
+                else
+                    textStrings.push(action.text)
             }
         }
 

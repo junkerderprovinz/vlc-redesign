@@ -45,6 +45,8 @@ Widgets.ExpandGridItemView {
     basePictureWidth: VLCStyle.gridCover_video_width
     basePictureHeight: VLCStyle.gridCover_video_height
 
+    subtitleHeight: 0
+
     activeFocusOnTab: true
 
     // Functions
@@ -100,9 +102,6 @@ Widgets.ExpandGridItemView {
         opacity: (gridView.expandIndex !== -1
                   &&
                   gridView.expandIndex !== gridItem.index) ? 0.7 : 1
-
-        // FIXME: Sometimes MLBaseModel::getDataAt returns {} so we use 'isNew === true'.
-        showNewIndicator: (model.isNew === true)
 
         dragItem: gridView.dragItem
 

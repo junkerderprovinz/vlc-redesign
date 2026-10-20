@@ -84,8 +84,14 @@ Widgets.IconToolButton {
 
         function onSelected(index: int) {
             const selectedSortKey = root.model[index].criteria
+            const selectedSortOrder = root.model[index].order
 
-            if (root.sortKey !== selectedSortKey) {
+            // entries that name their own order, such as "Title Z-A", select it directly
+            if (selectedSortOrder !== undefined) {
+                if (root.sortKey !== selectedSortKey)
+                    root.sortSelected(selectedSortKey)
+                root.sortOrderSelected(selectedSortOrder)
+            } else if (root.sortKey !== selectedSortKey) {
                 root.sortSelected(selectedSortKey)
                 root.sortOrderSelected(Qt.AscendingOrder)
             } else {
@@ -100,7 +106,8 @@ Widgets.IconToolButton {
     function show() {
         const model = root.model.map(function(modelData) {
             const checked = modelData.criteria === sortKey
-            const order = checked ? root.sortOrder : undefined
+                            && (modelData.order === undefined || modelData.order === root.sortOrder)
+            const order = (checked && modelData.order === undefined) ? root.sortOrder : undefined
             return {
                 "text": modelData.text,
                 "checked": checked,

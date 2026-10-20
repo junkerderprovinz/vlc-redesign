@@ -74,8 +74,10 @@ MainViewLoader {
     }
 
     sortModel: [
-        { text: qsTr("Alphabetic"), criteria: "name" },
-        { text: qsTr("Tracks Count"),   criteria: "nb_tracks" }
+        { text: qsTr("Artist A-Z"), criteria: "name", order: Qt.AscendingOrder },
+        { text: qsTr("Artist Z-A"), criteria: "name", order: Qt.DescendingOrder },
+        { text: qsTr("Most Tracks First"), criteria: "nb_tracks", order: Qt.DescendingOrder },
+        { text: qsTr("Fewest Tracks First"), criteria: "nb_tracks", order: Qt.AscendingOrder }
     ]
 
     grid: gridComponent
@@ -106,7 +108,6 @@ MainViewLoader {
 
             basePictureWidth: VLCStyle.gridCover_music_width
             basePictureHeight: VLCStyle.gridCover_music_height
-            titleTopMargin: VLCStyle.gridItemTitle_topMargin + VLCStyle.margin_xxsmall
 
             selectionModel: root.selectionModel
             model: artistModel
@@ -135,15 +136,12 @@ MainViewLoader {
 
                 pictureWidth: artistGrid.maxPictureWidth
                 pictureHeight: artistGrid.maxPictureHeight
-                pictureRadius: (width / 2) // "pictureWidth" is image source width, postprocessing is done on item
-
                 image: model.cover || ""
                 fallbackImage: VLCStyle.noArtArtistSmall
 
                 title: model.name || qsTr("Unknown artist")
                 subtitle: qsTr("%1 song", "%1 songs", model.nb_tracks).arg(model.nb_tracks)
                 titleTopMargin: artistGrid.titleTopMargin
-                textAlignHCenter: true
                 dragItem: artistsDragItem
 
                 onItemClicked: (modifier, select) => { artistGrid.leftClickOnItem(modifier, index, select) }
@@ -154,9 +152,6 @@ MainViewLoader {
                     artistGrid.rightClickOnItem(index)
                     contextMenu.popup(selectionModel.selectedIndexes, globalMousePos)
                 }
-
-                selectedShadow.anchors.margins: VLCStyle.dp(1, VLCStyle.scale) // outside border
-                unselectedShadow.anchors.margins: VLCStyle.dp(1, VLCStyle.scale) // outside border
             }
         }
     }
@@ -165,86 +160,52 @@ MainViewLoader {
     Component {
         id: tableComponent
 
-        Widgets.TableViewExt {
-            id: artistTable
-
-            property var _modelSmall: [{
-                weight: 1,
-
-                model: ({
-                    criteria: "name",
-
-                    subCriterias: [ "nb_tracks" ],
-
-                    text: qsTr("Name"),
-
-                    headerDelegate: tableColumns.titleHeaderDelegate,
-                    colDelegate: tableColumns.titleDelegate,
-
-                    placeHolder: VLCStyle.noArtArtistSmall
-                })
-            }]
-
-            property var _modelMedium: [{
-                weight: 1,
-
-                model: {
-                    criteria: "name",
-
-                    text: qsTr("Name"),
-
-                    headerDelegate: tableColumns.titleHeaderDelegate,
-                    colDelegate: tableColumns.titleDelegate,
-
-                    placeHolder: VLCStyle.noArtArtistSmall
-                }
-            }, {
-                size: 1,
-
-                model: {
-                    criteria: "nb_tracks",
-
-                    text: qsTr("Tracks")
-                }
-            }]
+        Widgets.ListGridView {
+            id: listView
 
             selectionModel: root.selectionModel
             model: artistModel
             focus: true
-            dragItem: artistsDragItem
-            rowContextMenu: contextMenu
-            rowHeight: VLCStyle.tableCoverRow_height
 
             displayMarginBeginning: root.displayMarginBeginning
             displayMarginEnd: root.displayMarginEnd
 
-            fadingEdge.enableBeginningFade: root.enableBeginningFade
-            fadingEdge.enableEndFade: root.enableEndFade
-
-            preferredHeader: root.header
+            headerDelegate: root.header
             Navigation.parentItem: root
 
-            onActionForSelection: (selection) => {
-                artistModel.addAndPlay( selection )
-                if ( selection.length === 1)
-                    requestArtistAlbumView(Qt.TabFocusReason)
+            onActionAtIndex: (index) => {
+                if (selectionModel.selectedIndexes.length > 1) {
+                    artistModel.addAndPlay( selectionModel.selectedIndexes )
+                } else {
+                    currentIndex = index
+                    root.requestArtistAlbumView(Qt.TabFocusReason)
+                }
             }
 
-            sortModel: (_availableRowWidth < VLCStyle.colWidth(4)) ? _modelSmall
-                                                                   : _modelMedium
+            delegate: Widgets.ListGridItem {
+                required property var model
+                required property int index
 
-            onItemDoubleClicked: function(index, model) {
-                root.requestArtistAlbumView(Qt.MouseFocusReason, model.id)
-            }
+                width: listView.cellWidth
+                height: listView.cellHeight
 
-            onRightClick: (_,_,globalMousePos) => {
-                contextMenu.popup(selectionModel.selectedIndexes, globalMousePos)
-            }
+                image: model.cover || ""
+                fallbackImage: VLCStyle.noArtArtistSmall
 
-            MLTableColumns {
-                id: tableColumns
+                title: model.name || qsTr("Unknown artist")
 
-                showCriterias: (artistTable.sortModel === artistTable._modelSmall)
+                dragItem: artistsDragItem
+
+                onItemClicked: (modifier, select) => { listView.leftClickOnItem(modifier, index, select) }
+
+                onItemDoubleClicked: root.requestArtistAlbumView(Qt.MouseFocusReason, model.id)
+
+                onPlayClicked: artistModel.addAndPlay([artistModel.index(index, 0)])
+
+                onContextMenuButtonClicked: (_, globalMousePos) => {
+                    listView.rightClickOnItem(index)
+                    contextMenu.popup(listView.selectionModel.selectedIndexes, globalMousePos)
+                }
             }
         }
     }

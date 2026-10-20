@@ -63,9 +63,6 @@ Widgets.PageLoader {
                 displayMarginBeginning: root.displayMarginBeginning
                 displayMarginEnd: root.displayMarginEnd
 
-                enableBeginningFade: root.enableBeginningFade
-                enableEndFade: root.enableEndFade
-
                 onCurrentIndexChanged: History.viewProp.initialIndex = currentIndex
 
                 onShowList: (model, reason) => {

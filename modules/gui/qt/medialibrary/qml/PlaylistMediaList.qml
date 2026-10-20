@@ -47,17 +47,13 @@ MainViewLoader {
 
     readonly property int currentIndex: currentItem?.currentIndex ?? -1
 
-    property Component header: null
+    property Component header: createPlaylistHeader
 
     readonly property int contentLeftMargin: currentItem?.contentLeftMargin ?? 0
     readonly property int contentRightMargin: currentItem?.contentRightMargin ?? 0
 
     property int displayMarginBeginning: 0
     property int displayMarginEnd: 0
-
-    // Currently only respected by the list view:
-    property bool enableBeginningFade: true
-    property bool enableEndFade: true
 
     property alias searchPattern: playlistModel.searchPattern
     property alias sortOrder: playlistModel.sortOrder
@@ -104,7 +100,10 @@ MainViewLoader {
     emptyLabel: emptyLabel
 
     isSearchable: true
-    sortModel: [{ text: qsTr("Alphabetic"), criteria: "title" }]
+    sortModel: [
+        { text: qsTr("Title A-Z"), criteria: "title", order: Qt.AscendingOrder },
+        { text: qsTr("Title Z-A"), criteria: "title", order: Qt.DescendingOrder }
+    ]
 
 
     model: MLPlaylistListModel {
@@ -187,6 +186,13 @@ MainViewLoader {
             drop.accepted = false
         }
         return Promise.resolve()
+    }
+
+    function createPlaylist() {
+        const result = DialogsProvider.getTextDialog(null, qsTr("Create playlist"),
+                                                     qsTr("Please enter the playlist name:"), "")
+        if (result.ok && result.text !== "")
+            root.model.create(result.text, [])
     }
 
     function deleteSelectedPlaylists() {
@@ -405,119 +411,84 @@ MainViewLoader {
     Component {
         id: table
 
-        Widgets.TableViewExt {
-            id: tableView
-
-            //-------------------------------------------------------------------------------------
-            // Properties
-
-            property var _modelSmall: [{
-                weight: 1,
-
-                model: {
-                    criteria: "name",
-
-                    subCriterias: [ "count" ],
-
-                    text: qsTr("Name"),
-
-                    headerDelegate: columns.titleHeaderDelegate,
-                    colDelegate   : columns.titleDelegate
-                }
-            }]
-
-            property var _modelMedium: [{
-                weight: 1,
-
-                model: {
-                    criteria: "name",
-
-                    text: qsTr("Name"),
-
-                    headerDelegate: columns.titleHeaderDelegate,
-                    colDelegate   : columns.titleDelegate
-                }
-            }, {
-                size: 1,
-
-                model: {
-                    criteria: "count",
-
-                    text: qsTr("Items"),
-
-                    isSortable: false
-                }
-            }]
+        Widgets.ListGridView {
+            id: listView
 
             //-------------------------------------------------------------------------------------
             // Settings
 
-            rowHeight: VLCStyle.tableCoverRow_height
-
             model: root.model
-
-            sortModel: (_availableRowWidth < VLCStyle.colWidth(4)) ? _modelSmall
-                                                                   : _modelMedium
 
             selectionModel: root.selectionModel
 
-            dragItem: dragItemPlaylist
-
-            preferredHeader: root.header
-
-            rowContextMenu: contextMenu
+            headerDelegate: root.header
 
             displayMarginBeginning: root.displayMarginBeginning
             displayMarginEnd: root.displayMarginEnd
 
-            fadingEdge.enableBeginningFade: root.enableBeginningFade
-            fadingEdge.enableEndFade: root.enableEndFade
-
-            isDropAcceptableFunc: function(drag, index) {
-                root._adjustDragAccepted(drag)
-                return drag.accepted
-            }
-
-            acceptDropFunc: function(index, drop) {
-                return root._dropAction(drop, tableView.itemContainsDrag?.index)
-            }
-
-            dropIndicator: null
-
             Navigation.parentItem: root
 
-            //-------------------------------------------------------------------------------------
-            // Events
+            delegate: Widgets.ListGridItem {
+                required property var model
+                required property int index
 
-            onActionForSelection: _actionAtIndex()
+                width: listView.cellWidth
+                height: listView.cellHeight
 
-            onItemDoubleClicked: (_, model) => showList(model, Qt.MouseFocusReason)
+                iconText: VLCIcons.playlist
 
-            onRightClick: (_, _, globalMousePos) => {
-                contextMenu.popup(selectionModel.selectedRows(), globalMousePos)
+                title: model.name || qsTr("Unknown title")
+
+                dragItem: dragItemPlaylist
+
+                onItemClicked: (modifier, select) => { listView.leftClickOnItem(modifier, index, select) }
+
+                onItemDoubleClicked: root.showList(model, Qt.MouseFocusReason)
+
+                onPlayClicked: root.model.addAndPlay([root.model.index(index, 0)])
+
+                onContextMenuButtonClicked: (_, globalMousePos) => {
+                    listView.rightClickOnItem(index)
+                    contextMenu.popup(listView.selectionModel.selectedRows(), globalMousePos)
+                }
+
+                DropArea {
+                    anchors.fill: parent
+
+                    onEntered: function(drag) {
+                        root._adjustDragAccepted(drag)
+                    }
+
+                    onDropped: function(drop) {
+                        root._dropAction(drop, index)
+                    }
+                }
             }
 
-            //-------------------------------------------------------------------------------------
-            // Childs
+            onActionAtIndex: root._actionAtIndex()
+        }
+    }
 
-            Widgets.TableColumns {
-                id: columns
+    Component {
+        id: createPlaylistHeader
 
-                showCriterias: (tableView.sortModel === tableView._modelSmall)
+        Item {
+            width: root.width
+            implicitHeight: createRow.height + VLCStyle.dp(10, VLCStyle.scale)
 
-                criteriaCover: "thumbnail"
+            Widgets.ListGridItem {
+                id: createRow
 
-                //---------------------------------------------------------------------------------
-                // NOTE: When it's music we want the cover to be square
+                x: root.contentLeftMargin
 
-                titleCover_width: (isMusic) ? VLCStyle.trackListAlbumCover_width
-                                            : VLCStyle.listAlbumCover_width
+                iconText: VLCIcons.add
+                title: qsTr("Create playlist")
 
-                titleCover_height: (isMusic) ? VLCStyle.trackListAlbumCover_heigth
-                                             : VLCStyle.listAlbumCover_height
+                dimmed: true
+                showContextButton: false
 
-                titleCover_radius: (isMusic) ? VLCStyle.trackListAlbumCover_radius
-                                             : VLCStyle.listAlbumCover_radius
+                onItemClicked: root.createPlaylist()
+                onPlayClicked: root.createPlaylist()
             }
         }
     }

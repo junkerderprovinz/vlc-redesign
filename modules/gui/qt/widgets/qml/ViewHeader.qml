@@ -36,8 +36,8 @@ T.Pane {
     leftPadding: view?.contentLeftMargin ?? 0
     rightPadding: view?.contentRightMargin ?? 0
 
-    bottomPadding: VLCStyle.layoutTitle_bottom_padding
-    topPadding: VLCStyle.layoutTitle_top_padding
+    bottomPadding: 0
+    topPadding: VLCStyle.dp(57, VLCStyle.scale)
 
     // Aliases
 
@@ -83,20 +83,38 @@ T.Pane {
 
         anchors.fill: parent
 
-        SubtitleLabel {
+        spacing: VLCStyle.dp(5, VLCStyle.scale)
+
+        LabelExt {
             id: label
 
-            Layout.fillWidth: true
+            Layout.maximumWidth: row.width - (button.visible ? button.width + row.spacing : 0)
 
-            color: theme.fg.primary
+            elide: Text.ElideRight
+            textFormat: Text.PlainText
+
+            font.pixelSize: VLCStyle.fontSize_xlarge
+
+            color: (button.visible && labelHover.hovered) ? theme.fg.highlight : theme.fg.primary
+
+            HoverHandler {
+                id: labelHover
+
+                enabled: button.visible
+                cursorShape: Qt.PointingHandCursor
+            }
+
+            TapHandler {
+                enabled: button.visible
+
+                onTapped: root.seeAllButtonClicked(Qt.MouseFocusReason)
+            }
         }
 
-        TextToolButton {
+        IconToolButton {
             id: button
 
             visible: false
-
-            Layout.preferredWidth: implicitWidth
 
             focus: true
 
@@ -105,13 +123,16 @@ T.Pane {
                 value: root.focusReason
             }
 
-            text: qsTr("See All")
-
-            font.pixelSize: VLCStyle.fontSize_large
+            description: qsTr("See All")
+            text: VLCIcons.chevron_right
 
             Navigation.parentItem: root
 
             onClicked: root.seeAllButtonClicked(focusReason)
+        }
+
+        Item {
+            Layout.fillWidth: true
         }
     }
 }

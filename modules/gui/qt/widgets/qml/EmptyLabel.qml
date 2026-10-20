@@ -20,7 +20,6 @@ import QtQuick
 import QtQuick.Templates as T
 
 import VLC.Style
-import VLC.Widgets as Widgets
 
 T.Control {
     id: root
@@ -75,9 +74,7 @@ T.Control {
 
             fillMode: Image.PreserveAspectFit
 
-            Widgets.DefaultShadow {
-
-            }
+            opacity: 0.6
         }
 
         T.Label {
@@ -90,10 +87,9 @@ T.Control {
 
             focus: false
 
-            color: theme.fg.primary
+            color: theme.fg.secondary
 
-            font.pixelSize: VLCStyle.fontSize_xxlarge
-            font.weight: Font.DemiBold
+            font.pixelSize: VLCStyle.fontSize_large
         }
     }
 }

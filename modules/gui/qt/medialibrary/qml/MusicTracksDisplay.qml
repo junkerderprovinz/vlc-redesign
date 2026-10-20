@@ -34,12 +34,18 @@ Widgets.PageExt {
     property alias selectionModel: tracklistdisplay_id.selectionModel
 
     property var sortModel: [
-        { text: qsTr("Title"),    criteria: "title"},
-        { text: qsTr("Album"),    criteria: "album_title" },
-        { text: qsTr("Artist"),   criteria: "main_artist" },
-        { text: qsTr("Duration"), criteria: "duration" },
-        { text: qsTr("Track"),    criteria: "track_number" },
-        { text: qsTr("Disc"),     criteria: "disc_number" }
+        { text: qsTr("Title A-Z"), criteria: "title", order: Qt.AscendingOrder },
+        { text: qsTr("Title Z-A"), criteria: "title", order: Qt.DescendingOrder },
+        { text: qsTr("Artist A-Z"), criteria: "main_artist", order: Qt.AscendingOrder },
+        { text: qsTr("Artist Z-A"), criteria: "main_artist", order: Qt.DescendingOrder },
+        { text: qsTr("Album A-Z"), criteria: "album_title", order: Qt.AscendingOrder },
+        { text: qsTr("Album Z-A"), criteria: "album_title", order: Qt.DescendingOrder },
+        { text: qsTr("Track Number Ascending"), criteria: "track_number", order: Qt.AscendingOrder },
+        { text: qsTr("Track Number Descending"), criteria: "track_number", order: Qt.DescendingOrder },
+        { text: qsTr("Disc Number Ascending"), criteria: "disc_number", order: Qt.AscendingOrder },
+        { text: qsTr("Disc Number Descending"), criteria: "disc_number", order: Qt.DescendingOrder },
+        { text: qsTr("Duration Ascending"), criteria: "duration", order: Qt.AscendingOrder },
+        { text: qsTr("Duration Descending"), criteria: "duration", order: Qt.DescendingOrder }
     ]
 
     function setCurrentItemFocus(reason) {

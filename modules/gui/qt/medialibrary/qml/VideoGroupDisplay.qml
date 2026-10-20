@@ -56,17 +56,6 @@ Widgets.PageExt {
 
         displayMarginBeginning: root.displayMarginBeginning
         displayMarginEnd: root.displayMarginEnd
-        enableBeginningFade: root.enableBeginningFade
-        enableEndFade: root.enableEndFade
-
-        sectionProperty: {
-            switch (model.sortCriteria) {
-            case "title":
-                return "title_first_symbol"
-            default:
-                return ""
-            }
-        }
 
         function isInfoExpandPanelAvailable(/* modelIndexData */) {
             return true

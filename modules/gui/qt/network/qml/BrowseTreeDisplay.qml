@@ -70,10 +70,14 @@ Widgets.PageExt {
         isSearchable: true
 
         sortModel: [
-            { text: qsTr("Alphabetic"), criteria: "name"},
-            { text: qsTr("Url"), criteria: "mrl" },
-            { text: qsTr("File size"), criteria: "fileSizeRaw64" },
-            { text: qsTr("File modified"), criteria: "fileModified" }
+            { text: qsTr("Newest First"), criteria: "fileModified", order: Qt.DescendingOrder },
+            { text: qsTr("Oldest First"), criteria: "fileModified", order: Qt.AscendingOrder },
+            { text: qsTr("Title A-Z"), criteria: "name", order: Qt.AscendingOrder },
+            { text: qsTr("Title Z-A"), criteria: "name", order: Qt.DescendingOrder },
+            { text: qsTr("URI Ascending"), criteria: "mrl", order: Qt.AscendingOrder },
+            { text: qsTr("URI Descending"), criteria: "mrl", order: Qt.DescendingOrder },
+            { text: qsTr("File Size Ascending"), criteria: "fileSizeRaw64", order: Qt.AscendingOrder },
+            { text: qsTr("File Size Descending"), criteria: "fileSizeRaw64", order: Qt.DescendingOrder }
         ]
 
         grid: gridComponent
@@ -206,84 +210,11 @@ Widgets.PageExt {
         Component{
             id: tableComponent
 
-            Widgets.TableViewExt {
-                id: tableView
-
-                property Component thumbnailColumn: NetworkThumbnailItem {
-                    onPlayClicked: index => playAt(index)
-                }
-
-                property var _modelSmall: [{
-                    weight: 1,
-
-                    model: ({
-                        criteria: "name",
-
-                        title: "name",
-
-                        subCriterias: [ "mrl" ],
-
-                        text: qsTr("Name"),
-
-                        headerDelegate: tableColumns.titleHeaderDelegate,
-                        colDelegate: thumbnailColumn
-                    })
-                }]
-
-                property var _modelMedium: [{
-                    size: 1,
-
-                    model: {
-                        criteria: "thumbnail",
-
-                        text: qsTr("Cover"),
-
-                        isSortable: false,
-
-                        headerDelegate: tableColumns.titleHeaderDelegate,
-                        colDelegate: thumbnailColumn
-                    }
-                }, {
-                    weight: 1,
-
-                    model: {
-                        criteria: "name",
-
-                        text: qsTr("Name")
-                    }
-                }, {
-                    weight: 1,
-
-                    model: {
-                        criteria: "mrl",
-
-                        text: qsTr("Url"),
-
-                        showContextButton: true
-                    }
-                }, {
-                    size: 1,
-
-                    model: {
-                        criteria: "duration",
-
-                        text: qsTr("Duration"),
-
-                        showContextButton: true,
-                        headerDelegate: tableColumns.timeHeaderDelegate,
-                        colDelegate: tableColumns.timeColDelegate
-                    }
-                }]
+            Widgets.ListGridView {
+                id: listView
 
                 displayMarginBeginning: root.displayMarginBeginning
                 displayMarginEnd: root.displayMarginEnd
-                fadingEdge.enableBeginningFade: root.enableBeginningFade
-                fadingEdge.enableEndFade: root.enableEndFade
-
-                dragItem: networkDragItem
-
-                sortModel: (_availableRowWidth < VLCStyle.colWidth(4)) ? _modelSmall
-                                                                       : _modelMedium
 
                 model: root.model
 
@@ -293,25 +224,53 @@ Widgets.PageExt {
                 Navigation.parentItem: root
                 Navigation.upItem: browseTreeHeader.networkAddressbar
 
-                rowHeight: VLCStyle.tableCoverRow_height
+                delegate: Widgets.ListGridItem {
+                    required property var model
+                    required property int index
 
-                rowContextMenu: root.contextMenu
+                    readonly property bool isContainer: model.type === NetworkMediaModel.TYPE_NODE
+                                                        || model.type === NetworkMediaModel.TYPE_DIRECTORY
+                                                        || model.type === NetworkMediaModel.TYPE_PLAYLIST
 
-                onActionForSelection: (selection) => _actionAtIndex(selection[0].row)
-                onItemDoubleClicked: (index, model) => _actionAtIndex(index)
+                    width: listView.cellWidth
+                    height: listView.cellHeight
 
-                onRightClick: (_,_,globalMousePos) => {
-                    root.contextMenu.popup(loader.selectionModel.selectedIndexes, globalMousePos)
+                    iconText: {
+                        if (model.type === NetworkMediaModel.TYPE_PLAYLIST)
+                            return VLCIcons.playlist
+                        if (isContainer)
+                            return VLCIcons.folder
+                        return ""
+                    }
+
+                    image: model.artwork ?? ""
+                    fallbackImage: SVGColorImage.colorize(model.artworkFallback)
+                                                .color1(colorContext.fg.primary)
+                                                .accent(colorContext.accent)
+                                                .uri()
+
+                    title: model.name || qsTr("Unknown share")
+
+                    progress: Helpers.clamp(model.progress ?? 0, 0, 1)
+                    dimmed: isContainer
+
+                    dragItem: networkDragItem
+
+                    onPlayClicked: playAt(index)
+
+                    onItemClicked: (modifier, select) => {
+                        listView.leftClickOnItem(modifier, index, select)
+                    }
+
+                    onItemDoubleClicked: _actionAtIndex(index)
+
+                    onContextMenuButtonClicked: (_, globalMousePos) => {
+                        listView.rightClickOnItem(index)
+                        root.contextMenu.popup(loader.selectionModel.selectedIndexes, globalMousePos)
+                    }
                 }
 
-                Widgets.TableColumns {
-                    id: tableColumns
-
-                    titleCover_width: VLCStyle.listAlbumCover_width
-                    titleCover_height: VLCStyle.listAlbumCover_height
-
-                    showTitleText: tableView.sortModel === tableView._modelSmall
-                }
+                onActionAtIndex: (index) => { _actionAtIndex(index) }
             }
         }
 

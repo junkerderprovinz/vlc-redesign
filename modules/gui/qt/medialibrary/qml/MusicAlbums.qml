@@ -53,10 +53,14 @@ MainViewLoader {
     model: albumModelId
 
     sortModel: [
-        { text: qsTr("Alphabetic"),  criteria: "title"},
-        { text: qsTr("Duration"),    criteria: "duration" },
-        { text: qsTr("Date"),        criteria: "release_year" },
-        { text: qsTr("Artist"),      criteria: "main_artist" },
+        { text: qsTr("Newest First"), criteria: "release_year", order: Qt.DescendingOrder },
+        { text: qsTr("Oldest First"), criteria: "release_year", order: Qt.AscendingOrder },
+        { text: qsTr("Title A-Z"), criteria: "title", order: Qt.AscendingOrder },
+        { text: qsTr("Title Z-A"), criteria: "title", order: Qt.DescendingOrder },
+        { text: qsTr("Artist A-Z"), criteria: "main_artist", order: Qt.AscendingOrder },
+        { text: qsTr("Artist Z-A"), criteria: "main_artist", order: Qt.DescendingOrder },
+        { text: qsTr("Duration Ascending"), criteria: "duration", order: Qt.AscendingOrder },
+        { text: qsTr("Duration Descending"), criteria: "duration", order: Qt.DescendingOrder }
     ]
 
     grid: gridComponent
@@ -188,104 +192,46 @@ MainViewLoader {
     Component {
         id: tableComponent
 
-        Widgets.TableViewExt {
-            id: tableView_id
-
-            property var _modelSmall: [{
-                weight: 1,
-
-                model: ({
-                    criteria: "title",
-
-                    subCriterias: [ "main_artist", "duration" ],
-
-                    text: qsTr("Title"),
-
-                    headerDelegate: tableColumns.titleHeaderDelegate,
-                    colDelegate: tableColumns.titleDelegate,
-
-                    placeHolder: VLCStyle.noArtAlbumCover
-                })
-            }]
-
-            property var _modelMedium: [{
-                weight: 1,
-
-                model: {
-                    criteria: "title",
-
-                    text: qsTr("Title"),
-
-                    headerDelegate: tableColumns.titleHeaderDelegate,
-                    colDelegate: tableColumns.titleDelegate,
-
-                    placeHolder: VLCStyle.noArtAlbumCover
-                }
-            }, {
-                weight: 1,
-
-                model: {
-                    criteria: "main_artist",
-
-                    text: qsTr("Artist")
-                }
-            }, {
-                size: 1,
-
-                model: {
-                    criteria: "duration",
-
-                    text: qsTr("Duration"),
-
-                    showSection: "",
-
-                    headerDelegate: tableColumns.timeHeaderDelegate,
-                    colDelegate: tableColumns.timeColDelegate
-                }
-            }]
+        Widgets.ListGridView {
+            id: listView
 
             model: albumModelId
             selectionModel: root.selectionModel
-            onActionForSelection: (selection) => _actionAtIndex(selection[0])
-            Navigation.parentItem: root
-            section.property: "title_first_symbol"
-            preferredHeader: root.header
-            dragItem: albumDragItem
-            rowHeight: VLCStyle.tableCoverRow_height
-
-            rowContextMenu: contextMenu
-
-            sortModel: (_availableRowWidth < VLCStyle.colWidth(4)) ? _modelSmall
-                                                                   : _modelMedium
+            headerDelegate: root.header
 
             displayMarginBeginning: root.displayMarginBeginning
             displayMarginEnd: root.displayMarginEnd
 
-            fadingEdge.enableBeginningFade: root.enableBeginningFade
-            fadingEdge.enableEndFade: root.enableEndFade
+            Navigation.parentItem: root
 
-            onRightClick: (_,_,globalMousePos) => {
-                contextMenu.popup(selectionModel.selectedIndexes, globalMousePos)
-            }
-            onItemDoubleClicked: (index, model) => MediaLib.addAndPlay( model.id )
+            onActionAtIndex: (index) => { _actionAtIndex(albumModelId.index(index, 0)) }
 
-            MLTableColumns {
-                id: tableColumns
+            delegate: Widgets.ListGridItem {
+                required property var model
+                required property int index
 
-                showCriterias: (tableView_id.sortModel === tableView_id._modelSmall)
-            }
+                width: listView.cellWidth
+                height: listView.cellHeight
 
-            Connections {
-                target: albumModelId
-                function onSortCriteriaChanged() {
-                    switch (albumModelId.sortCriteria) {
-                    case "title":
-                    case "main_artist":
-                        tableView_id.section.property = albumModelId.sortCriteria + "_first_symbol"
-                        break;
-                    default:
-                        tableView_id.section.property = ""
-                    }
+                image: model.cover || ""
+                fallbackImage: VLCStyle.noArtAlbumCover
+
+                title: {
+                    const title = model.title || qsTr("Unknown title")
+                    return model.main_artist ? qsTr("%1 - %2").arg(title).arg(model.main_artist) : title
+                }
+
+                dragItem: albumDragItem
+
+                onItemClicked: (modifier, select) => { listView.leftClickOnItem(modifier, index, select) }
+
+                onItemDoubleClicked: MediaLib.addAndPlay(model.id)
+
+                onPlayClicked: MediaLib.addAndPlay(model.id)
+
+                onContextMenuButtonClicked: (_, globalMousePos) => {
+                    listView.rightClickOnItem(index)
+                    contextMenu.popup(listView.selectionModel.selectedIndexes, globalMousePos)
                 }
             }
         }

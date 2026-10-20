@@ -55,64 +55,75 @@ NativeMenu {
 
     actions: [{
             "text": qsTr("Play"),
+            "icon": ":/icons/figma/playback-duo.svg",
             "action": addAndPlay
         }, {
-            "text": qsTr("Play as audio"),
+            "text": qsTr("Play as Audio"),
             "action": playAsAudio,
             "visible": root.showPlayAsAudioAction
         }, {
-            "text": qsTr("Play as album"),
+            "text": qsTr("Play as Album"),
             "action": playAsAlbum,
             "visible": root.showPlayAsAlbumAction &&
                        (root.model instanceof MLAudioModel)
         }, {
-            "text": qsTr("Enqueue"),
+            "text": qsTr("Mark as Watched"),
+            "icon": ":/icons/figma/check-selected-duo.svg",
+            "action": markSeen,
+            "visible": _showSeen
+        }, {
+            "text": qsTr("Mark as Unwatched"),
+            "icon": ":/icons/figma/check-selected-duo.svg",
+            "action": markUnseen,
+            "visible": _showUnseen
+        }, {
+            "text": qsTr("Favorite"),
+            "icon": ":/icons/figma/favorite-duo.svg",
+            "action": addFavorite,
+            "visible": _showAddFavorite
+        }, {
+            "text": qsTr("Remove from Favorites"),
+            "icon": ":/icons/figma/favorite-active.svg",
+            "action": removeFavorite,
+            "visible": _showRemoveFavorite
+        }, {
+            "text": qsTr("Stream"),
+            "icon": ":/icons/figma/streaming-duo.svg",
+            "action": stream,
+            "visible": _hasMrl
+        }, {
+            "text": qsTr("Convert"),
+            "icon": ":/icons/figma/swap-duo.svg",
+            "action": convert,
+            "visible": _hasMrl
+        }, {
+            "text": qsTr("Add to Queue"),
+            "icon": ":/icons/figma/queue-duo.svg",
             "action": enqueue
         }, {
-            "text": qsTr("Enqueue as album"),
+            "text": qsTr("Add Album to Queue"),
             "action": enqueueAsAlbum,
             "visible": root.showPlayAsAlbumAction &&
                        (root.model instanceof MLAudioModel)
         }, {
-            "text": qsTr("Add to favorites"),
-            "action": addFavorite,
-            "visible": _showAddFavorite
-        }, {
-            "text": qsTr("Remove from favorites"),
-            "action": removeFavorite,
-            "visible": _showRemoveFavorite
-        }, {
-            "text": (root.showPlayAsAudioAction ? qsTr("Add to a video-only playlist") : qsTr("Add to an audio-only playlist")),
-            "action": (root.showPlayAsAudioAction ? root.addToVideoOnlyPlaylist : root.addToAudioOnlyPlaylist)
-        }, {
-            "text": qsTr("Add to a playlist"),
+            "text": qsTr("Add to Playlist"),
+            "icon": ":/icons/figma/playlist-duo.svg",
             "action": addToAPlaylist
         }, {
-            "text": qsTr("Mark as seen"),
-            "action": markSeen,
-            "visible": _showSeen
+            "text": (root.showPlayAsAudioAction ? qsTr("Add to Video Playlist") : qsTr("Add to Audio Playlist")),
+            "action": (root.showPlayAsAudioAction ? root.addToVideoOnlyPlaylist : root.addToAudioOnlyPlaylist)
         }, {
-            "text": qsTr("Mark as unseen"),
-            "action": markUnseen,
-            "visible": _showUnseen
-        }, {
-            "text": qsTr("Open Containing Folder"),
+            "text": qsTr("Show in File Explorer"),
+            "icon": ":/icons/figma/folder-duo.svg",
             "action": openContainingFolder,
             "visible": _openContainingFolder
         }, {
-            "text": qsTr("Delete"),
-            "action": deleteStream,
-            "visible": _deleteStream
-        }, {
-            "text": qsTr("Information"),
+            "text": qsTr("Info"),
             "action": _signalShowInformation,
             "visible": showInformationAvailable
-        },{
-            "text": qsTr("Delete File From System"),
-            "action": deleteFileFromSource,
-            "visible": _deleteFileFromSource
-        },{
-            "text": qsTr("Media Information"),
+        }, {
+            "text": qsTr("Properties && Metadata"),
+            "icon": ":/icons/figma/info-duo.svg",
             "action": function(dataList, options, indexes) {
                 DialogsProvider.mediaInfoDialog(dataList[0][idDataRole])
             },
@@ -120,6 +131,14 @@ NativeMenu {
                 return (dataList.length === 1)
                         && !(dataList[0][idDataRole].hasParent())
             }
+        }, {
+            "text": qsTr("Delete"),
+            "action": deleteStream,
+            "visible": _deleteStream
+        }, {
+            "text": qsTr("Delete File From System"),
+            "action": deleteFileFromSource,
+            "visible": _deleteFileFromSource
         }
     ]
 
@@ -184,6 +203,14 @@ NativeMenu {
         model.setItemPlayed(indexes[0], false)
     }
 
+    function stream(dataList, options, indexes) {
+        DialogsProvider.streamingDialog(_mrlList(dataList), true)
+    }
+
+    function convert(dataList, options, indexes) {
+        DialogsProvider.streamingDialog(_mrlList(dataList), false)
+    }
+
     function openContainingFolder(dataList, options, indexes) {
         const parentDir = model.getParentURL(indexes[0]);
 
@@ -238,6 +265,14 @@ NativeMenu {
 
     function _openContainingFolder(dataList, options, indexes) {
         return _checkRole(dataList, "isLocal", true)
+    }
+
+    function _hasMrl(dataList, options, indexes) {
+        return dataList.length > 0 && dataList.every((data) => !!data.mrl)
+    }
+
+    function _mrlList(dataList) {
+        return dataList.map((data) => data.mrl.toString())
     }
 
     function _deleteStream(dataList,options, indexes) {

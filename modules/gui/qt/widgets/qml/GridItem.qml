@@ -48,6 +48,12 @@ T.ItemDelegate {
     // if the item is selected
     property bool selected: false
 
+    // played items are drawn with a dimmer title
+    property bool dimmed: false
+
+    // darken the picture while the item is not highlighted, used for video thumbnails
+    property bool pictureDimmed: false
+
     // Aliases
 
     property alias mediaCover: picture
@@ -67,9 +73,6 @@ T.ItemDelegate {
     property alias pictureRadius: picture.radius
     property alias effectiveRadius: picture.effectiveRadius
     property alias pictureOverlay: picture.imageOverlay
-
-    property alias selectedShadow: selectedShadow
-    property alias unselectedShadow: unselectedShadow
 
     property alias artworkTextureProvider: picture.textureProvider
 
@@ -112,12 +115,7 @@ T.ItemDelegate {
             when: highlighted
 
             PropertyChanges {
-                target: selectedShadow
-                opacity: 1.0
-            }
-
-            PropertyChanges {
-                target: unselectedShadow
+                target: pictureShade
                 opacity: 0
             }
 
@@ -318,25 +316,15 @@ T.ItemDelegate {
                 }
              }
 
-            DefaultShadow {
-                id: unselectedShadow
+            Rectangle {
+                id: pictureShade
 
-                visible: opacity > 0
-            }
+                anchors.fill: parent
 
-            DoubleShadow {
-                id: selectedShadow
+                visible: root.pictureDimmed && opacity > 0
 
-                visible: opacity > 0
-                opacity: 0
-
-                primaryVerticalOffset: VLCStyle.dp(6, VLCStyle.scale)
-                primaryBlurRadius: VLCStyle.dp(18, VLCStyle.scale)
-
-                secondaryVerticalOffset: VLCStyle.dp(32, VLCStyle.scale)
-                secondaryBlurRadius: VLCStyle.dp(72, VLCStyle.scale)
-
-                z: -1
+                radius: picture.radius
+                color: Qt.rgba(0, 0, 0, 0.2)
             }
         }
 
@@ -357,9 +345,17 @@ T.ItemDelegate {
                 id: titleLabel
 
                 height: implicitHeight
-                color: root.selected
-                    ? theme.fg.highlight
-                    : theme.fg.primary
+
+                font.pixelSize: VLCStyle.fontSize_large
+                font.weight: Font.Normal
+
+                color: {
+                    if (root.selected)
+                        return theme.fg.highlight
+                    if (root.dimmed && !root.highlighted)
+                        return theme.fg.secondary
+                    return theme.fg.primary
+                }
             }
         }
 
@@ -369,6 +365,7 @@ T.ItemDelegate {
             visible: text !== ""
             text: root.subtitle
             elide: Text.ElideRight
+            font.pixelSize: VLCStyle.fontSize_large
             color: root.selected
                 ? theme.fg.highlight
                 : theme.fg.secondary
@@ -384,6 +381,11 @@ T.ItemDelegate {
             HoverHandler {
                 id: subtitleTxtMouseHandler
             }
+        }
+
+        // keeps the texts right below the picture when the cell is taller than the content
+        Item {
+            Layout.fillHeight: true
         }
     }
 }

@@ -56,10 +56,6 @@ FocusScope {
 
     readonly property bool hasGridListMode: true
 
-    // NOTE: Currently only respected by the table view:
-    property bool enableBeginningFade: true
-    property bool enableEndFade: true
-
     property bool interactive: true
 
     property bool reuseItems: true
@@ -217,83 +213,21 @@ FocusScope {
     Component {
         id: list
 
-        Widgets.TableViewExt {
+        Widgets.ListGridView {
             id: listView
 
             // Properties
 
-            readonly property int maximumCount: root.maximumRows
-
-            readonly property int nbItemPerRow: 1
-
-            property var _modelSmall: [{
-                weight: 1,
-
-                model: ({
-                    criteria: "name",
-
-                    title: "name",
-
-                    subCriterias: [ "mrl" ],
-
-                    text: qsTr("Name"),
-
-                    headerDelegate: tableColumns.titleHeaderDelegate,
-                    colDelegate: artworkColumn
-                })
-            }]
-
-            property var _modelMedium: [{
-                size: 1,
-
-                model: {
-                    criteria: "artwork",
-
-                    text: qsTr("Cover"),
-
-                    isSortable: false,
-
-                    headerDelegate: tableColumns.titleHeaderDelegate,
-                    colDelegate: artworkColumn
-                }
-            }, {
-                weight: 1,
-
-                model: {
-                    criteria: "name",
-
-                    text: qsTr("Name")
-                }
-            }, {
-                weight: 1,
-
-                model: {
-                    criteria: "mrl",
-
-                    text: qsTr("Url"),
-
-                    colDelegate: mrlColumn
-                }
-            }]
+            readonly property int maximumCount: (root.maximumRows === -1)
+                                                ? -1
+                                                : root.maximumRows * nbItemPerRow
 
             // Settings
-
-            rowContextMenu: null
-
-            rowHeight: VLCStyle.tableCoverRow_height
 
             displayMarginBeginning: root.displayMarginBeginning
             displayMarginEnd: root.displayMarginEnd
 
-            fadingEdge.enableBeginningFade: root.enableBeginningFade
-            fadingEdge.enableEndFade: root.enableEndFade
-
             model: root.model
-
-            sortModel: (_availableRowWidth < VLCStyle.colWidth(4)) ? _modelSmall
-                                                                   : _modelMedium
-
-            preferredHeader: root.header
 
             selectionModel: modelSelect
 
@@ -303,64 +237,36 @@ FocusScope {
 
             Navigation.parentItem: root
 
-            onActionForSelection: selection => root.onAction(selection[0].row)
+            onActionAtIndex: (index) => { root.onAction(index) }
 
-            onItemDoubleClicked: (index, model) => root.onDoubleClicked(model, index)
+            delegate: Widgets.ListGridItem {
+                required property var model
+                required property int index
 
-            Widgets.TableColumns {
-                id: tableColumns
+                readonly property bool isContainer: model.type === NetworkMediaModel.TYPE_NODE
+                                                    || model.type === NetworkMediaModel.TYPE_DIRECTORY
+                                                    || model.type === NetworkMediaModel.TYPE_PLAYLIST
 
-                titleCover_width: VLCStyle.listAlbumCover_width
-                titleCover_height: VLCStyle.listAlbumCover_height
+                width: listView.cellWidth
+                height: listView.cellHeight
 
-                showTitleText: listView.sortModel === listView._modelSmall
-            }
+                image: model.artwork ?? ""
+                fallbackImage: SVGColorImage.colorize(model.artworkFallback)
+                                            .color1(colorContext.fg.primary)
+                                            .accent(colorContext.accent)
+                                            .uri()
 
-            Component {
-                id: artworkColumn
+                title: model.name || qsTr("Unknown share")
 
-                NetworkThumbnailItem { onPlayClicked: index => root.playAt(index) }
-            }
+                dimmed: isContainer
 
-            Component {
-                id: mrlColumn
+                showContextButton: false
 
-                Widgets.TableRowDelegate {
-                    id: itemText
+                onItemClicked: (modifier, select) => { root.onClicked(model, index, modifier, select) }
 
-                    Widgets.TextAutoScroller {
+                onItemDoubleClicked: root.onDoubleClicked(model, index)
 
-                        anchors.fill: parent
-
-                        clip: scrolling
-
-                        label: itemLabel
-
-                        forceScroll: itemText.currentlyFocused
-
-                        Widgets.ListLabel {
-                            id: itemLabel
-
-                            anchors.verticalCenter: parent.verticalCenter
-
-                            text: {
-                                if (itemText.rowModel === null)
-                                    return ""
-
-                                const text = itemText.rowModel[itemText.colModel.criteria]
-
-                                if (text.toString() === "vlc://nop")
-                                    return ""
-                                else
-                                    return text
-                            }
-
-                            color: itemText.selected
-                                ? itemText.colorContext.fg.highlight
-                                : itemText.colorContext.fg.primary
-                        }
-                    }
-                }
+                onPlayClicked: root.playAt(index)
             }
         }
     }

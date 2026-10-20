@@ -83,14 +83,8 @@ Widgets.PageExt {
 
         gridLabels: _meta?.gridLabels ?? videoAll.getLabel
 
-        showGroupCountColumn: _meta?.showGroupCountColumn ?? false
-
-        sectionProperty: _meta?.sectionProperty ?? ""
-
         displayMarginBeginning: root.displayMarginBeginning
         displayMarginEnd: root.displayMarginEnd
-        enableBeginningFade: root.enableBeginningFade
-        enableEndFade: root.enableEndFade
 
 
         // VideoAll events reimplementation
@@ -136,15 +130,6 @@ Widgets.PageExt {
 
                 property var gridLabels: videoAll.getLabel
 
-                property string sectionProperty: {
-                    switch (model.sortCriteria) {
-                    case "title":
-                        return "title_first_symbol"
-                    default:
-                        return ""
-                    }
-                }
-
                 function onAction(indexes) {
                     model.addAndPlay( indexes )
                     MainCtx.playerView = true
@@ -172,20 +157,9 @@ Widgets.PageExt {
                     sortCriteria: root.sort.criteria
                 }
 
-                property string sectionProperty: {
-                    switch (model.sortCriteria) {
-                    case "title":
-                        return "group_title_first_symbol"
-                    default:
-                        return ""
-                    }
-                }
-
                 property var gridLabels: function (model) {
                     return videoAll.getLabelGroup(model, qsTr("%1 Videos"))
                 }
-
-                property bool showGroupCountColumn: true
 
                 function onAction(indexes) {
                     const index = indexes[0]
@@ -231,20 +205,9 @@ Widgets.PageExt {
                     sortCriteria: root.sort.criteria
                 }
 
-                property string sectionProperty: {
-                    switch (model.sortCriteria) {
-                    case "title":
-                        return "title_first_symbol"
-                    default:
-                        return ""
-                    }
-                }
-
                 property var gridLabels: function (model) {
                     return videoAll.getLabelGroup(model, qsTr("%1 Videos"))
                 }
-
-                property bool showGroupCountColumn: true
 
                 function onAction(indexes) {
                     const index = indexes[0]

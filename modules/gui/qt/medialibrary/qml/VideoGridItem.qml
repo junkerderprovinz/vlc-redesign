@@ -27,9 +27,12 @@ import VLC.Style
 Widgets.GridItem {
     id: root
 
-    property bool showNewIndicator: false
-    
     property var labels
+
+    readonly property real progress: Helpers.clamp(model.progress !== undefined ? model.progress : 0, 0, 1)
+
+    // A finished video has its progress reset, only the play count remains.
+    readonly property bool watched: progress >= 0.85 || ((model.playcount ?? 0) > 0 && !(progress > 0))
 
     function play() {
         if ( model.id !== undefined ) {
@@ -40,70 +43,38 @@ Widgets.GridItem {
 
     image: model.thumbnail || ""
     fallbackImage: VLCStyle.noArtVideoCover
-    fillMode: Image.Stretch
+    fillMode: Image.PreserveAspectCrop
 
     title: model.title || qsTr("Unknown title")
-    subtitle: model?.duration?.formatHMS() ?? ""
+    subtitle: ""
     pictureWidth: VLCStyle.gridCover_video_width
     pictureHeight: VLCStyle.gridCover_video_height
 
-    // Bottom rounding is provided by the progress bar if it is visible:
-    mediaCover.radiusBottomLeft: progressBar.visible ? 0.0 : mediaCover.radius
-    mediaCover.radiusBottomRight: progressBar.visible ? 0.0 : mediaCover.radius
-
-    selectedShadow.height: selectedShadow.implicitHeight + (progressBar.visible ? progressBar.height : 0.0)
-    unselectedShadow.height: unselectedShadow.implicitHeight + (progressBar.visible ? progressBar.height : 0.0)
+    pictureDimmed: true
+    dimmed: watched
 
     Widgets.VideoProgressBar {
         id: progressBar
 
         parent: root.mediaCover
 
-        // If the background color of the image is opaque (which should be
-        // the case by default), we can place the progress bar beneath the
-        // thumbnail and disable clipping because the top part would not be
-        // exposed. Note that the top part is still going to be painted, as
-        // long as the image is not opaque which is the expected case since
-        // SDF-based round images always have transparent parts which needs
-        // blending. If the image is not rounded and its blending is disabled,
-        // the top part of the bar is not going to be painted, thanks to depth
-        // testing. Furthermore, fragment shader may not even be executed for
-        // the top part that are obscured by the opaque image, provided that
-        // early depth test is applicable. In any case, since bottom radii
-        // are 0.0 and background color is opaque, the top part (if painted)
-        // will not be exposed to the user.
-        z: (root.mediaCover.color.a > (1.0 - Number.EPSILON)) ? -0.1 : 0.0
-        clip: (z >= 0.0)
+        z: 1
 
         anchors {
-            top: parent.bottom
+            bottom: parent.bottom
             left: parent.left
             right: parent.right
         }
 
-        visible: (model.progress > 0)
+        visible: root.progress > 0 || root.watched
 
         radius: root.pictureRadius
-        value: Helpers.clamp(model.progress !== undefined ? model.progress : 0, 0, 1)
+        value: root.progress > 0 ? root.progress : 1
     }
 
     pictureOverlay: Item {
         implicitWidth: root.pictureWidth
         implicitHeight: root.pictureHeight
-
-        Widgets.ScaledImage {
-            id: image
-
-            anchors.right: parent.right
-            anchors.top: parent.top
-
-            width: VLCStyle.gridItem_newIndicator
-            height: width
-
-            visible: root.showNewIndicator
-
-            source: VLCStyle.newIndicator
-        }
 
         Widgets.VideoQualityLabels {
             anchors {

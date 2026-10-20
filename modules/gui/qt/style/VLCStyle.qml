@@ -222,16 +222,16 @@ QtObject {
     readonly property int table_section_width: MainCtx.dp(32, scale)
     readonly property int table_section_text_margin: MainCtx.dp(10, scale)
 
-    readonly property int gridCover_network_width: colWidth(1)
+    readonly property int gridCover_network_width: MainCtx.dp(200, scale)
     readonly property int gridCover_network_height: gridCover_network_width
     readonly property int gridCover_network_border: MainCtx.dp(3, scale)
 
-    readonly property int gridCover_music_width: colWidth(1)
+    readonly property int gridCover_music_width: MainCtx.dp(200, scale)
     readonly property int gridCover_music_height: gridCover_music_width
     readonly property int gridCover_music_border: MainCtx.dp(3, scale)
 
-    readonly property int gridCover_video_width: colWidth(2)
-    readonly property int gridCover_video_height: ( gridCover_video_width * 10.0 ) / 16
+    readonly property int gridCover_video_width: MainCtx.dp(316, scale)
+    readonly property int gridCover_video_height: MainCtx.dp(178, scale)
     readonly property int gridCover_video_border: MainCtx.dp(4, scale)
 
     readonly property int gridCover_radius: MainCtx.dp(12, scale)
@@ -246,11 +246,14 @@ QtObject {
     readonly property real mainView_topLeftRadius: MainCtx.dp(6, scale)
 
     //GridItem
-    readonly property int gridItemTitle_topMargin: margin_xsmall + margin_xxxsmall
-    readonly property int gridItemTitle_height: fontHeight_normal
+    readonly property int gridItemTitle_topMargin: MainCtx.dp(20, scale)
+    readonly property int gridItemTitle_height: fontHeight_large
 
-    readonly property int gridItemSubtitle_topMargin: margin_xsmall - margin_xxxsmall
-    readonly property int gridItemSubtitle_height: fontHeight_normal
+    readonly property int gridItemSubtitle_topMargin: MainCtx.dp(10, scale)
+    readonly property int gridItemSubtitle_height: fontHeight_large
+
+    readonly property int gridItem_spacing: MainCtx.dp(20, scale)
+    readonly property int gridItem_rowSpacing: MainCtx.dp(40, scale)
 
     readonly property int gridItemSelectedBorder: MainCtx.dp(8, scale)
 

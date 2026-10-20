@@ -230,6 +230,8 @@ libqt_plugin_la_SOURCES = \
 	medialibrary/mlqueryparams.hpp \
 	medialibrary/mlrecentmediamodel.cpp \
 	medialibrary/mlrecentmediamodel.hpp \
+	medialibrary/mlrecentaudiomodel.cpp \
+	medialibrary/mlrecentaudiomodel.hpp \
 	medialibrary/mlrecentvideomodel.cpp \
 	medialibrary/mlrecentvideomodel.hpp \
 	medialibrary/mlurlmodel.cpp \
@@ -466,6 +468,7 @@ nodist_libqt_plugin_la_SOURCES = \
 	medialibrary/mlthreadpool.moc.cpp \
 	medialibrary/mlqmltypes.moc.cpp \
 	medialibrary/mlrecentmediamodel.moc.cpp \
+	medialibrary/mlrecentaudiomodel.moc.cpp \
 	medialibrary/mlrecentvideomodel.moc.cpp \
 	medialibrary/mlurlmodel.moc.cpp \
 	medialibrary/mlvideo.moc.cpp \
@@ -1364,7 +1367,6 @@ libqml_module_network_a_QML = \
 	network/qml/DiscoverUrlDisplay.qml \
 	network/qml/NetworkAddressbar.qml \
 	network/qml/NetworkGridItem.qml \
-	network/qml/NetworkThumbnailItem.qml \
 	network/qml/ServicesHomeDisplay.qml \
 	network/qml/ServicesManage.qml \
 	network/qml/ServicesSources.qml
@@ -1547,6 +1549,8 @@ libqml_module_widgets_a_QML = \
 	widgets/qml/EmptyLabelButton.qml \
 	widgets/qml/EmptyLabelHint.qml \
 	widgets/qml/GridItem.qml \
+	widgets/qml/ListGridItem.qml \
+	widgets/qml/ListGridView.qml \
 	widgets/qml/GridSortFilterControls.qml \
 	widgets/qml/HorizontalResizeHandle.qml \
 	widgets/qml/IconLabel.qml \

@@ -57,7 +57,8 @@ MainViewLoader {
     model: genreModel
 
     sortModel: [
-        { text: qsTr("Alphabetic"), criteria: "name" }
+        { text: qsTr("Title A-Z"), criteria: "name", order: Qt.AscendingOrder },
+        { text: qsTr("Title Z-A"), criteria: "name", order: Qt.DescendingOrder }
     ]
 
     list: tableComponent
@@ -219,92 +220,51 @@ MainViewLoader {
 
     Component {
         id: tableComponent
-        /* Table View */
-        Widgets.TableViewExt {
-            id: tableView_id
 
-            property var _modelSmall: [{
-                weight: 1,
-
-                model: {
-                    criteria: "name",
-
-                    subCriterias: [ "nb_tracks" ],
-
-                    text: qsTr("Name"),
-
-                    headerDelegate: tableColumns.titleHeaderDelegate,
-                    colDelegate: tableColumns.titleDelegate
-                }
-            }]
-
-            property var _modelMedium: [{
-                weight: 1,
-
-                model: {
-                    criteria: "name",
-
-                    text: qsTr("Name"),
-
-                    headerDelegate: tableColumns.titleHeaderDelegate,
-                    colDelegate: tableColumns.titleDelegate
-                }
-            }, {
-                size: 1,
-
-                model: {
-                    criteria: "nb_tracks",
-
-                    text: qsTr("Tracks"),
-
-                    isSortable: false
-                }
-            }]
+        Widgets.ListGridView {
+            id: listView
 
             model: genreModel
 
-            sortModel: (_availableRowWidth < VLCStyle.colWidth(4)) ? _modelSmall
-                                                                   : _modelMedium
-
             selectionModel: root.selectionModel
             focus: true
-            onActionForSelection: (selection) => _actionAtIndex(selection)
-            Navigation.parentItem: root
-            dragItem: genreDragItem
-            rowHeight: VLCStyle.tableCoverRow_height
 
             displayMarginBeginning: root.displayMarginBeginning
             displayMarginEnd: root.displayMarginEnd
 
-            fadingEdge.enableBeginningFade: root.enableBeginningFade
-            fadingEdge.enableEndFade: root.enableEndFade
+            headerDelegate: root.header
 
-            preferredHeader: root.header
+            Navigation.parentItem: root
 
-            rowContextMenu: contextMenu
+            onActionAtIndex: (index) => { _actionAtIndex(index) }
 
-            onItemDoubleClicked: (index, model) => {
-                root.showAlbumView(model.id, model.name, Qt.MouseFocusReason)
-            }
+            delegate: Widgets.ListGridItem {
+                required property var model
+                required property int index
 
-            onRightClick: (_,_,globalMousePos) => {
-                contextMenu.popup(selectionModel.selectedIndexes, globalMousePos)
-            }
+                width: listView.cellWidth
+                height: listView.cellHeight
 
-            MLTableColumns {
-                id: tableColumns
+                image: model.coverNonBlur || ""
+                fallbackImage: VLCStyle.noArtAlbumCover
 
-                criteriaCover: "coverNonBlur" 
+                title: model.name || qsTr("Unknown genre")
 
-                showCriterias: (tableView_id.sortModel === tableView_id._modelSmall)
+                dragItem: genreDragItem
 
-                titleCover_height: VLCStyle.listAlbumCover_height
-                titleCover_width: VLCStyle.listAlbumCover_width
-                titleCover_radius: VLCStyle.listAlbumCover_radius
+                onItemClicked: (modifier, select) => { listView.leftClickOnItem(modifier, index, select) }
+
+                onItemDoubleClicked: root.showAlbumView(model.id, model.name, Qt.MouseFocusReason)
+
+                onPlayClicked: genreModel.addAndPlay([genreModel.index(index, 0)])
+
+                onContextMenuButtonClicked: (_, globalMousePos) => {
+                    listView.rightClickOnItem(index)
+                    contextMenu.popup(listView.selectionModel.selectedIndexes, globalMousePos)
+                }
             }
         }
     }
-
 
     Component {
         id: emptyLabelComponent

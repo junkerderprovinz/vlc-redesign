@@ -99,9 +99,11 @@ T.Control {
 
                 text: defaultDelId.rowModel[defaultDelId.colModel.criteria] ?? ""
 
+                font.weight: Font.Normal
+
                 color: defaultDelId.selected
                     ? defaultDelId.colorContext.fg.highlight
-                    : defaultDelId.colorContext.fg.primary
+                    : defaultDelId.colorContext.fg.secondary
             }
         }
     }

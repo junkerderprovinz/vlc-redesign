@@ -39,6 +39,13 @@
 
 namespace
 {
+    // two-tone icon of the design, its second color is the accent color
+    QIcon libraryIcon(const QMenu *menu, const MainCtx *ctx, const QString &name)
+    {
+        return ColorizedSvgIcon(QStringLiteral(":/icons/figma/%1.svg").arg(name),
+                                menu->palette().text().color(), ctx->accentColor());
+    }
+
     QIcon sortIcon(QWidget *widget, int order)
     {
         assert(order == Qt::AscendingOrder || order == Qt::DescendingOrder);
@@ -102,7 +109,7 @@ void StringListMenu::popup(const QPoint &point, const QVariantList &stringList)
         if (!icon.isEmpty())
         {
             assert(action);
-            action->setIcon(ColorizedSvgIcon::colorizedIconForWidget(icon, m));
+            action->setIcon(ColorizedSvgIcon(icon, m->palette().text().color(), m_ctx->accentColor()));
         }
     }
 
@@ -164,7 +171,7 @@ void SortMenu::popup(const QPoint &point, const bool popupAbovePoint, const QVar
         const bool checked = obj.value("checked").toBool();
         action->setChecked(checked);
 
-        if (checked)
+        if (checked && obj.value("order").isValid())
             action->setIcon(sortIcon(m_menu.get(), obj.value("order").toInt()));
 
         connect(action, &QAction::triggered, this, [this, i]()
@@ -856,13 +863,13 @@ void PlaylistListContextMenu::popup(const QModelIndexList & selected, QPoint pos
 
     MediaLib * ml = m_model->ml();
 
-    QAction * action = menu->addAction(qtr("Add and play"));
+    QAction * action = menu->addAction(libraryIcon(menu, m_ctx, "playback-duo"), qtr("Play"));
 
     connect(action, &QAction::triggered, [ml, ids]() {
         ml->addAndPlay(ids);
     });
 
-    action = menu->addAction(qtr("Enqueue"));
+    action = menu->addAction(libraryIcon(menu, m_ctx, "queue-duo"), qtr("Add to Queue"));
 
     connect(action, &QAction::triggered, [ml, ids]() {
         ml->addToPlaylist(ids);
@@ -908,32 +915,32 @@ void PlaylistMediaContextMenu::popup(const QModelIndexList & selected, QPoint po
 
     MediaLib * ml = m_model->ml();
 
-    QAction * action = menu->addAction(qtr("Add and play"));
+    QAction * action = menu->addAction(libraryIcon(menu, m_ctx, "playback-duo"), qtr("Play"));
 
     connect(action, &QAction::triggered, [ml, ids]() {
         ml->addAndPlay(ids);
     });
 
-    action = menu->addAction(qtr("Enqueue"));
-
-    connect(action, &QAction::triggered, [ml, ids]() {
-        ml->addToPlaylist(ids);
-    });
-
-    action = menu->addAction(qtr("Add to playlist"));
-
-    connect(action, &QAction::triggered, [ids]() {
-        DialogsProvider::getInstance()->playlistsDialog(ids);
-    });
-
-    action = menu->addAction(qtr("Play as audio"));
+    action = menu->addAction(qtr("Play as Audio"));
 
     connect(action, &QAction::triggered, [ml, ids]() {
         ml->addAndPlay(ids, {":no-video"});
     });
 
+    action = menu->addAction(libraryIcon(menu, m_ctx, "queue-duo"), qtr("Add to Queue"));
+
+    connect(action, &QAction::triggered, [ml, ids]() {
+        ml->addToPlaylist(ids);
+    });
+
+    action = menu->addAction(libraryIcon(menu, m_ctx, "playlist-duo"), qtr("Add to Playlist"));
+
+    connect(action, &QAction::triggered, [ids]() {
+        DialogsProvider::getInstance()->playlistsDialog(ids);
+    });
+
     if (options.contains("information") && options["information"].typeId() == QMetaType::Int) {
-        action = menu->addAction(qtr("Information"));
+        action = menu->addAction(libraryIcon(menu, m_ctx, "info-duo"), qtr("Info"));
 
         QSignalMapper * mapper = new QSignalMapper(menu);
 
@@ -946,7 +953,7 @@ void PlaylistMediaContextMenu::popup(const QModelIndexList & selected, QPoint po
 
     menu->addSeparator();
 
-    action = menu->addAction(qtr("Remove Selected"));
+    action = menu->addAction(qtr("Remove from Playlist"));
 
     action->setIcon(QIcon(":/menu/remove.svg"));
 
@@ -969,30 +976,14 @@ void NetworkMediaContextMenu::popup(const QModelIndexList& selected, QPoint pos)
     auto menu = newMenu();
     QAction* action;
 
-    action = menu->addAction( qtr("Add and play") );
+    action = menu->addAction( libraryIcon(menu, m_ctx, "playback-duo"), qtr("Play") );
     connect(action, &QAction::triggered, [this, selected]( ) {
         m_model->addAndPlay(selected);
     });
 
-    action = menu->addAction( qtr("Enqueue") );
+    action = menu->addAction( libraryIcon(menu, m_ctx, "queue-duo"), qtr("Add to Queue") );
     connect(action, &QAction::triggered, [this, selected]( ) {
         m_model->addToPlaylist(selected);
-    });
-
-    action = menu->addAction( qtr("Information") );
-    connect(action, &QAction::triggered, [this, selected]( ) {
-        if (selected.isEmpty()) return;
-
-        m_model->getItemsForIndexes(selected, [](const QVariantList& items) {
-            if (items.isEmpty()) return;
-
-            QVariant firstItem = items.first();
-
-            if (firstItem.canConvert<SharedInputItem>()) {
-                 SharedInputItem sii = firstItem.value<SharedInputItem>();
-                 DialogsProvider::getInstance()->mediaInfoDialog(sii);
-            }
-        });
     });
 
     bool canBeIndexed = false;
@@ -1025,6 +1016,22 @@ void NetworkMediaContextMenu::popup(const QModelIndexList& selected, QPoint pos)
         });
     }
 
+    action = menu->addAction( libraryIcon(menu, m_ctx, "info-duo"), qtr("Properties && Metadata") );
+    connect(action, &QAction::triggered, [this, selected]( ) {
+        if (selected.isEmpty()) return;
+
+        m_model->getItemsForIndexes(selected, [](const QVariantList& items) {
+            if (items.isEmpty()) return;
+
+            QVariant firstItem = items.first();
+
+            if (firstItem.canConvert<SharedInputItem>()) {
+                 SharedInputItem sii = firstItem.value<SharedInputItem>();
+                 DialogsProvider::getInstance()->mediaInfoDialog(sii);
+            }
+        });
+    });
+
     menu->popup(pos);
 }
 
@@ -1038,17 +1045,17 @@ void NetworkDeviceContextMenu::popup(const QModelIndexList& selected, QPoint pos
     auto menu = newMenu();
     QAction* action;
 
-    action = menu->addAction( qtr("Add and play") );
+    action = menu->addAction( libraryIcon(menu, m_ctx, "playback-duo"), qtr("Play") );
     connect(action, &QAction::triggered, [this, selected]( ) {
         m_model->addAndPlay(selected);
     });
 
-    action = menu->addAction( qtr("Enqueue") );
+    action = menu->addAction( libraryIcon(menu, m_ctx, "queue-duo"), qtr("Add to Queue") );
     connect(action, &QAction::triggered, [this, selected]( ) {
         m_model->addToPlaylist(selected);
     });
 
-    action = menu->addAction( qtr("Information") );
+    action = menu->addAction( libraryIcon(menu, m_ctx, "info-duo"), qtr("Properties && Metadata") );
     connect(action, &QAction::triggered, [this, selected]( ) {
         if (selected.isEmpty()) return;
 

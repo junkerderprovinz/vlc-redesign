@@ -23,117 +23,73 @@ import VLC.MediaLibrary
 import VLC.Util
 import VLC.Widgets as Widgets
 import VLC.MainInterface
+import VLC.Player
 import VLC.Style
 
-Widgets.TableViewExt {
-    id: listView_id
+Widgets.ListGridView {
+    id: listView
 
-    //---------------------------------------------------------------------------------------------
     // Properties
-    //---------------------------------------------------------------------------------------------
 
-    // NOTE: This is useful for groups because our main criteria is 'name' instead of 'title'.
-    property string mainCriteria: "title"
+    property MLDragItem dragItem
+    property MLContextMenu contextMenu
 
-    property bool showGroupCountColumn: false
+    // Signals
 
-    property real coverHeight: VLCStyle.listAlbumCover_height
-    property real coverWidth: VLCStyle.listAlbumCover_width
-    property real coverRadius: VLCStyle.listAlbumCover_radius
-
-    //---------------------------------------------------------------------------------------------
-    // Private
-
-    property var _modelSmall: [{
-        weight: 1,
-
-        model: ({
-            criteria: mainCriteria,
-
-            subCriterias: showGroupCountColumn ? [ "nb_videos", "duration" ]
-                                               : [ "duration" ],
-
-            showSection: "title",
-
-            text: qsTr("Title"),
-
-            placeHolder: VLCStyle.noArtVideoCover,
-
-            headerDelegate: tableColumns.titleHeaderDelegate,
-            colDelegate   : tableColumns.titleDelegate
-        })
-    }]
-
-    property var _modelMedium: (function(){
-        const medium = [{
-            weight: 1,
-
-            model: ({
-                criteria: mainCriteria,
-
-                showSection: "title",
-
-                text: qsTr("Title"),
-
-                headerDelegate: tableColumns.titleHeaderDelegate,
-                colDelegate   : tableColumns.titleDelegate,
-
-                placeHolder: VLCStyle.noArtVideoCover
-            })
-        }]
-
-        if (showGroupCountColumn) {
-            medium.push({
-                size: 0.5,
-                model: ({
-                    criteria: "nb_videos",
-                    text: qsTr("Videos"),
-                    isSortable: false
-                })
-            })
-        }
-
-        medium.push({
-            size: showGroupCountColumn ? 0.5 : 1,
-
-            model: ({
-                criteria: "duration",
-
-                text: qsTr("Duration"),
-
-                showSection: "",
-                showContextButton: true,
-
-                headerDelegate: tableColumns.timeHeaderDelegate,
-                colDelegate   : tableColumns.timeColDelegate
-            })
-        })
-
-        return medium
-    })()
+    signal itemDoubleClicked(var model)
 
     // Settings
 
-    sortModel: (_availableRowWidth < VLCStyle.colWidth(4)) ? _modelSmall
-                                                           : _modelMedium
+    activeFocusOnTab: true
 
-    section.property: "title_first_symbol"
+    // Children
 
-    rowHeight: VLCStyle.tableCoverRow_height
+    delegate: Widgets.ListGridItem {
+        id: listItem
 
-    //---------------------------------------------------------------------------------------------
-    // Childs
-    //---------------------------------------------------------------------------------------------
+        // Properties
 
-    MLTableColumns {
-        id: tableColumns
+        required property var model
+        required property int index
 
-        showCriterias: (listView_id.sortModel === listView_id._modelSmall)
+        // Groups and folders have no isVideo role, or have it set to false.
+        readonly property bool isContainer: (model.isVideo !== true)
 
-        criteriaCover: "thumbnail"
+        readonly property real mediaProgress: Helpers.clamp(model.progress ?? 0, 0, 1)
 
-        titleCover_height: listView_id.coverHeight
-        titleCover_width: listView_id.coverWidth
-        titleCover_radius: listView_id.coverRadius
+        readonly property bool watched: !isContainer
+                                        && (mediaProgress >= 0.85
+                                            || ((model.playcount ?? 0) > 0 && !(mediaProgress > 0)))
+
+        // Settings
+
+        width: listView.cellWidth
+        height: listView.cellHeight
+
+        image: isContainer ? "" : (model.thumbnail || "")
+        fallbackImage: VLCStyle.noArtVideoCover
+        iconText: isContainer ? VLCIcons.folder : ""
+
+        title: model.title || qsTr("Unknown title")
+
+        progress: mediaProgress > 0 ? mediaProgress : (watched ? 1 : 0)
+        dimmed: watched || isContainer
+
+        current: !isContainer && Player.isStarted && !!model.mrl
+                 && model.mrl.toString() === Player.url.toString()
+
+        dragItem: listView.dragItem
+
+        // Events
+
+        onItemClicked: (modifier, select) => { listView.leftClickOnItem(modifier, index, select) }
+
+        onItemDoubleClicked: listView.itemDoubleClicked(model)
+
+        onContextMenuButtonClicked: (_, globalMousePos) => {
+            listView.rightClickOnItem(index)
+
+            listView.contextMenu.popup(listView.selectionModel.selectedIndexes, globalMousePos)
+        }
     }
 }

@@ -21,6 +21,8 @@ import VLC.MainInterface
 import VLC.MediaLibrary
 
 import VLC.Widgets as Widgets
+import VLC.Player
+import VLC.Util
 import VLC.Style
 
 // The media played last, newest first.
@@ -47,7 +49,7 @@ Widgets.PageExt {
 
         focus: true
 
-        Widgets.TableViewExt {
+        Widgets.ListGridView {
             id: recentView
 
             anchors.fill: parent
@@ -57,64 +59,39 @@ Widgets.PageExt {
 
             model: recentModel
 
-            sortModel: [{
-                weight: 1,
-
-                model: {
-                    criteria: "title",
-
-                    text: qsTr("Title"),
-
-                    isSortable: false,
-
-                    placeHolder: VLCStyle.noArtVideoCover,
-
-                    headerDelegate: tableColumns.titleHeaderDelegate,
-                    colDelegate: tableColumns.titleDelegate
-                }
-            }, {
-                weight: 1,
-
-                model: {
-                    criteria: "url",
-
-                    text: qsTr("Location"),
-
-                    isSortable: false
-                }
-            }, {
-                size: 1,
-
-                model: {
-                    criteria: "duration",
-
-                    text: qsTr("Duration"),
-
-                    isSortable: false,
-
-                    showContextButton: true,
-
-                    headerDelegate: tableColumns.timeHeaderDelegate,
-                    colDelegate: tableColumns.timeColDelegate
-                }
-            }]
-
-            rowHeight: VLCStyle.tableCoverRow_height
-
-            rowContextMenu: contextMenu
-
             displayMarginBeginning: root.displayMarginBeginning
             displayMarginEnd: root.displayMarginEnd
 
-            fadingEdge.enableBeginningFade: root.enableBeginningFade
-            fadingEdge.enableEndFade: root.enableEndFade
+            delegate: Widgets.ListGridItem {
+                required property var model
+                required property int index
 
-            onActionForSelection: (selection) => recentModel.addAndPlay(selection)
-            onItemDoubleClicked: (index, model) => MediaLib.addAndPlay(model.id)
+                width: recentView.cellWidth
+                height: recentView.cellHeight
 
-            onRightClick: (_, _, globalMousePos) => {
-                contextMenu.popup(selectionModel.selectedIndexes, globalMousePos)
+                image: model.small_cover ?? ""
+                fallbackImage: model.isVideo ? VLCStyle.noArtVideoCover : VLCStyle.noArtAlbumCover
+
+                title: model.title || qsTr("Unknown title")
+
+                progress: Helpers.clamp(model.progress ?? 0, 0, 1)
+
+                current: Player.isStarted && !!model.mrl
+                         && model.mrl.toString() === Player.url.toString()
+
+                onItemClicked: (modifier, select) => { recentView.leftClickOnItem(modifier, index, select) }
+
+                onItemDoubleClicked: MediaLib.addAndPlay(model.id)
+
+                onPlayClicked: MediaLib.addAndPlay(model.id)
+
+                onContextMenuButtonClicked: (_, globalMousePos) => {
+                    recentView.rightClickOnItem(index)
+                    contextMenu.popup(recentView.selectionModel.selectedIndexes, globalMousePos)
+                }
             }
+
+            onActionAtIndex: recentModel.addAndPlay(selectionModel.selectedIndexes)
 
             Navigation.parentItem: root
             Navigation.upItem: root.header
@@ -142,11 +119,5 @@ Widgets.PageExt {
         id: contextMenu
 
         model: recentModel
-    }
-
-    MLTableColumns {
-        id: tableColumns
-
-        criteriaCover: "small_cover"
     }
 }

@@ -23,6 +23,7 @@ import VLC.MediaLibrary
 
 import VLC.MainInterface
 import VLC.Widgets as Widgets
+import VLC.Player
 import VLC.Util
 import VLC.Style
 
@@ -36,22 +37,8 @@ MainViewLoader {
     Accessible.name: qsTr("Media view")
     AccessibleCompat.id: "mediaView"
 
-    property int listHeaderPositioning: ListView.OverlayHeader // ListView.InlineHeader, when as a row
-
-    // Currently only respected by the list view:
-    property bool enableBeginningFade: true
-    property bool enableEndFade: true
-
-    property string listSectionProperty: model.sortCriteria === "title" ? "title_first_symbol" : "" // "", when as a row
-
-    property int listCoverWidth: VLCStyle.trackListAlbumCover_width
-    property int listCoverHeight: VLCStyle.trackListAlbumCover_heigth
-    property int listCoverRadius: VLCStyle.trackListAlbumCover_radius
-
     property int gridCoverWidth: VLCStyle.gridCover_music_width
     property int gridCoverHeight: VLCStyle.gridCover_music_height
-
-    property int fillMode: MainCtx.gridView ? Image.PreserveAspectCrop : Image.PreserveAspectFit
 
     property int displayMarginBeginning: 0
     property int displayMarginEnd: 0
@@ -72,8 +59,12 @@ MainViewLoader {
     isSearchable: true
 
     sortModel: [
-        { text: qsTr("Alphabetic"), criteria: "title" },
-        { text: qsTr("Duration"), criteria: "duration" }
+        { text: qsTr("Newest First"), criteria: "insertion", order: Qt.DescendingOrder },
+        { text: qsTr("Oldest First"), criteria: "insertion", order: Qt.AscendingOrder },
+        { text: qsTr("Title A-Z"), criteria: "title", order: Qt.AscendingOrder },
+        { text: qsTr("Title Z-A"), criteria: "title", order: Qt.DescendingOrder },
+        { text: qsTr("Duration Ascending"), criteria: "duration", order: Qt.AscendingOrder },
+        { text: qsTr("Duration Descending"), criteria: "duration", order: Qt.DescendingOrder }
     ]
 
     list: listComponent
@@ -96,6 +87,14 @@ MainViewLoader {
     function _onActionAtIndex() {
         model.addAndPlay(selectionModel.selectedIndexes)
         History.push(["player"])
+    }
+
+    function _play(model) {
+        if (model.id !== undefined) {
+            MediaLib.addAndPlay(model.id)
+            if (model.isVideo)
+                MainCtx.requestShowPlayerView()
+        }
     }
 
 
@@ -158,25 +157,19 @@ MainViewLoader {
                 pictureWidth: gridView.maxPictureWidth
                 pictureHeight: gridView.maxPictureHeight
 
-                fillMode: root.fillMode
+                fillMode: Image.PreserveAspectCrop
 
                 image: model.small_cover ?? ""
                 fallbackImage: model.isVideo ? VLCStyle.noArtVideoCover : VLCStyle.noArtAlbumCover
 
                 title: model.title || qsTr("Unknown Title")
-                subtitle: model.duration?.formatHMS() ?? "--:--"
+                subtitle: model.main_artist ?? ""
 
                 opacity: gridView.expandIndex !== -1 && gridView.expandIndex !== index ? 0.7 : 1
 
                 dragItem: dragItemId
 
-                onPlayClicked: {
-                    if (model.id !== undefined) {
-                        MediaLib.addAndPlay(model.id)
-                        if (model.isVideo)
-                            MainCtx.requestShowPlayerView()
-                    }
-                }
+                onPlayClicked: root._play(model)
 
                 onItemDoubleClicked: root._onItemDoubleClicked(model)
 
@@ -203,70 +196,14 @@ MainViewLoader {
     Component {
         id: listComponent
 
-        Widgets.TableViewExt {
-            id: tableView
-
-            property var _sortModelLarge: [{
-                weight: 1,
-
-                model: {
-                    criteria: "title",
-
-                    text: qsTr("Title"),
-
-                    headerDelegate: tableColumns.titleHeaderDelegate,
-                    colDelegate: tableColumns.titleDelegate,
-
-                    placeHolder: VLCStyle.noArtAlbumCover // TODO: better fallback image
-                }
-            }, {
-                size: 1,
-
-                model: {
-                    criteria: "duration",
-
-                    text: qsTr("Duration"),
-
-                    headerDelegate: tableColumns.timeHeaderDelegate,
-                    colDelegate: tableColumns.timeColDelegate
-                }
-            }]
-
-            property var _sortModelSmall: [{
-                weight: 1,
-
-                model: {
-                    criteria: "title",
-
-                    text: qsTr("Title"),
-
-                    headerDelegate: tableColumns.titleHeaderDelegate,
-                    colDelegate: tableColumns.titleDelegate,
-
-                    placeHolder: VLCStyle.noArtAlbumCover, // TODO: better fallback image
-
-                    subCriterias: ["duration"]
-                }
-            }]
+        Widgets.ListGridView {
+            id: listView
 
             focus: true
 
             model: root.model
 
             selectionModel: root.selectionModel
-
-            sortModel: _availableRowWidth >= VLCStyle.colWidth(4) ? _sortModelLarge : _sortModelSmall
-
-            headerPositioning: root.listHeaderPositioning
-
-            rowHeight: VLCStyle.tableCoverRow_height
-
-            section.property: root.listSectionProperty
-
-            fadingEdge.enableBeginningFade: root.enableBeginningFade
-            fadingEdge.enableEndFade: root.enableEndFade
-
-            dragItem: dragItemId
 
             displayMarginBeginning: root.displayMarginBeginning
             displayMarginEnd: root.displayMarginEnd
@@ -277,32 +214,43 @@ MainViewLoader {
 
             Navigation.parentItem: root
 
-            rowContextMenu: contextMenu
+            delegate: Widgets.ListGridItem {
+                required property int index
+                required property var model
 
-            onItemDoubleClicked: (_, model) => {
-                root._onItemDoubleClicked(model)
+                width: listView.cellWidth
+                height: listView.cellHeight
+
+                image: model.small_cover ?? ""
+                fallbackImage: model.isVideo ? VLCStyle.noArtVideoCover : VLCStyle.noArtAlbumCover
+
+                title: {
+                    const title = model.title || qsTr("Unknown Title")
+                    return model.main_artist ? qsTr("%1 - %2").arg(title).arg(model.main_artist) : title
+                }
+
+                progress: Helpers.clamp(model.progress ?? 0, 0, 1)
+
+                current: Player.isStarted && !!model.mrl
+                         && model.mrl.toString() === Player.url.toString()
+
+                dragItem: dragItemId
+
+                onPlayClicked: root._play(model)
+
+                onItemDoubleClicked: root._onItemDoubleClicked(model)
+
+                onContextMenuButtonClicked: (_, globalMousePos) => {
+                    listView.rightClickOnItem(index)
+                    contextMenu.popup(selectionModel.selectedIndexes, globalMousePos)
+                }
+
+                onItemClicked: (modifier, select) => {
+                    listView.leftClickOnItem(modifier, index, select)
+                }
             }
 
-            onRightClick: (_, _, globalMousePos) => {
-                contextMenu.popup(selectionModel.selectedIndexes, globalMousePos)
-            }
-
-            onActionForSelection: root._onActionAtIndex()
-
-
-            MLTableColumns {
-                id: tableColumns
-
-                fillMode: root.fillMode
-
-                titleCover_width: root.listCoverWidth
-                titleCover_height: root.listCoverHeight
-                titleCover_radius: root.listCoverRadius
-
-                criteriaCover: "small_cover"
-
-                showCriterias: tableView.sortModel === tableView._sortModelSmall
-            }
+            onActionAtIndex: root._onActionAtIndex()
         }
     }
 

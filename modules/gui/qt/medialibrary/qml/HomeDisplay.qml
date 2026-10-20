@@ -36,6 +36,9 @@ Widgets.PageLoader {
         name: "continueWatching",
         component: continueWatchingComponent
     }, {
+        name: "listenAgain",
+        component: listenAgainComponent
+    }, {
         name: "favorites",
         component: favoritesComponent
     }, {
@@ -100,8 +103,6 @@ Widgets.PageLoader {
                     }
                 }
 
-                sectionProperty: model.sortCriteria === "title" ? "title_first_symbol" : ""
-
                 contextMenu: MLContextMenu {
                     model: continueWatching.model
 
@@ -110,9 +111,39 @@ Widgets.PageLoader {
 
                 displayMarginBeginning: root.displayMarginBeginning
                 displayMarginEnd: root.displayMarginEnd
+            }
+        }
+    }
 
-                enableBeginningFade: root.enableBeginningFade
-                enableEndFade: root.enableEndFade
+    Component {
+        id: listenAgainComponent
+
+        Widgets.PageExt {
+            id: listenAgainPage
+
+            title: qsTr("Listen Again")
+
+            MediaView {
+                focus: true
+
+                anchors.fill: parent
+
+                model: MLRecentAudioModel {
+                    ml: MediaLib
+
+                    searchPattern: listenAgainPage.search.pattern
+
+                    readonly property bool needToNavigateBack: !loading && count === 0
+                                                               && listenAgainPage.search.pattern === ""
+
+                    onNeedToNavigateBackChanged: {
+                        if (needToNavigateBack)
+                            History.previous(Qt.BacktabFocusReason)
+                    }
+                }
+
+                displayMarginBeginning: root.displayMarginBeginning
+                displayMarginEnd: root.displayMarginEnd
             }
         }
     }
@@ -142,9 +173,6 @@ Widgets.PageLoader {
 
                 displayMarginBeginning: root.displayMarginBeginning
                 displayMarginEnd: root.displayMarginEnd
-
-                enableBeginningFade: root.enableBeginningFade
-                enableEndFade: root.enableEndFade
             }
         }
     }
@@ -172,8 +200,6 @@ Widgets.PageLoader {
                     searchPattern: newVideoPage.search.pattern
                 }
 
-                sectionProperty: model.sortCriteria === "title" ? "title_first_symbol" : ""
-
                 contextMenu: MLContextMenu {
                     model: newVideo.model
 
@@ -182,9 +208,6 @@ Widgets.PageLoader {
 
                 displayMarginBeginning: root.displayMarginBeginning
                 displayMarginEnd: root.displayMarginEnd
-
-                enableBeginningFade: root.enableBeginningFade
-                enableEndFade: root.enableEndFade
             }
         }
     }
@@ -212,9 +235,6 @@ Widgets.PageLoader {
 
                 displayMarginBeginning: root.displayMarginBeginning
                 displayMarginEnd: root.displayMarginEnd
-
-                enableBeginningFade: root.enableBeginningFade
-                enableEndFade: root.enableEndFade
             }
         }
     }

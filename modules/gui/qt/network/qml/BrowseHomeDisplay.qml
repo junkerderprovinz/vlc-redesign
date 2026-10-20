@@ -206,7 +206,7 @@ Widgets.PageExt {
 
                 text: qsTr("Folders")
 
-                topPadding: 0
+                topPadding: VLCStyle.dp(20, VLCStyle.scale)
 
                 anchors.left: parent.left
                 anchors.right: parent.right
@@ -366,9 +366,6 @@ Widgets.PageExt {
         maximumRows: root.maximumRows
 
         interactive: false
-
-        enableBeginningFade: false
-        enableEndFade: false
 
         // FIXME: ExpandGridView makes this page completely unusable when `reuseItems` is set (#29084):
         reuseItems: !MainCtx.gridView

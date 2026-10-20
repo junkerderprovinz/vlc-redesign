@@ -35,16 +35,10 @@ MainViewLoader {
     readonly property int contentLeftMargin: currentItem?.contentLeftMargin ?? 0
     readonly property int contentRightMargin: currentItem?.contentRightMargin ?? 0
 
-    // Currently only respected by the list view:
-    property bool enableBeginningFade: true
-    property bool enableEndFade: true
-
     // NOTE: Specify an optional header for the view.
     property Component header: null
 
     property Item headerItem: currentItem?.headerItem ?? null
-
-    property int headerPositioning: ListView.OverlayHeader
 
     property int displayMarginBeginning: 0
     property int displayMarginEnd: 0
@@ -57,21 +51,12 @@ MainViewLoader {
 
     readonly property int rowHeight: currentItem?.rowHeight ?? 0
 
-    // 'role' used for tableview's section text
-    required  property string sectionProperty
-
     // NOTE: The ContextMenu depends on the model so we have to provide it too.
     required property MLContextMenu contextMenu
 
     // function(model) -> [strings....]
     // used to get grid labels per model item
     property var gridLabels: getLabel
-
-    property bool showGroupCountColumn: false
-
-    property real listCoverHeight: VLCStyle.listAlbumCover_height
-    property real listCoverWidth: VLCStyle.listAlbumCover_width
-    property real listCoverRadius: VLCStyle.listAlbumCover_radius
 
     // Aliases
 
@@ -84,10 +69,26 @@ MainViewLoader {
     grid: grid
     emptyLabel: emptylabel
 
-    sortModel: [
-        { text: qsTr("Alphabetic"), criteria: "title"    },
-        { text: qsTr("Duration"),   criteria: "duration" }
-    ]
+    sortModel: {
+        const sorts = []
+
+        // groups and folders have neither a play count nor an insertion date
+        if (model instanceof MLVideoModel && !(model instanceof MLVideoGroupsModel)) {
+            sorts.push(
+                { text: qsTr("Unwatched First"), criteria: "playcount", order: Qt.AscendingOrder },
+                { text: qsTr("Watched First"), criteria: "playcount", order: Qt.DescendingOrder },
+                { text: qsTr("Newest First"), criteria: "insertion", order: Qt.DescendingOrder },
+                { text: qsTr("Oldest First"), criteria: "insertion", order: Qt.AscendingOrder })
+        }
+
+        sorts.push(
+            { text: qsTr("Title A-Z"), criteria: "title", order: Qt.AscendingOrder },
+            { text: qsTr("Title Z-A"), criteria: "title", order: Qt.DescendingOrder },
+            { text: qsTr("Duration Ascending"), criteria: "duration", order: Qt.AscendingOrder },
+            { text: qsTr("Duration Descending"), criteria: "duration", order: Qt.DescendingOrder })
+
+        return sorts
+    }
 
 
     signal seeAllButtonClicked(int reason)
@@ -197,20 +198,11 @@ MainViewLoader {
 
             selectionModel: root.selectionModel
 
-            rowContextMenu: root.contextMenu
+            contextMenu: root.contextMenu
 
             dragItem: root.dragItem
 
-            preferredHeader: root.header
-
-            headerPositioning: root.headerPositioning
-
-            activeFocusOnTab: true
-
-            section.property: root.sectionProperty
-
-            fadingEdge.enableBeginningFade: root.enableBeginningFade
-            fadingEdge.enableEndFade: root.enableEndFade
+            headerDelegate: root.header
 
             displayMarginBeginning: root.displayMarginBeginning
             displayMarginEnd: root.displayMarginEnd
@@ -225,21 +217,9 @@ MainViewLoader {
 
             // Events
 
-            onActionForSelection: (selection) => {
-                root.onAction(selectionModel.selectedIndexes)
-            }
+            onActionAtIndex: root.onAction(selectionModel.selectedIndexes)
 
-            onItemDoubleClicked: (index, model) => root.onDoubleClick(model)
-
-            onRightClick: (_,_,globalMousePos) => {
-                root.contextMenu.popup(selectionModel.selectedIndexes, globalMousePos)
-            }
-
-            showGroupCountColumn: root.showGroupCountColumn
-
-            coverWidth: root.listCoverWidth
-            coverHeight: root.listCoverHeight
-            coverRadius: root.listCoverRadius
+            onItemDoubleClicked: model => root.onDoubleClick(model)
         }
     }
 

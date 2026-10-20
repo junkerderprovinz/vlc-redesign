@@ -36,7 +36,7 @@ FocusScope {
 
     //margin to apply
     property int bottomMargin: 0
-    property int topMargin: 0
+    property int topMargin: VLCStyle.dp(20, VLCStyle.scale)
     property int leftMargin: VLCStyle.layout_left_margin + leftPadding
     property int rightMargin: VLCStyle.layout_right_margin + rightPadding
 
@@ -57,8 +57,8 @@ FocusScope {
     // default is true
     property bool reuseItems: true
 
-    property int horizontalSpacing: VLCStyle.column_spacing
-    property int verticalSpacing: VLCStyle.column_spacing
+    property int horizontalSpacing: VLCStyle.gridItem_spacing
+    property int verticalSpacing: VLCStyle.gridItem_rowSpacing
 
     property int displayMarginBeginning: 0
     property int displayMarginEnd: 0

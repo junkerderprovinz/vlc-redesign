@@ -220,9 +220,10 @@ Item {
 
             horizontalAlignment: Text.AlignHCenter
             text: timeDel.rowModel?.[timeDel.colModel.criteria]?.formatShort() ?? ""
+            font.weight: Font.Normal
             color: timeDel.selected
                 ? timeDel.colorContext.fg.highlight
-                : timeDel.colorContext.fg.primary
+                : timeDel.colorContext.fg.secondary
         }
     }
 
@@ -272,6 +273,8 @@ Item {
                 text: (source.rowModel && root.showTitleText)
                       ? root._titleTextProvider(source.rowModel, source.colModel)
                       : ""
+
+                font.weight: Font.Normal
 
                 color: source.selected
                     ? source.colorContext.fg.highlight
