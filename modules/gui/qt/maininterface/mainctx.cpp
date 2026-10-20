@@ -433,8 +433,10 @@ void MainCtx::loadPrefs(const bool callSignals)
     };
 
     bool minimalMode = false;
-    /* Are we in the enhanced always-video mode or not ? */
-    loadFromVLCOption(minimalMode, "qt-minimal-view", nullptr);
+    /* Are we in the enhanced always-video mode or not ?
+     * The minimal view does not host the first run dialog. */
+    if (!hasFirstrun())
+        loadFromVLCOption(minimalMode, "qt-minimal-view", nullptr);
     setMinimalView(minimalMode);
 
     loadFromVLCOption(m_bgCone, "qt-bgcone", &MainCtx::bgConeToggled);
