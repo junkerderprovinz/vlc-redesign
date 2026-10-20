@@ -55,7 +55,6 @@
 #include "dialogs/podcast/podcast_configuration.hpp"
 #include "dialogs/plugins/plugins.hpp"
 #include "dialogs/epg/epg.hpp"
-#include "dialogs/playlists/playlists.hpp"
 
 #include <vlc_url.h>
 
@@ -185,7 +184,7 @@ void DialogsProvider::customEvent( QEvent *event )
             //playlistDialog(); break;
             break;
         // case INTF_DIALOG_PLAYLISTS:
-        // FIXME: `intf_dialog_args_t` is not supported by `PlaylistsDialog`.
+        // FIXME: `intf_dialog_args_t` is not supported by the playlists dialog.
         case INTF_DIALOG_MESSAGES:
             messagesDialog(); break;
         case INTF_DIALOG_FILEINFO:
@@ -593,9 +592,8 @@ QMessageBox::StandardButton DialogsProvider::messageDialog(const QString &text,
 
 void DialogsProvider::playlistsDialog( const QVariantList & medias, MLPlaylistListModel::PlaylistType type )
 {
-    const auto dialog = new PlaylistsDialog(p_intf, medias, type);
-    dialog->setAttribute(Qt::WA_DeleteOnClose);
-    dialog->show(); // "Modeless dialogs are displayed using show()"
+    if( p_intf->p_mi && p_intf->p_mi->hasMediaLibrary() )
+        emit showAddToPlaylistDialog( medias, type );
 }
 
 void DialogsProvider::bookmarksDialog()

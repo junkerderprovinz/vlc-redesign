@@ -81,7 +81,6 @@ class VLMDialog;
 class HelpDialog;
 class AboutDialog;
 class MediaInfoDialog;
-class PlaylistsDialog;
 class BookmarksDialog;
 class PodcastConfigDialog;
 class PluginDialog;
@@ -304,6 +303,7 @@ signals:
     void showAddSubtitlesDialog();
     void showKeyboardShortcutsDialog();
     void showNewPlaylistDialog();
+    void showAddToPlaylistDialog(const QVariantList &medias, int type);
     void showAboutDialog();
 
     //visiblity signal

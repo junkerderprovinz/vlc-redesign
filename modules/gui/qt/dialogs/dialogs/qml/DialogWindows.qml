@@ -55,6 +55,12 @@ Item {
     }
 
     Loader {
+        id: addToPlaylist
+        active: false
+        source: "qrc:///qt/qml/VLC/Dialogs/AddToPlaylistDialog.qml"
+    }
+
+    Loader {
         id: about
         active: false
         source: "qrc:///qt/qml/VLC/Dialogs/AboutDialog.qml"
@@ -67,6 +73,12 @@ Item {
         function onShowAddSubtitlesDialog() { root._show(addSubtitles) }
         function onShowKeyboardShortcutsDialog() { root._show(keyboardShortcuts) }
         function onShowNewPlaylistDialog() { root._show(newPlaylist) }
+        function onShowAddToPlaylistDialog(medias, type) {
+            addToPlaylist.active = true
+            addToPlaylist.item.medias = medias
+            addToPlaylist.item.playlistType = type
+            addToPlaylist.item.open()
+        }
         function onShowAboutDialog() { root._show(about) }
     }
 }

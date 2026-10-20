@@ -170,7 +170,6 @@ libqt_plugin_la_SOURCES = \
 	dialogs/toolbar/controlbar_profile_model.cpp \
 	dialogs/toolbar/controlbar_profile_model.hpp \
 	dialogs/vlm/vlm.cpp dialogs/vlm/vlm.hpp \
-	dialogs/playlists/playlists.cpp dialogs/playlists/playlists.hpp \
 	maininterface/compositor.hpp \
 	maininterface/compositor.cpp \
 	maininterface/compositor_common.hpp \
@@ -454,7 +453,6 @@ nodist_libqt_plugin_la_SOURCES = \
 	dialogs/systray/systray.moc.cpp \
 	dialogs/toolbar/controlbar_profile.moc.cpp \
 	dialogs/toolbar/controlbar_profile_model.moc.cpp \
-	dialogs/playlists/playlists.moc.cpp \
 	maininterface/compositor.moc.cpp \
 	maininterface/compositor_common.moc.cpp \
 	maininterface/compositor_dummy.moc.cpp \
@@ -1286,6 +1284,7 @@ libqml_module_dialogs_a_QML = \
 	dialogs/help/qml/AboutDialog.qml \
 	dialogs/hotkeys/qml/KeyboardShortcutsDialog.qml \
 	dialogs/open/qml/NetworkStreamDialog.qml \
+	dialogs/playlists/qml/AddToPlaylistDialog.qml \
 	dialogs/playlists/qml/NewPlaylistDialog.qml \
 	dialogs/playlists/qml/PlaylistCreator.qml \
 	dialogs/subtitles/qml/AddSubtitlesDialog.qml \
