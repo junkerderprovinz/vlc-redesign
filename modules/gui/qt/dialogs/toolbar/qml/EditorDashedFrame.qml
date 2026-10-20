@@ -20,7 +20,7 @@ import QtQuick
 import VLC.Style
 
 // Rectangle outline drawn with dashes of equal length and gap.
-Canvas {
+Item {
     id: frame
 
     property color color: "transparent"
@@ -28,39 +28,71 @@ Canvas {
     property real dashLength: VLCStyle.dp(4, VLCStyle.scale)
     property real lineWidth: VLCStyle.border
 
-    onColorChanged: requestPaint()
-    onFillColorChanged: requestPaint()
-    onWidthChanged: requestPaint()
-    onHeightChanged: requestPaint()
+    readonly property real _width: Math.floor(width)
+    readonly property real _height: Math.floor(height)
+    readonly property real _step: 2 * dashLength
+    readonly property int _columns: Math.ceil(_width / _step)
+    readonly property int _rows: Math.ceil(_height / _step)
 
-    onPaint: {
-        const ctx = getContext("2d")
-        ctx.reset()
+    Rectangle {
+        width: frame._width
+        height: frame._height
 
-        const w = Math.floor(width)
-        const h = Math.floor(height)
-        if (w <= 0 || h <= 0)
-            return
+        visible: frame.fillColor.a > 0
+        color: frame.fillColor
+    }
 
-        if (fillColor.a > 0) {
-            ctx.fillStyle = fillColor
-            ctx.fillRect(0, 0, w, h)
+    Repeater {
+        model: frame._columns
+
+        delegate: Rectangle {
+            required property int index
+
+            x: index * frame._step
+            width: Math.min(frame.dashLength, frame._width - x)
+            height: frame.lineWidth
+            color: frame.color
         }
+    }
 
-        ctx.fillStyle = color
+    Repeater {
+        model: frame._columns
 
-        const step = dashLength * 2
+        delegate: Rectangle {
+            required property int index
 
-        for (let x = 0; x < w; x += step) {
-            const length = Math.min(dashLength, w - x)
-            ctx.fillRect(x, 0, length, lineWidth)
-            ctx.fillRect(x, h - lineWidth, length, lineWidth)
+            x: index * frame._step
+            y: frame._height - frame.lineWidth
+            width: Math.min(frame.dashLength, frame._width - x)
+            height: frame.lineWidth
+            color: frame.color
         }
+    }
 
-        for (let y = 0; y < h; y += step) {
-            const length = Math.min(dashLength, h - y)
-            ctx.fillRect(0, y, lineWidth, length)
-            ctx.fillRect(w - lineWidth, y, lineWidth, length)
+    Repeater {
+        model: frame._rows
+
+        delegate: Rectangle {
+            required property int index
+
+            y: index * frame._step
+            width: frame.lineWidth
+            height: Math.min(frame.dashLength, frame._height - y)
+            color: frame.color
+        }
+    }
+
+    Repeater {
+        model: frame._rows
+
+        delegate: Rectangle {
+            required property int index
+
+            x: frame._width - frame.lineWidth
+            y: index * frame._step
+            width: frame.lineWidth
+            height: Math.min(frame.dashLength, frame._height - y)
+            color: frame.color
         }
     }
 }

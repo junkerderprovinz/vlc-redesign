@@ -153,34 +153,9 @@ FramelessDialog {
 
                 radius: VLCStyle.dp(6, VLCStyle.scale)
                 color: VLCStyle.palette.bgB2
-            }
-
-            Canvas {
-                id: dashes
-
-                anchors.fill: parent
-
-                readonly property color strokeColor: (dropArea.containsDrag || dropZone.activeFocus)
-                                                     ? VLCStyle.palette.accentDim
-                                                     : VLCStyle.palette.dividerBright
-
-                onStrokeColorChanged: requestPaint()
-                onWidthChanged: requestPaint()
-                onHeightChanged: requestPaint()
-
-                onPaint: {
-                    const ctx = getContext("2d")
-                    const lineWidth = VLCStyle.dp(2, VLCStyle.scale)
-                    const r = VLCStyle.dp(6, VLCStyle.scale)
-                    const inset = lineWidth / 2
-                    ctx.reset()
-                    ctx.strokeStyle = strokeColor
-                    ctx.lineWidth = lineWidth
-                    ctx.setLineDash([3, 3])
-                    ctx.beginPath()
-                    ctx.roundedRect(inset, inset, width - lineWidth, height - lineWidth, r, r)
-                    ctx.stroke()
-                }
+                border.width: VLCStyle.dp(2, VLCStyle.scale)
+                border.color: (dropArea.containsDrag || dropZone.activeFocus) ? VLCStyle.palette.accentDim
+                                                                              : VLCStyle.palette.bgA4
             }
 
             TapHandler {
