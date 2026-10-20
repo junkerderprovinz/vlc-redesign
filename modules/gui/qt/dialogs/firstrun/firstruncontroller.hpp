@@ -52,7 +52,6 @@ public:
 
     Q_INVOKABLE void browseFolder();
     Q_INVOKABLE void setColorScheme( ColorSchemeModel::ColorScheme scheme );
-    Q_INVOKABLE void pickAccentColor();
     Q_INVOKABLE QStringList hotkey( const QString& name ) const;
 
     Q_INVOKABLE void finish();

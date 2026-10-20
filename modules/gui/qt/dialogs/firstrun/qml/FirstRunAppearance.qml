@@ -150,7 +150,19 @@ FocusScope {
 
             Navigation.leftItem: accentRepeater.itemAt(accentRepeater.count - 1)
 
-            onClicked: root.controller.pickAccentColor()
+            onClicked: {
+                picker.setColor(MainCtx.accentColor)
+                picker.open()
+            }
+
+            SettingsColorPicker {
+                id: picker
+
+                x: customSwatch.width - width
+                y: -height - VLCStyle.dp(6, VLCStyle.scale)
+
+                onPicked: (c) => MainCtx.accentColor = c
+            }
 
             Rectangle {
                 anchors.centerIn: parent

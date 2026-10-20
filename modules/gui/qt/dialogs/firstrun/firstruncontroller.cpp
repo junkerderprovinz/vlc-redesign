@@ -25,7 +25,6 @@
 #include "maininterface/mainctx.hpp"
 #include "medialibrary/medialib.hpp"
 
-#include <QColorDialog>
 #include <QDir>
 #include <QFileDialog>
 #include <QFileInfo>
@@ -118,18 +117,6 @@ void FirstRunController::setColorScheme( ColorSchemeModel::ColorScheme scheme )
             return;
         }
     }
-}
-
-void FirstRunController::pickAccentColor()
-{
-    assert( m_ctx );
-
-    /* Opened without a nested event loop, as the first run dialog may close meanwhile */
-    auto dialog = new QColorDialog( m_ctx->accentColor() );
-    dialog->setWindowTitle( qtr( "Accent color" ) );
-    dialog->setAttribute( Qt::WA_DeleteOnClose );
-    connect( dialog, &QColorDialog::colorSelected, m_ctx, &MainCtx::setAccentColor );
-    dialog->open();
 }
 
 QStringList FirstRunController::hotkey( const QString& name ) const
