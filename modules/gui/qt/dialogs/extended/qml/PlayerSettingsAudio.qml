@@ -55,7 +55,7 @@ ColumnLayout {
         const slug = _equalizerIcons[id]
         if (!slug)
             return ""
-        return SVGColorImage.colorize("qrc:///icons/figma/" + slug + ".svg")
+        return SVGColorImage.colorize("qrc:///icons/ui/" + slug + ".svg")
                             .color1(colors.label).accent(colors.accent).uri()
     }
 

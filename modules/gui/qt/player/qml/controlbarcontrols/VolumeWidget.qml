@@ -264,7 +264,7 @@ T.Pane {
 
                 readonly property color trackColor: theme.tokens.isDark ? theme.tokens.bgB2 : theme.tokens.bgA4
 
-                readonly property string _source: "qrc:///icons/figma/volume-wedge.svg"
+                readonly property string _source: "qrc:///icons/ui/volume-wedge.svg"
 
                 opacity: _player.muted ? 0.5 : 1.0
 

@@ -172,7 +172,7 @@ static QIcon entryIcon( qt_intf_t *p_intf, const QMenu *menu, const char *name,
     return QIcon();
 #else
     if( p_intf->p_mi )
-        return MenuStyle::icon( QStringLiteral( ":/icons/figma/%1.svg" ).arg( QLatin1String( name ) ),
+        return MenuStyle::icon( QStringLiteral( ":/icons/ui/%1.svg" ).arg( QLatin1String( name ) ),
                                 menu->palette().text().color(), p_intf->p_mi->accentColor() );
     if( !EMPTY_STR( legacyIcon ) )
         return ColorizedSvgIcon::colorizedIconForWidget( legacyIcon, menu );

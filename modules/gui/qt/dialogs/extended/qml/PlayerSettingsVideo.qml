@@ -141,7 +141,7 @@ ColumnLayout {
                 width: VLCStyle.dp(20, VLCStyle.scale)
                 height: width
                 sourceSize: Qt.size(width, height)
-                source: SVGColorImage.colorize("qrc:///icons/figma/link-active.svg")
+                source: SVGColorImage.colorize("qrc:///icons/ui/link-active.svg")
                                      .accent(link.colors.accent).uri()
             }
         }

@@ -56,7 +56,7 @@ Rectangle {
             height: root._iconSize
             sourceSize: Qt.size(width, height)
 
-            source: SVGColorImage.colorize("qrc:///icons/figma/vlc.svg")
+            source: SVGColorImage.colorize("qrc:///icons/ui/vlc.svg")
                                  .accent(root.tokens.accent)
                                  .uri()
         }
@@ -181,7 +181,7 @@ Rectangle {
                 Item {
                     id: wedge
 
-                    readonly property string _source: "qrc:///icons/figma/volume-wedge.svg"
+                    readonly property string _source: "qrc:///icons/ui/volume-wedge.svg"
                     readonly property color trackColor: root.tokens.bgB2
 
                     width: VLCStyle.dp(48, VLCStyle.scale)

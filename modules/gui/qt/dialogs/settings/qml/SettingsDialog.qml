@@ -324,7 +324,7 @@ FramelessDialog {
                                                 sourceSize: Qt.size(width, height)
                                                 visible: category.current && status === Image.Ready
                                                 source: category.current
-                                                        ? SVGColorImage.colorize("qrc:///icons/figma/" + category.modelData.icon + "-active.svg")
+                                                        ? SVGColorImage.colorize("qrc:///icons/ui/" + category.modelData.icon + "-active.svg")
                                                                        .accent(t.accent).uri()
                                                         : ""
                                             }

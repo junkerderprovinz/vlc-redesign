@@ -42,7 +42,7 @@ namespace
 {
     QIcon libraryIcon(const QMenu *menu, const MainCtx *ctx, const QString &name)
     {
-        return MenuStyle::icon(QStringLiteral(":/icons/figma/%1.svg").arg(name),
+        return MenuStyle::icon(QStringLiteral(":/icons/ui/%1.svg").arg(name),
                                menu->palette().text().color(), ctx->accentColor());
     }
 

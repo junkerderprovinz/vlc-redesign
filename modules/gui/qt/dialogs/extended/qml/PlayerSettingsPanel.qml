@@ -47,7 +47,7 @@ Widgets.FloatingPanel {
     Keys.onEscapePressed: root.closeRequested()
 
     function _tabIcon(slug) {
-        return SVGColorImage.colorize("qrc:///icons/figma/" + slug + "-duo.svg")
+        return SVGColorImage.colorize("qrc:///icons/ui/" + slug + "-duo.svg")
                             .color1(colors.text)
                             .color2(colors.accent)
                             .accent(colors.accent).uri()

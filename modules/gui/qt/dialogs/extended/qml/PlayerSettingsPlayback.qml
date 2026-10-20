@@ -93,7 +93,7 @@ ColumnLayout {
                     const slug = root._visualizerImages[text]
                     if (!slug)
                         return ""
-                    return SVGColorImage.colorize("qrc:///icons/figma/" + slug + ".svg")
+                    return SVGColorImage.colorize("qrc:///icons/ui/" + slug + ".svg")
                                         .color1(root.colors.label).color2(root.colors.accent).uri()
                 }
                 Accessible.name: qsTr("Audio Visualizer")

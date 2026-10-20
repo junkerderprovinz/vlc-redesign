@@ -272,7 +272,7 @@ FocusScope {
 
                 visible: card.scheme === ColorSchemeModel.System
                 sourceSize: Qt.size(width, height)
-                source: visible ? "qrc:///icons/figma/theme-system.svg" : ""
+                source: visible ? "qrc:///icons/ui/theme-system.svg" : ""
             }
         }
 

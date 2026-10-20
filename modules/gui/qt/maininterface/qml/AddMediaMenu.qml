@@ -27,12 +27,12 @@ StringListMenu {
     ctx: MainCtx
 
     readonly property var _actions: [
-        { text: qsTr("Open File..."), icon_svg: ":/icons/figma/file-duo.svg", trigger: () => DialogsProvider.simpleOpenDialog() },
-        { text: qsTr("Open Multiple Files..."), icon_svg: ":/icons/figma/add.svg", trigger: () => DialogsProvider.openFileDialog() },
-        { text: qsTr("Open Folder..."), icon_svg: ":/icons/figma/new-folder-duo.svg", trigger: () => DialogsProvider.PLOpenDir() },
-        { text: qsTr("Open Disc..."), icon_svg: ":/icons/figma/disc-duo.svg", trigger: () => DialogsProvider.openDiscDialog() },
-        { text: qsTr("Open Network Stream..."), icon_svg: ":/icons/figma/streaming-duo.svg", trigger: () => DialogsProvider.openNetDialog() },
-        { text: qsTr("Open Capture Device..."), icon_svg: ":/icons/figma/capture-device-duo.svg", trigger: () => DialogsProvider.openCaptureDialog() }
+        { text: qsTr("Open File..."), icon_svg: ":/icons/ui/file-duo.svg", trigger: () => DialogsProvider.simpleOpenDialog() },
+        { text: qsTr("Open Multiple Files..."), icon_svg: ":/icons/ui/add.svg", trigger: () => DialogsProvider.openFileDialog() },
+        { text: qsTr("Open Folder..."), icon_svg: ":/icons/ui/new-folder-duo.svg", trigger: () => DialogsProvider.PLOpenDir() },
+        { text: qsTr("Open Disc..."), icon_svg: ":/icons/ui/disc-duo.svg", trigger: () => DialogsProvider.openDiscDialog() },
+        { text: qsTr("Open Network Stream..."), icon_svg: ":/icons/ui/streaming-duo.svg", trigger: () => DialogsProvider.openNetDialog() },
+        { text: qsTr("Open Capture Device..."), icon_svg: ":/icons/ui/capture-device-duo.svg", trigger: () => DialogsProvider.openCaptureDialog() }
     ]
 
     function show(item: Item) {

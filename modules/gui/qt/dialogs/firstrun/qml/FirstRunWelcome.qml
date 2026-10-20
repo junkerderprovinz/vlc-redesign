@@ -49,7 +49,7 @@ FocusScope {
             height: width
             sourceSize: Qt.size(width, height)
 
-            source: SVGColorImage.colorize("qrc:///icons/figma/vlc.svg")
+            source: SVGColorImage.colorize("qrc:///icons/ui/vlc.svg")
                                  .accent(VLCStyle.palette.accent)
                                  .uri()
         }
