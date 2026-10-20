@@ -259,7 +259,7 @@ QtObject {
                 {
                     title: qsTr("Keyboard Shortcuts"),
                     rows: [
-                        action("advancedPreferences", qsTr("Defaults"), qsTr("Edit Keyboard Shortcuts"), "", { wide: true }),
+                        action("keyboardShortcuts", qsTr("Defaults"), qsTr("Edit Keyboard Shortcuts"), "", { wide: true }),
                         action("resetHotkeys", qsTr("Reset all shortcuts"), qsTr("Reset"), "",
                                { wide: true, confirm: qsTr("Confirm"), done: qsTr("Done") })
                     ]

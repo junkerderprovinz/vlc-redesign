@@ -75,6 +75,7 @@ public:
     static void freeRendererMenu(){ delete rendererMenu; rendererMenu = NULL; }
 
     /* All main Menus */
+    static void AppMenu( qt_intf_t *, QMenu * );
     static void FileMenu( qt_intf_t *, QMenu * );
 
     static void ToolsMenu( qt_intf_t *, QMenu * );
@@ -98,6 +99,8 @@ public:
 
     /* Popups Menus */
     static void PopupMenuStaticEntries( QMenu *menu );
+    static void OpenMediaEntries( qt_intf_t *, QMenu * );
+    static void PlaylistMenu( qt_intf_t *, QMenu * );
     static void PopupMenuPlaylistEntries( QMenu *menu, qt_intf_t *p_intf );
     static void PopupMenuPlaylistControlEntries( QMenu *menu, qt_intf_t *p_intf );
     static void PopupMenuControlEntries( QMenu *menu, qt_intf_t *p_intf, bool b = true );

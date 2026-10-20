@@ -445,7 +445,10 @@ void DialogsProvider::updateDialog(Mode mode)
 
 void DialogsProvider::aboutDialog()
 {
-    toggleDialogVisible(m_aboutDialog);
+    if( p_intf->p_mi )
+        emit showAboutDialog();
+    else
+        toggleDialogVisible(m_aboutDialog);
 }
 
 void DialogsProvider::mediaInfoDialog( void )
@@ -714,11 +717,30 @@ void DialogsProvider::openDiscDialog()
 }
 void DialogsProvider::openNetDialog()
 {
-    openDialog( OpenDialog::OPEN_NETWORK_TAB );
+    if( p_intf->p_mi )
+        emit showNetworkStreamDialog();
+    else
+        openDialog( OpenDialog::OPEN_NETWORK_TAB );
 }
 void DialogsProvider::openCaptureDialog()
 {
     openDialog( OpenDialog::OPEN_CAPTURE_TAB );
+}
+void DialogsProvider::openNetAdvancedDialog()
+{
+    openDialog( OpenDialog::OPEN_NETWORK_TAB );
+}
+
+void DialogsProvider::keyboardShortcutsDialog()
+{
+    if( p_intf->p_mi )
+        emit showKeyboardShortcutsDialog();
+}
+
+void DialogsProvider::newPlaylistDialog()
+{
+    if( p_intf->p_mi && p_intf->p_mi->hasMediaLibrary() )
+        emit showNewPlaylistDialog();
 }
 
 /* Same as the open one, but force the enqueue */
@@ -1064,7 +1086,10 @@ void  DialogsProvider::loadMediaFile( const es_format_category_e category, const
 
 void DialogsProvider::loadSubtitlesFile()
 {
-    loadMediaFile( SPU_ES, EXT_FILTER_SUBTITLE, qtr( "Open subtitles..." ) );
+    if( p_intf->p_mi )
+        emit showAddSubtitlesDialog();
+    else
+        loadMediaFile( SPU_ES, EXT_FILTER_SUBTITLE, qtr( "Open subtitles..." ) );
 }
 
 void DialogsProvider::loadAudioFile()

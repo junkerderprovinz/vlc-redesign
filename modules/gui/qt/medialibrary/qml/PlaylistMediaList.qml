@@ -189,10 +189,7 @@ MainViewLoader {
     }
 
     function createPlaylist() {
-        const result = DialogsProvider.getTextDialog(null, qsTr("Create playlist"),
-                                                     qsTr("Please enter the playlist name:"), "")
-        if (result.ok && result.text !== "")
-            root.model.create(result.text, [])
+        DialogsProvider.newPlaylistDialog()
     }
 
     function deleteSelectedPlaylists() {

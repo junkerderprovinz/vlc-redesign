@@ -142,6 +142,9 @@ Window {
         case "advancedPreferences":
             DialogsProvider.advancedPrefsDialog()
             break
+        case "keyboardShortcuts":
+            DialogsProvider.keyboardShortcutsDialog()
+            break
         case "openConfigDirectory":
             SettingsBridge.openConfigDirectory()
             break

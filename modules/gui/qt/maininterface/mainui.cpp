@@ -65,6 +65,9 @@
 #include "dialogs/settings/settings_bridge.hpp"
 #include "dialogs/extended/effects_controller.hpp"
 #include "dialogs/firstrun/firstruncontroller.hpp"
+#include "dialogs/hotkeys/hotkeys_model.hpp"
+#include "dialogs/subtitles/subtitles_model.hpp"
+#include "menus/menu_style.hpp"
 #ifdef UPDATE_CHECK
 #include "dialogs/help/help.hpp" // UpdateModel
 #endif
@@ -111,6 +114,8 @@ MainUI::MainUI(qt_intf_t *p_intf, MainCtx *mainCtx, QWindow* interfaceWindow,  Q
     assert(m_interfaceWindow);
 
     registerQMLTypes();
+
+    new MenuStyle(m_mainCtx, this);
 
     // FIXME: Since Qt 6.6, Qt follows a different approach for scrolling. This new approach has
     //        caused a lot of frustration (QTBUG-116388, QTBUG-129948, QTBUG-120038). However,
@@ -289,6 +294,9 @@ void MainUI::registerQMLTypes()
         qmlRegisterTypesAndRevisions<ConfigOption>(uri, versionMajor);
         qmlRegisterSingletonInstance<EffectsController>(uri, versionMajor, versionMinor, "EffectsController", new EffectsController(m_intf, this));
         qmlRegisterType<FirstRunController>( uri, versionMajor, versionMinor, "FirstRunController" );
+
+        qmlRegisterType<HotkeysModel>( uri, versionMajor, versionMinor, "HotkeysModel" );
+        qmlRegisterType<SubtitlesModel>( uri, versionMajor, versionMinor, "SubtitlesModel" );
 
         qmlRegisterModule(uri, versionMajor, versionMinor);
         qmlProtectModule(uri, versionMajor);

@@ -129,6 +129,8 @@ libqt_plugin_la_SOURCES = \
 	dialogs/firstrun/firstruncontroller.cpp dialogs/firstrun/firstruncontroller.hpp \
 	dialogs/gototime/gototime.cpp dialogs/gototime/gototime.hpp \
 	dialogs/help/aboutmodel.hpp \
+	dialogs/hotkeys/hotkeys_model.cpp dialogs/hotkeys/hotkeys_model.hpp \
+	dialogs/subtitles/subtitles_model.cpp dialogs/subtitles/subtitles_model.hpp \
 	dialogs/help/help.cpp dialogs/help/help.hpp \
 	dialogs/mediainfo/info_panels.cpp dialogs/mediainfo/info_panels.hpp \
 	dialogs/mediainfo/info_widgets.cpp dialogs/mediainfo/info_widgets.hpp \
@@ -266,6 +268,7 @@ libqt_plugin_la_SOURCES = \
 	menus/qml_menu_wrapper.cpp \
 	menus/qml_menu_wrapper.hpp \
 	menus/menus.cpp menus/menus.hpp \
+	menus/menu_style.cpp menus/menu_style.hpp \
 	network/addonsmodel.cpp \
 	network/addonsmodel.hpp \
 	network/mediatreelistener.cpp \
@@ -425,6 +428,8 @@ nodist_libqt_plugin_la_SOURCES = \
 	dialogs/firstrun/firstruncontroller.moc.cpp \
 	dialogs/gototime/gototime.moc.cpp \
 	dialogs/help/aboutmodel.moc.cpp \
+	dialogs/hotkeys/hotkeys_model.moc.cpp \
+	dialogs/subtitles/subtitles_model.moc.cpp \
 	dialogs/help/help.moc.cpp \
 	dialogs/mediainfo/info_panels.moc.cpp \
 	dialogs/mediainfo/info_widgets.moc.cpp \
@@ -487,6 +492,7 @@ nodist_libqt_plugin_la_SOURCES = \
 	menus/custom_menus.moc.cpp \
 	menus/qml_menu_wrapper.moc.cpp \
 	menus/menus.moc.cpp \
+	menus/menu_style.moc.cpp \
 	network/addonsmodel.moc.cpp \
 	network/devicesourceprovider.moc.cpp \
 	network/networkdevicemodel.moc.cpp \
@@ -1272,6 +1278,17 @@ libqml_module_dialogs_a_QML = \
 	dialogs/firstrun/qml/FirstRunPrivacy.qml \
 	dialogs/firstrun/qml/FirstRunShortcuts.qml \
 	dialogs/firstrun/qml/FirstRunWelcome.qml \
+	dialogs/dialogs/qml/DialogWindows.qml \
+	dialogs/dialogs/qml/FramelessDialog.qml \
+	dialogs/dialogs/qml/DialogHeading.qml \
+	dialogs/dialogs/qml/DialogSelect.qml \
+	dialogs/dialogs/qml/DialogToolbarField.qml \
+	dialogs/help/qml/AboutDialog.qml \
+	dialogs/hotkeys/qml/KeyboardShortcutsDialog.qml \
+	dialogs/open/qml/NetworkStreamDialog.qml \
+	dialogs/playlists/qml/NewPlaylistDialog.qml \
+	dialogs/playlists/qml/PlaylistCreator.qml \
+	dialogs/subtitles/qml/AddSubtitlesDialog.qml \
 	dialogs/toolbar/qml/EditorDNDDelegate.qml \
 	dialogs/toolbar/qml/EditorDNDView.qml\
 	dialogs/toolbar/qml/EditorDummyButton.qml \

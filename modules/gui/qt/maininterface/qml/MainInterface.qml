@@ -337,6 +337,10 @@ Item {
         }
 
         Loader {
+            source: "qrc:///qt/qml/VLC/Dialogs/DialogWindows.qml"
+        }
+
+        Loader {
             active: {
                 const windowVisibility = MainCtx.intfMainWindow.visibility
                 return MainCtx.clientSideDecoration && !MainCtx.platformHandlesResizeWithCSD()

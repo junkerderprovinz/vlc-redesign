@@ -132,11 +132,11 @@ public:
     {
         return Singleton<DialogsProvider>::getInstance( p_intf );
     }
-    QStringList showSimpleOpen( const QString& help = QString(),
-                                int filters = EXT_FILTER_MEDIA |
-                                EXT_FILTER_VIDEO | EXT_FILTER_AUDIO |
-                                EXT_FILTER_PLAYLIST,
-                                const QUrl& path = QUrl() );
+    Q_INVOKABLE QStringList showSimpleOpen( const QString& help = QString(),
+                                            int filters = EXT_FILTER_MEDIA |
+                                            EXT_FILTER_VIDEO | EXT_FILTER_AUDIO |
+                                            EXT_FILTER_PLAYLIST,
+                                            const QUrl& path = QUrl() );
     bool isDying() { return b_isDying; }
     static QString getDirectoryDialog( qt_intf_t *p_intf);
 
@@ -251,6 +251,10 @@ public slots:
     void openUrlDialog();
     void openNetDialog();
     void openCaptureDialog();
+    void openNetAdvancedDialog();
+
+    void keyboardShortcutsDialog();
+    void newPlaylistDialog();
 
     void PLOpenDir();
     void PLAppendDir();
@@ -295,6 +299,12 @@ signals:
     void releaseMouseEvents();
     void showToolbarEditorDialog();
     void showSettingsDialog();
+
+    void showNetworkStreamDialog();
+    void showAddSubtitlesDialog();
+    void showKeyboardShortcutsDialog();
+    void showNewPlaylistDialog();
+    void showAboutDialog();
 
     //visiblity signal
     void openDialogVisibleChanged();
