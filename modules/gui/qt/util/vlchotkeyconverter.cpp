@@ -350,3 +350,21 @@ QString VLCKeyToString( unsigned val, bool locale )
     free( base );
     return r;
 }
+
+/* The translated names of the modifiers and of the key, the way a keyboard
+ * labels them */
+QStringList VLCKeyToStringList( unsigned val )
+{
+    QString key = VLCKeyToString( val & ~KEY_MODIFIER, true );
+    if( key.isEmpty() )
+        return {};
+
+    const QString combination = VLCKeyToString( val, true );
+    QStringList keys = combination.left( combination.size() - key.size() )
+                                  .split( '+', Qt::SkipEmptyParts );
+    /* letter keys are named in lower case */
+    if( key.size() == 1 )
+        key[0] = key[0].toUpper();
+    keys << key;
+    return keys;
+}

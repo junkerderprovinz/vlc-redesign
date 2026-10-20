@@ -33,7 +33,6 @@
 #include "util/vlchotkeyconverter.hpp"
 
 #include <QKeyEvent>
-#include <QRegularExpression>
 
 #include <algorithm>
 
@@ -337,14 +336,7 @@ QString HotkeysModel::displayKeys(const QStringList &keys) const
 {
     QStringList names;
     for (const QString &key : keys)
-    {
-        QString name = VLCKeyToString(vlc_str2keycode(qtu(key)), true);
-        /* letter keys are named in lower case, keyboards show them in upper case */
-        if (name.size() - name.lastIndexOf(QLatin1Char('+')) == 2)
-            name.back() = name.back().toUpper();
-        static const QRegularExpression separator(QStringLiteral("(?<=[^+\\s])\\+(?=\\S)"));
-        names.push_back(name.replace(separator, QStringLiteral(" + ")));
-    }
+        names.push_back(VLCKeyToStringList(vlc_str2keycode(qtu(key))).join(QStringLiteral(" + ")));
     return names.join(QStringLiteral(", "));
 }
 

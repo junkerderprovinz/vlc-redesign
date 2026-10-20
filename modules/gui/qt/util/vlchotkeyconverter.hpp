@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QPoint>
+#include <QStringList>
 #include <QtQml/qqmlregistration.h>
 
 /* VLC Key/Wheel hotkeys interactions */
@@ -18,6 +19,7 @@ int qtKeyModifiersToVLC( const QInputEvent& e );
 int qtEventToVLCKey( QKeyEvent *e );
 int qtWheelEventToVLCKey( const QWheelEvent& e );
 QString VLCKeyToString( unsigned val, bool );
+QStringList VLCKeyToStringList( unsigned val );
 
 /**
  * @brief The WheelToVLCConverter class aggregates wheel events and

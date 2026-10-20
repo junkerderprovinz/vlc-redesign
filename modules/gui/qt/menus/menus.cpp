@@ -193,11 +193,7 @@ static QString hotkeyHint( qt_intf_t *p_intf, const char *option )
     free( keys );
     if( first.isEmpty() )
         return QString();
-    QString hint = VLCKeyToString( vlc_str2keycode( qtu( first ) ), true );
-    /* letter keys are named in lower case, keyboards show them in upper case */
-    if( hint.size() - hint.lastIndexOf( QLatin1Char( '+' ) ) == 2 )
-        hint.back() = hint.back().toUpper();
-    return QLatin1Char( '\t' ) + hint;
+    return QLatin1Char( '\t' ) + VLCKeyToStringList( vlc_str2keycode( qtu( first ) ) ).join( '+' );
 }
 
 static void addRecentMenu( qt_intf_t *p_intf, QMenu *menu, const QString &title )
