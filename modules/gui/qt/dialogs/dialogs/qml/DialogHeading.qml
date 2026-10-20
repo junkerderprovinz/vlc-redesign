@@ -37,7 +37,7 @@ ColumnLayout {
         Layout.preferredHeight: VLCStyle.dp(28, VLCStyle.scale)
 
         verticalAlignment: Text.AlignVCenter
-        font.pixelSize: VLCStyle.fontSize_xlarge
+        font.pixelSize: VLCStyle.fontSize_large
         color: VLCStyle.palette.fg2
         textFormat: Text.PlainText
     }
@@ -51,7 +51,7 @@ ColumnLayout {
         visible: text.length > 0
         verticalAlignment: Text.AlignVCenter
         wrapMode: Text.WordWrap
-        font.pixelSize: VLCStyle.fontSize_large
+        font.pixelSize: VLCStyle.fontSize_normal
         color: VLCStyle.palette.fgA3
         textFormat: Text.PlainText
     }

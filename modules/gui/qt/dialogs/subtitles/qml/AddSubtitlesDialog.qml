@@ -60,7 +60,7 @@ FramelessDialog {
 
         spacing: VLCStyle.dp(10, VLCStyle.scale)
 
-        DialogSelect {
+        ToolbarSelect {
             id: targetSelect
 
             model: [
@@ -72,7 +72,7 @@ FramelessDialog {
             Accessible.name: qsTr("Add subtitles to")
         }
 
-        DialogSelect {
+        ToolbarSelect {
             id: originSelect
 
             model: [
@@ -139,7 +139,7 @@ FramelessDialog {
 
             visible: list.count === 0
             color: VLCStyle.palette.fgA3
-            font.pixelSize: VLCStyle.fontSize_large
+            font.pixelSize: VLCStyle.fontSize_normal
             textFormat: Text.PlainText
 
             text: {
@@ -273,7 +273,7 @@ FramelessDialog {
                     text: pair.mediaName
                     elide: Text.ElideMiddle
                     color: VLCStyle.palette.fgA1
-                    font.pixelSize: VLCStyle.fontSize_large
+                    font.pixelSize: VLCStyle.fontSize_normal
                     textFormat: Text.PlainText
                 }
 
@@ -397,8 +397,29 @@ FramelessDialog {
 
             elide: Text.ElideMiddle
             color: parent.dimmed ? VLCStyle.palette.fgA4 : VLCStyle.palette.fgA1
-            font.pixelSize: VLCStyle.fontSize_large
+            font.pixelSize: VLCStyle.fontSize_normal
             textFormat: Text.PlainText
+        }
+    }
+
+    // the open list grows to show its longest entry in full
+    component ToolbarSelect: DialogSelect {
+        id: select
+
+        font.pixelSize: VLCStyle.fontSize_normal
+
+        popup.width: {
+            let longest = 0
+            for (const entry of model)
+                longest = Math.max(longest, metrics.advanceWidth(entry.text))
+            // row paddings, check mark and the frame of the list
+            const chrome = VLCStyle.dp(66, VLCStyle.scale)
+            return Math.ceil(Math.max(width + VLCStyle.dp(9, VLCStyle.scale), longest + chrome))
+        }
+
+        FontMetrics {
+            id: metrics
+            font: select.font
         }
     }
 }

@@ -100,7 +100,7 @@ FramelessDialog {
             rightPadding: VLCStyle.dp(18, VLCStyle.scale)
 
             placeholderText: qsTr("e.g., Favorite Videos")
-            font.pixelSize: VLCStyle.fontSize_large
+            font.pixelSize: VLCStyle.fontSize_normal
 
             background: Rectangle {
                 radius: VLCStyle.dp(6, VLCStyle.scale)
@@ -193,7 +193,7 @@ FramelessDialog {
                     visible: files.count === 0
                     text: qsTr("Drag files into the box or click here to select files.")
                     color: VLCStyle.palette.fgA4
-                    font.pixelSize: VLCStyle.fontSize_large
+                    font.pixelSize: VLCStyle.fontSize_normal
                     textFormat: Text.PlainText
                 }
 
@@ -243,7 +243,7 @@ FramelessDialog {
                                 text: fileRow.name
                                 elide: Text.ElideMiddle
                                 color: VLCStyle.palette.fgA1
-                                font.pixelSize: VLCStyle.fontSize_large
+                                font.pixelSize: VLCStyle.fontSize_normal
                                 textFormat: Text.PlainText
                             }
 

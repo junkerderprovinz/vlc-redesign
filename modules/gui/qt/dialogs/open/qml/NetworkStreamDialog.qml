@@ -57,7 +57,7 @@ FramelessDialog {
         anchors.verticalCenter: parent.verticalCenter
 
         text: qsTr("Advanced Options")
-        font.pixelSize: VLCStyle.fontSize_large
+        font.pixelSize: VLCStyle.fontSize_normal
 
         onClicked: {
             root.hide()
@@ -104,7 +104,7 @@ FramelessDialog {
                 color: VLCStyle.palette.fgA2
                 selectionColor: VLCStyle.palette.bgAccentBright
                 selectedTextColor: VLCStyle.palette.fg1
-                font.pixelSize: VLCStyle.fontSize_large
+                font.pixelSize: VLCStyle.fontSize_normal
                 wrapMode: TextEdit.WrapAnywhere
                 background: null
 
@@ -142,7 +142,7 @@ FramelessDialog {
             rightPadding: VLCStyle.dp(18, VLCStyle.scale)
 
             placeholderText: qsTr("e.g., Favorite TV Channels")
-            font.pixelSize: VLCStyle.fontSize_large
+            font.pixelSize: VLCStyle.fontSize_normal
 
             background: FieldBackground {
                 active: nameField.activeFocus
