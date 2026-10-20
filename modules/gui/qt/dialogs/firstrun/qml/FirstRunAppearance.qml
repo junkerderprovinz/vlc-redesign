@@ -104,6 +104,44 @@ FocusScope {
         }
     }
 
+    Column {
+        anchors.horizontalCenter: parent.horizontalCenter
+        y: VLCStyle.dp(470, VLCStyle.scale)
+
+        spacing: VLCStyle.dp(10, VLCStyle.scale)
+
+        Widgets.SegmentedControl {
+            id: layoutChoice
+
+            anchors.horizontalCenter: parent.horizontalCenter
+            width: VLCStyle.dp(240, VLCStyle.scale)
+            segmentHeight: VLCStyle.dp(32, VLCStyle.scale)
+            font.pixelSize: VLCStyle.fontSize_normal
+
+            model: [qsTr("Modern"), qsTr("Classic")]
+            currentIndex: root.controller.classicLayout ? 1 : 0
+
+            Accessible.name: qsTr("Layout")
+
+            Navigation.parentItem: root
+            Navigation.upItem: lightCard.checked ? lightCard : (darkCard.checked ? darkCard : systemCard)
+            Navigation.downItem: accentRepeater.itemAt(0)
+
+            onActivated: (index) => root.controller.classicLayout = (index === 1)
+        }
+
+        T.Label {
+            anchors.horizontalCenter: parent.horizontalCenter
+
+            text: root.controller.classicLayout
+                  ? qsTr("<i>VLC will use a classic layout with a menubar and pinned controls but with no client-side decoration</i>")
+                  : qsTr("<i>VLC will use a modern layout with no menubar or pinned controls but with client-side decoration</i>")
+            textFormat: Text.StyledText
+            color: VLCStyle.palette.fgA3
+            font.pixelSize: VLCStyle.fontSize_normal
+        }
+    }
+
     Row {
         x: VLCStyle.dp(41, VLCStyle.scale)
         y: VLCStyle.dp(655, VLCStyle.scale)
@@ -199,7 +237,7 @@ FocusScope {
         hoverEnabled: true
 
         Navigation.parentItem: root
-        Navigation.downItem: accentRepeater.itemAt(0)
+        Navigation.downItem: layoutChoice
         Keys.priority: Keys.AfterItem
         Keys.onPressed: (event) => Navigation.defaultKeyAction(event)
 
@@ -219,41 +257,22 @@ FocusScope {
                                                              : VLCStyle.palette.dividerBright
 
             // the swatches picture each theme, so they keep their colors in any theme
-            Canvas {
+            Rectangle {
                 anchors.fill: parent
                 anchors.margins: VLCStyle.dp(8, VLCStyle.scale)
 
-                readonly property color lightColor: "#afafaf"
-                readonly property color darkColor: "#222222"
+                visible: card.scheme !== ColorSchemeModel.System
+                radius: VLCStyle.dp(12, VLCStyle.scale)
+                color: card.scheme === ColorSchemeModel.Night ? "#222222" : "#afafaf"
+            }
 
-                onWidthChanged: requestPaint()
+            Image {
+                anchors.fill: parent
+                anchors.margins: VLCStyle.dp(8, VLCStyle.scale)
 
-                onPaint: {
-                    const ctx = getContext("2d")
-                    const r = VLCStyle.dp(12, VLCStyle.scale)
-                    ctx.reset()
-                    ctx.beginPath()
-                    ctx.roundedRect(0, 0, width, height, r, r)
-                    ctx.closePath()
-                    ctx.clip()
-
-                    ctx.fillStyle = card.scheme === ColorSchemeModel.Night ? darkColor : lightColor
-                    ctx.fillRect(0, 0, width, height)
-
-                    if (card.scheme !== ColorSchemeModel.System)
-                        return
-
-                    // split along a 60 degree line through the centre, dark on the left
-                    const offset = height / 2 * Math.tan(Math.PI / 6)
-                    ctx.fillStyle = darkColor
-                    ctx.beginPath()
-                    ctx.moveTo(0, 0)
-                    ctx.lineTo(width / 2 - offset, 0)
-                    ctx.lineTo(width / 2 + offset, height)
-                    ctx.lineTo(0, height)
-                    ctx.closePath()
-                    ctx.fill()
-                }
+                visible: card.scheme === ColorSchemeModel.System
+                sourceSize: Qt.size(width, height)
+                source: visible ? "qrc:///icons/figma/theme-system.svg" : ""
             }
         }
 
@@ -286,7 +305,7 @@ FocusScope {
         }
 
         Navigation.parentItem: root
-        Navigation.upItem: lightCard.checked ? lightCard : (darkCard.checked ? darkCard : systemCard)
+        Navigation.upItem: layoutChoice
         Keys.priority: Keys.AfterItem
         Keys.onPressed: (event) => Navigation.defaultKeyAction(event)
 

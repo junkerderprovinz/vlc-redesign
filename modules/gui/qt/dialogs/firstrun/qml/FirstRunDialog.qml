@@ -38,7 +38,7 @@ ModalDialog {
 
     readonly property bool lastPage: currentIndex === pages.length - 1
 
-    // drawn for 1090x759, it shrinks to fit small windows
+    // the pages are laid out at this size and scaled down to fit small windows
     readonly property real baseWidth: VLCStyle.dp(1090, VLCStyle.scale)
     readonly property real baseHeight: VLCStyle.dp(759, VLCStyle.scale)
     readonly property real fitScale: {
@@ -69,8 +69,6 @@ ModalDialog {
     closeButtonVisible: false
 
     closePolicy: Popup.CloseOnEscape
-
-    Accessible.name: qsTr("Welcome to VLC!")
 
     function next() {
         if (lastPage) {
@@ -140,6 +138,9 @@ ModalDialog {
         }
 
         clip: true
+
+        Accessible.role: Accessible.Dialog
+        Accessible.name: qsTr("Welcome to VLC!")
 
         Navigation.leftAction: root.back
         Navigation.rightAction: root.next

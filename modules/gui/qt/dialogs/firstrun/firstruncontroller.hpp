@@ -40,6 +40,7 @@ class FirstRunController : public QObject
     Q_PROPERTY(MainCtx* ctx READ getCtx WRITE setCtx NOTIFY ctxChanged FINAL)
     Q_PROPERTY(QString folder READ folder WRITE setFolder NOTIFY folderChanged FINAL)
     Q_PROPERTY(bool metadataNetworkAccess MEMBER m_metadataNetworkAccess NOTIFY metadataNetworkAccessChanged FINAL)
+    Q_PROPERTY(bool classicLayout MEMBER m_classicLayout NOTIFY classicLayoutChanged FINAL)
 
 public:
     explicit FirstRunController( QObject *parent = nullptr );
@@ -61,14 +62,17 @@ signals:
     void ctxChanged();
     void folderChanged();
     void metadataNetworkAccessChanged();
+    void classicLayoutChanged();
 
 private:
     void apply();
-    void addFolder();
+    void addFolders();
 
     MainCtx* m_ctx = nullptr;
     QString m_folder;
+    QString m_defaultFolder;
     bool m_metadataNetworkAccess = true;
+    bool m_classicLayout = false;
 };
 
 #endif // VLC_FIRSTRUNCONTROLLER_HPP

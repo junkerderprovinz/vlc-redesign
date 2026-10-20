@@ -35,12 +35,6 @@ Rectangle {
 
     Accessible.ignored: true
 
-    ColorContext {
-        id: theme
-        palette: root.tokens
-        colorSet: ColorContext.Window
-    }
-
     component Glyph: Widgets.IconLabel {
         font.pixelSize: root._iconSize
         color: root.tokens.fgA2
@@ -184,31 +178,38 @@ Rectangle {
 
                 Glyph { text: VLCIcons.volume_high }
 
-                Canvas {
+                Item {
+                    id: wedge
+
+                    readonly property string _source: "qrc:///icons/figma/volume-wedge.svg"
+                    readonly property color trackColor: root.tokens.bgB2
+
                     width: VLCStyle.dp(48, VLCStyle.scale)
                     height: VLCStyle.dp(15, VLCStyle.scale)
 
-                    readonly property color trackColor: root.tokens.bgB2
-                    readonly property color levelColor: theme.fg.positive
+                    // the level is painted in the track color, so only the track shows
+                    Image {
+                        anchors.fill: parent
+                        sourceSize: Qt.size(width, height)
+                        source: SVGColorImage.colorize(wedge._source)
+                                             .color1(wedge.trackColor)
+                                             .any({ "url(#level)": wedge.trackColor })
+                                             .uri()
+                    }
 
-                    onTrackColorChanged: requestPaint()
-                    onLevelColorChanged: requestPaint()
+                    Item {
+                        width: parent.width * 0.375
+                        height: parent.height
+                        clip: true
 
-                    // the volume slider is a wedge that widens to the right
-                    onPaint: {
-                        const ctx = getContext("2d")
-                        ctx.reset()
-                        ctx.beginPath()
-                        ctx.moveTo(0, height * 0.31)
-                        ctx.lineTo(width, 0)
-                        ctx.lineTo(width, height)
-                        ctx.lineTo(0, height * 0.69)
-                        ctx.closePath()
-                        ctx.clip()
-                        ctx.fillStyle = trackColor
-                        ctx.fillRect(0, 0, width, height)
-                        ctx.fillStyle = levelColor
-                        ctx.fillRect(0, 0, width * 0.375, height)
+                        Image {
+                            width: wedge.width
+                            height: wedge.height
+                            sourceSize: Qt.size(width, height)
+                            source: SVGColorImage.colorize(wedge._source)
+                                                 .color1(wedge.trackColor)
+                                                 .uri()
+                        }
                     }
                 }
             }

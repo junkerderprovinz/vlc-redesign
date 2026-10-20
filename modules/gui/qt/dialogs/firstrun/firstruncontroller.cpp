@@ -22,8 +22,10 @@
 
 #include "firstruncontroller.hpp"
 
+#include "dialogs/toolbar/controlbar_profile_model.hpp"
 #include "maininterface/mainctx.hpp"
 #include "medialibrary/medialib.hpp"
+#include "util/vlchotkeyconverter.hpp"
 
 #include <QDir>
 #include <QFileDialog>
@@ -70,7 +72,7 @@ FirstRunController::FirstRunController( QObject *parent )
 {
     auto videos = vlc::wrap_cptr( config_GetUserDir( VLC_VIDEOS_DIR ) );
     if( videos )
-        m_folder = displayPath( qfu( videos.get() ) );
+        m_folder = m_defaultFolder = displayPath( qfu( videos.get() ) );
 }
 
 void FirstRunController::setCtx( MainCtx* ctx )
@@ -131,40 +133,26 @@ QStringList FirstRunController::hotkey( const QString& name ) const
     if( code == KEY_UNSET )
         return {};
 
-    QStringList keys;
-    if( code & KEY_MODIFIER_CTRL )
-        keys << qtr( "Ctrl" ).toUpper();
-    if( code & KEY_MODIFIER_ALT )
-        keys << qtr( "Alt" ).toUpper();
-    if( code & KEY_MODIFIER_SHIFT )
-        keys << qtr( "Shift" ).toUpper();
-    if( code & KEY_MODIFIER_META )
-        keys << qtr( "Meta" ).toUpper();
-    if( code & KEY_MODIFIER_COMMAND )
-        keys << qtr( "Command" ).toUpper();
+    QStringList keys = VLCKeyToStringList( code );
+    if( keys.isEmpty() )
+        return {};
 
-    const uint_fast32_t key = code & ~KEY_MODIFIER;
-    switch( key )
+    /* the key caps print modifiers in capitals and arrows as symbols */
+    for( qsizetype i = 0; i < keys.size() - 1; ++i )
+        keys[i] = keys[i].toUpper();
+    switch( code & ~KEY_MODIFIER )
     {
-        case KEY_LEFT:  keys << QStringLiteral( "←" ); break;
-        case KEY_RIGHT: keys << QStringLiteral( "→" ); break;
-        case KEY_UP:    keys << QStringLiteral( "↑" ); break;
-        case KEY_DOWN:  keys << QStringLiteral( "↓" ); break;
-        default:
-        {
-            auto keyName = vlc::wrap_cptr( vlc_keycode2str( key, true ) );
-            if( !keyName )
-                return {};
-            const QString text = qfu( keyName.get() );
-            keys << ( text.size() == 1 ? text.toUpper() : text );
-        }
+        case KEY_LEFT:  keys.back() = QStringLiteral( "←" ); break;
+        case KEY_RIGHT: keys.back() = QStringLiteral( "→" ); break;
+        case KEY_UP:    keys.back() = QStringLiteral( "↑" ); break;
+        case KEY_DOWN:  keys.back() = QStringLiteral( "↓" ); break;
     }
     return keys;
 }
 
 void FirstRunController::finish()
 {
-    addFolder();
+    addFolders();
     apply();
 }
 
@@ -173,25 +161,37 @@ void FirstRunController::skip()
     apply();
 }
 
-void FirstRunController::addFolder()
+void FirstRunController::addFolders()
 {
+    assert( m_ctx );
     MediaLib* mediaLib = m_ctx->getMediaLibrary();
     if( !mediaLib )
         return;
 
-    const QString path = expandPath( m_folder );
-    if( path.isEmpty() || !QFileInfo( path ).isDir() )
-        return;
+    QStringList paths { expandPath( m_folder ) };
+    /* unless another folder was chosen, the music goes with the videos */
+    if( m_folder == m_defaultFolder )
+    {
+        auto music = vlc::wrap_cptr( config_GetUserDir( VLC_MUSIC_DIR ) );
+        if( music && !paths.contains( qfu( music.get() ) ) )
+            paths << qfu( music.get() );
+    }
 
-    auto mrl = vlc::wrap_cptr( vlc_path2uri( qtu( QDir::toNativeSeparators( path ) ), nullptr ) );
-    if( !mrl )
-        return;
+    for( const QString& path : paths )
+    {
+        if( path.isEmpty() || !QFileInfo( path ).isDir() )
+            continue;
 
-    mediaLib->runOnMLThread( mediaLib,
-    [entryPoint = std::string( mrl.get() )]( vlc_medialibrary_t* ml ) {
-        vlc_ml_add_folder( ml, entryPoint.c_str() );
-    },
-    ML_FOLDER_ADD_QUEUE );
+        auto mrl = vlc::wrap_cptr( vlc_path2uri( qtu( QDir::toNativeSeparators( path ) ), nullptr ) );
+        if( !mrl )
+            continue;
+
+        mediaLib->runOnMLThread( mediaLib,
+        [entryPoint = std::string( mrl.get() )]( vlc_medialibrary_t* ml ) {
+            vlc_ml_add_folder( ml, entryPoint.c_str() );
+        },
+        ML_FOLDER_ADD_QUEUE );
+    }
 }
 
 void FirstRunController::apply()
@@ -202,9 +202,23 @@ void FirstRunController::apply()
     config_PutInt( "metadata-network-access", m_metadataNetworkAccess );
     config_PutInt( "qt-privacy-ask", 0 );
 
-    /* Modern layout: client-side decoration and no menu bar */
-    config_PutInt( "qt-menubar", 0 );
-    config_PutInt( "qt-titlebar", 0 );
+    /* the modern layout draws its own title bar and has no menu bar, the
+     * classic one keeps both and pins the controls under the video */
+    config_PutInt( "qt-menubar", m_classicLayout );
+    config_PutInt( "qt-titlebar", m_classicLayout );
+    if( m_classicLayout )
+    {
+        config_PutInt( "qt-pin-controls", 1 );
+
+        ControlbarProfileModel* controlbarModel = m_ctx->controlbarProfileModel();
+        std::unique_ptr<ControlbarProfile> profile(
+            ControlbarProfileModel::generateProfileFromStyle( ControlbarProfileModel::Style::CLASSIC_STYLE ) );
+        if( const std::optional<int> index = controlbarModel->findModel( profile.get() ) )
+            controlbarModel->setSelectedProfile( *index );
+        else
+            controlbarModel->insertProfile( std::move( profile ), true );
+        controlbarModel->save();
+    }
 
     if( m_ctx->getMediaLibrary() )
         m_ctx->getMediaLibrary()->reload();

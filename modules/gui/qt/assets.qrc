@@ -103,6 +103,7 @@
         <file alias="subtitles-active.svg">pixmaps/icons/figma/subtitles-active.svg</file>
         <file alias="subtitles-duo.svg">pixmaps/icons/figma/subtitles-duo.svg</file>
         <file alias="swap-duo.svg">pixmaps/icons/figma/swap-duo.svg</file>
+        <file alias="theme-system.svg">pixmaps/icons/figma/theme-system.svg</file>
         <file alias="thumbnail.svg">pixmaps/icons/figma/thumbnail.svg</file>
         <file alias="thumbnail-high.svg">pixmaps/icons/figma/thumbnail-high.svg</file>
         <file alias="thumbnail-low.svg">pixmaps/icons/figma/thumbnail-low.svg</file>
