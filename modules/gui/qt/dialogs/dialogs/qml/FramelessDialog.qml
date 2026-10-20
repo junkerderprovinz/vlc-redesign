@@ -47,7 +47,9 @@ Window {
     property bool footerVisible: true
     property alias footerData: footerExtra.data
 
-    property color backgroundColor: theme.palette.bgA3
+    // a separate window cannot show the dimmed interface through it, so it is
+    // drawn a shade darker than bgA3 to keep bgA3 buttons visible
+    property color backgroundColor: Qt.tint(theme.palette.bgA3, Qt.rgba(0, 0, 0, 0.08))
     property color headerColor: theme.palette.isDark ? theme.palette.bgB2 : theme.palette.bgA3
 
     readonly property ColorContext colorContext: frame.colorContext
