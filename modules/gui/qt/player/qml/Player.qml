@@ -355,7 +355,7 @@ FocusScope {
                     // Six pass is free here since we release the intermediate layers
                     // through unsetting `live` (see `liveTimer`):
                     mode: Widgets.DualKawaseBlur.Mode.SixPass
-                    radius: 2
+                    radius: 5
 
                     // We disable live when everything settles through `liveTimer`,
                     // which is important to release intermediate layers with static
@@ -373,7 +373,8 @@ FocusScope {
 
                     postprocess: true
                     tint: bgtheme.tokens.isDark ? "black" : "white"
-                    tintStrength: 0.5
+                    // Bright covers stay behind the title instead of washing it out.
+                    tintStrength: 0.8
                     backgroundColor: bgtheme.bg.primary
 
                     readonly property ColorContext colorContext: ColorContext {
