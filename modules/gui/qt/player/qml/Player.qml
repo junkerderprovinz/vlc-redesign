@@ -1318,18 +1318,9 @@ FocusScope {
 
         focus: true
 
-        rightPadding: VLCStyle.applicationHorizontalMargin + (inlinePosition ? VLCStyle.dp(20, VLCStyle.scale) : 0)
+        rightPadding: VLCStyle.applicationHorizontalMargin + VLCStyle.dp(20, VLCStyle.scale)
         leftPadding: rightPadding
-        bottomPadding: VLCStyle.applicationVerticalMargin + (inlinePosition ? VLCStyle.dp(11, VLCStyle.scale)
-                                                                             : VLCStyle.margin_xsmall)
-
-        textPosition: (MainCtx.pinVideoControls)
-                      ? ControlBar.TimeTextPosition.LeftRightSlider
-                      : ControlBar.TimeTextPosition.AboveSlider
-
-        // hide right text so that it won't overlap with play queue
-        showRemainingTime: (textPosition !== ControlBar.TimeTextPosition.AboveSlider)
-                           || !playlistVisibility.isPlaylistVisible
+        bottomPadding: VLCStyle.applicationVerticalMargin + VLCStyle.dp(11, VLCStyle.scale)
 
         onStateChanged: {
             if (state === "visible")

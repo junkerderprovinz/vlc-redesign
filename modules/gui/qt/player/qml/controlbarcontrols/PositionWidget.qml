@@ -32,6 +32,8 @@ FocusScope {
 
     property bool paintOnly: false
 
+    readonly property alias slider: trackPositionSlider
+
     readonly property bool _active: Player.playingState === Player.PLAYING_STATE_PLAYING
                                     || Player.playingState === Player.PLAYING_STATE_PAUSED
 
