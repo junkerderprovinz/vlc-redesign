@@ -52,7 +52,10 @@ public:
         ONE_LINER_STYLE,
         SIMPLEST_STYLE,
         CLASSIC_STYLE,
-        MUSIC_STYLE
+        MUSIC_STYLE,
+        MOVIES_STYLE,
+        SHOWS_STYLE,
+        WORK_STYLE
     };
 
     // Editable:
