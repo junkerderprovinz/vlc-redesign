@@ -264,20 +264,6 @@ T.ToolBar {
             Navigation.parentItem: root
             Navigation.leftItem: startRow
 
-            TitleBarButton {
-                anchors.verticalCenter: parent.verticalCenter
-
-                visible: root._showCSD
-
-                width: VLCStyle.dp(36, VLCStyle.scale)
-                height: VLCStyle.icon_normal
-
-                text: VLCIcons.fullscreen
-                description: qsTr("Fullscreen")
-
-                onClicked: MainCtx.toggleInterfaceFullScreen()
-            }
-
             Loader {
                 height: parent.height
 
