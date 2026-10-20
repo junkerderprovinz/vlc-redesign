@@ -69,7 +69,9 @@ InterfaceWindowHandler::InterfaceWindowHandler(qt_intf_t *_p_intf, MainCtx* main
     m_window->setIcon( QApplication::windowIcon() );
     m_window->setOpacity( var_InheritFloat( p_intf, "qt-opacity" ) );
 
-    QVLCTools::restoreWindowPosition( getSettings(), m_window, QSize(600, 420) );
+    const QSize screenSize = QGuiApplication::primaryScreen()->availableSize();
+    const QSize defaultSize = QSize(1440, 900).boundedTo( screenSize * 0.9 );
+    QVLCTools::restoreWindowPosition( getSettings(), m_window, defaultSize );
 
     // this needs to be called asynchronously
     // otherwise QQuickWidget won't initialize properly
