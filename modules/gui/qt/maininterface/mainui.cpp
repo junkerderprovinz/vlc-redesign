@@ -293,10 +293,10 @@ void MainUI::registerQMLTypes()
         qmlRegisterSingletonInstance<SettingsBridge>(uri, versionMajor, versionMinor, "SettingsBridge", new SettingsBridge(m_intf, this));
         qmlRegisterTypesAndRevisions<ConfigOption>(uri, versionMajor);
         qmlRegisterSingletonInstance<EffectsController>(uri, versionMajor, versionMinor, "EffectsController", new EffectsController(m_intf, this));
-        qmlRegisterType<FirstRunController>( uri, versionMajor, versionMinor, "FirstRunController" );
+        qmlRegisterType<FirstRunController>(uri, versionMajor, versionMinor, "FirstRunController");
 
-        qmlRegisterType<HotkeysModel>( uri, versionMajor, versionMinor, "HotkeysModel" );
-        qmlRegisterType<SubtitlesModel>( uri, versionMajor, versionMinor, "SubtitlesModel" );
+        qmlRegisterType<HotkeysModel>(uri, versionMajor, versionMinor, "HotkeysModel");
+        qmlRegisterType<SubtitlesModel>(uri, versionMajor, versionMinor, "SubtitlesModel");
 
         qmlRegisterModule(uri, versionMajor, versionMinor);
         qmlProtectModule(uri, versionMajor);
