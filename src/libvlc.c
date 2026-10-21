@@ -214,13 +214,6 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
 
     vlc_CPU_dump( VLC_OBJECT(p_libvlc) );
 
-    if( var_InheritBool( p_libvlc, "media-library") )
-    {
-        priv->p_media_library = libvlc_MlCreate( p_libvlc );
-        if ( priv->p_media_library == NULL )
-            msg_Warn( p_libvlc, "Media library initialization failed" );
-    }
-
     /*
      * Initialize hotkey handling
      */
@@ -265,6 +258,15 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
 
     /* System specific configuration */
     system_Configure( p_libvlc, i_argc - vlc_optind, ppsz_argv + vlc_optind );
+
+    /* After system_Configure(): an instance that hands its files over to a
+     * running one exits there, and the running one holds the library lock. */
+    if( var_InheritBool( p_libvlc, "media-library") )
+    {
+        priv->p_media_library = libvlc_MlCreate( p_libvlc );
+        if ( priv->p_media_library == NULL )
+            msg_Warn( p_libvlc, "Media library initialization failed" );
+    }
 
 #ifdef ENABLE_VLM
     /* Initialize VLM if vlm-conf is specified */
