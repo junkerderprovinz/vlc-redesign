@@ -112,6 +112,11 @@ Window {
 
     onClosing: rejected()
 
+    onVisibleChanged: {
+        if (visible && MainCtx.hideSystemBorder) // Win32
+            MainCtx.hideSystemBorder(root)
+    }
+
     // assigned to a property, not to the default property that holds the content
     readonly property Item _frame: Rectangle {
         id: frame

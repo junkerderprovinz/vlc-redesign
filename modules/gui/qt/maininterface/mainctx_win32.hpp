@@ -105,6 +105,9 @@ public:
         return createWindowWithoutRedirectionSurfaceImpl(window);
     }
 
+    // for windows that draw their own decoration
+    Q_INVOKABLE void hideSystemBorder(QWindow* window);
+
 public slots:
     void reloadPrefs() override;
 

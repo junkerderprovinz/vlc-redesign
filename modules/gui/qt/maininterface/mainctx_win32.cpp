@@ -114,6 +114,16 @@ HWND WinId( const QWindow *window )
     return reinterpret_cast<HWND>(window->winId());
 }
 
+// Windows 11 draws a one pixel border around the window, in the accent color
+// when the user asks for it, which does not fit a decoration drawn by VLC
+void setSystemBorderVisible(HWND hwnd, bool visible)
+{
+    const COLORREF color = visible ? 0xFFFFFFFF /* DWMWA_COLOR_DEFAULT */
+                                   : 0xFFFFFFFE /* DWMWA_COLOR_NONE */;
+    // the attribute does not exist before Windows 11, the call fails there
+    DwmSetWindowAttribute(hwnd, 34 /* DWMWA_BORDER_COLOR */, &color, sizeof(color));
+}
+
 class CSDWin32EventHandler : public QObject, public QAbstractNativeEventFilter
 {
 public:
@@ -191,7 +201,11 @@ public:
         case WM_SHOWWINDOW:
         {
             // on window show, update client frame in case DWM settings were updated
-            if (msg->wParam) updateClientFrame();
+            if (msg->wParam)
+            {
+                updateClientFrame();
+                setSystemBorderVisible(msg->hwnd, false);
+            }
             return false;
         }
 
@@ -479,6 +493,7 @@ private:
             return;
 
         updateClientFrame();
+        setSystemBorderVisible(winId, !m_useClientSideDecoration);
 
         // trigger window update, this applies changes done in updateClientFrame
         SetWindowPos(winId, NULL, 0, 0, 0, 0,
@@ -839,6 +854,14 @@ void MainCtxWin32::reloadPrefs()
 bool MainCtxWin32::getDisableVolumeKeys() const
 {
     return m_disableVolumeKeys;
+}
+
+void MainCtxWin32::hideSystemBorder(QWindow *window)
+{
+    assert(window);
+
+    if (HWND hwnd = WinId(window))
+        setSystemBorderVisible(hwnd, false);
 }
 
 bool MainCtxWin32::createWindowWithoutRedirectionSurfaceImpl(QWindow *window)
