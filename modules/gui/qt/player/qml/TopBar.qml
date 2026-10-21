@@ -49,6 +49,9 @@ FocusScope {
     property string title
 
     property bool showCSD: false
+    // also true while the pointer is over a window button that Windows
+    // treats as non-client area, where no hover reaches the scene
+    readonly property bool csdButtonHovered: csdDecorations.item?.buttonHovered ?? false
     property bool showToolbar: false
     property bool pinControls: false
 
@@ -110,6 +113,8 @@ FocusScope {
     Accessible.role: Accessible.ToolBar
     Accessible.name: qsTr("Player topbar")
     AccessibleCompat.id: "playerTopBar"
+
+    onCsdButtonHoveredChanged: requestLockUnlockAutoHide(csdButtonHovered)
 
     // Children
 
@@ -353,11 +358,5 @@ FocusScope {
         source:  VLCStyle.palette.hasCSDImage
             ? "qrc:///qt/qml/VLC/Widgets/CSDThemeButtonSet.qml"
             : "qrc:///qt/qml/VLC/Widgets/CSDWindowButtonSet.qml"
-
-        Connections {
-            target: csdDecorations.item
-            enabled: csdDecorations.status === Loader.Ready
-            function onButtonHoveredChanged() { root.requestLockUnlockAutoHide(csdDecorations.item.buttonHovered) }
-        }
     }
 }

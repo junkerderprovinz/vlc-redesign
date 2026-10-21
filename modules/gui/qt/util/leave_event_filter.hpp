@@ -33,7 +33,8 @@
  *      }
  *  }
  *
- * Leave events caused by an opening popup menu are ignored.
+ * Leave events caused by an opening popup menu, or on Windows by the
+ * pointer moving onto the window's own caption buttons, are ignored.
  *
  * containsCursor() tells where the pointer is when no event has been
  * received yet, for instance right after the window was shown.

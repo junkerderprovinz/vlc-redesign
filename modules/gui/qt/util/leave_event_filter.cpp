@@ -22,6 +22,10 @@
 #include <QEvent>
 #include <QWindow>
 
+#ifdef _WIN32
+#include <windows.h>
+#endif
+
 LeaveEventFilter::~LeaveEventFilter()
 {
     if (m_target)
@@ -53,10 +57,33 @@ bool LeaveEventFilter::containsCursor() const
     return window->geometry().contains(QCursor::pos(window->screen()));
 }
 
-bool LeaveEventFilter::eventFilter(QObject *, QEvent *event)
+#ifdef _WIN32
+// With client-side decoration, the window buttons answer the hit test as
+// caption buttons so that Windows offers its snap layouts. Moving onto them
+// leaves the client area, but not the window.
+static bool isOverCaptionButton(QObject *target)
 {
-    if (event->type() == QEvent::Leave && !QApplication::activePopupWidget())
-        emit exited();
+    const auto window = qobject_cast<QWindow *>(target);
+    POINT point;
+    if (!window || !GetCursorPos(&point))
+        return false;
 
+    const LRESULT hit = SendMessage(reinterpret_cast<HWND>(window->winId()), WM_NCHITTEST,
+                                    0, MAKELPARAM(point.x, point.y));
+    return hit == HTMINBUTTON || hit == HTMAXBUTTON || hit == HTCLOSE;
+}
+#endif
+
+bool LeaveEventFilter::eventFilter(QObject *obj, QEvent *event)
+{
+    if (event->type() != QEvent::Leave || QApplication::activePopupWidget())
+        return false;
+
+#ifdef _WIN32
+    if (isOverCaptionButton(obj))
+        return false;
+#endif
+
+    emit exited();
     return false;
 }

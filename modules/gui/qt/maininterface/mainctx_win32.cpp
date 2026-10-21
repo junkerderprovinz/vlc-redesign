@@ -430,19 +430,7 @@ public:
             // fast_).
             const bool onSystemButton = (msg->wParam == HTCLOSE || msg->wParam == HTMINBUTTON || msg->wParam == HTMAXBUTTON);
             if (!m_trackingMouse && onSystemButton)
-            {
-                TRACKMOUSEEVENT ev{};
-                ev.cbSize = sizeof(TRACKMOUSEEVENT);
-                // TME_NONCLIENT is absolutely critical here. In my experimentation,
-                // we'd get WM_MOUSELEAVE messages after just a HOVER_DEFAULT
-                // timeout even though we're not requesting TME_HOVER, which kinda
-                // ruined the whole point of this.
-                ev.dwFlags = TME_LEAVE | TME_NONCLIENT;
-                ev.hwndTrack = msg->hwnd;
-                ev.dwHoverTime = HOVER_DEFAULT; // we don't _really_ care about this.
-                TrackMouseEvent(&ev); // TODO check return?
-                m_trackingMouse = true;
-            }
+                trackNonClientLeave(msg->hwnd);
 
             break;
         }
@@ -487,8 +475,22 @@ public:
         {
             m_trackingMouse = false;
 
-            // release all buttons we may have captured
-            setAllUnhovered();
+            // Moving from the client area onto a caption button leaves the
+            // client area first: keep that button hovered and wait for the
+            // pointer to leave it.
+            POINT cursor;
+            const CSDButton *button = (msg->message == WM_MOUSELEAVE && GetCursorPos(&cursor))
+                                      ? buttonAtScreenPoint(msg->hwnd, cursor) : nullptr;
+            if (button)
+            {
+                hoverExclusive(button->type());
+                trackNonClientLeave(msg->hwnd);
+            }
+            else
+            {
+                // release all buttons we may have captured
+                setAllUnhovered();
+            }
 
             break;
         }
@@ -552,13 +554,32 @@ private:
     // CSDButton::containsScenePos); nullptr when nothing matches
     CSDButton *buttonAtMsgPoint(const MSG *msg)
     {
-        POINT point = { GET_X_LPARAM(msg->lParam), GET_Y_LPARAM(msg->lParam) };
-        ::MapWindowPoints(nullptr, msg->hwnd, &point, 1);
+        return buttonAtScreenPoint(msg->hwnd, { GET_X_LPARAM(msg->lParam), GET_Y_LPARAM(msg->lParam) });
+    }
+
+    CSDButton *buttonAtScreenPoint(HWND hwnd, POINT point)
+    {
+        ::MapWindowPoints(nullptr, hwnd, &point, 1);
 
         const double scaleFactor = m_window->devicePixelRatio();
         const QPoint qtPoint { static_cast<int>(point.x / scaleFactor),
                                static_cast<int>(point.y / scaleFactor) };
         return m_buttonmodel->buttonAt(qtPoint);
+    }
+
+    void trackNonClientLeave(HWND hwnd)
+    {
+        TRACKMOUSEEVENT ev{};
+        ev.cbSize = sizeof(TRACKMOUSEEVENT);
+        // TME_NONCLIENT is absolutely critical here. In my experimentation,
+        // we'd get WM_MOUSELEAVE messages after just a HOVER_DEFAULT
+        // timeout even though we're not requesting TME_HOVER, which kinda
+        // ruined the whole point of this.
+        ev.dwFlags = TME_LEAVE | TME_NONCLIENT;
+        ev.hwndTrack = hwnd;
+        ev.dwHoverTime = HOVER_DEFAULT; // we don't _really_ care about this.
+        TrackMouseEvent(&ev); // TODO check return?
+        m_trackingMouse = true;
     }
 
     void hoverExclusive(CSDButton::ButtonType type)

@@ -1021,6 +1021,13 @@ FocusScope {
             rootPlayer.lockUnlockAutoHide(lock)
         }
 
+        // On Windows, leaving the window from a window button sends no leave
+        // event, as the pointer already left the client area on the way in.
+        onCsdButtonHoveredChanged: {
+            if (!csdButtonHovered)
+                Qt.callLater(rootPlayer.restartAutoHide)
+        }
+
         onBackRequested: {
             if (MainCtx.hasEmbededVideo && !MainCtx.canShowVideoPIP) {
                MainPlaylistController.stop()
