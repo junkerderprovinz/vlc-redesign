@@ -225,6 +225,12 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance,
         WaitForSingleObject(sem, INFINITE);
         CloseHandle(sem);
 
+        /* The destructor of a thread-local Qt timer faults when a Qt thread
+         * exits. The loader recovers from it, but reporting the fault to
+         * Windows Error Reporting first holds each exiting thread, and the
+         * shutdown waiting for it, for seconds. */
+        SetErrorMode(GetErrorMode() | SEM_NOGPFAULTERRORBOX);
+
         libvlc_release (vlc);
     }
     else
