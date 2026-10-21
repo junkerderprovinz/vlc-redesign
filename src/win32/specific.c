@@ -108,23 +108,15 @@ void system_Configure( libvlc_int_t *p_this, int i_argc, const char *const ppsz_
 
             /* Locate the window created by the IPC helper thread of the
              * 1st instance */
-            if( !( ipcwindow = FindWindow( 0, L"VLC ipc " TEXT(VERSION) ) ) )
-            {
-                msg_Err( p_this, "one instance mode DISABLED "
-                         "(couldn't find 1st instance of program)" );
-                ReleaseMutex( hmutex );
-                return;
-            }
-
-            /* We assume that the remaining parameters are filenames
-             * and their input options */
-            if( i_argc > 0 )
+            if( ( ipcwindow = FindWindow( 0, L"VLC ipc " TEXT(VERSION) ) ) )
             {
                 COPYDATASTRUCT wm_data;
                 int i_opt;
                 vlc_ipc_data_t *p_data;
                 size_t i_data = sizeof (*p_data);
 
+                /* We assume that the remaining parameters are filenames
+                 * and their input options */
                 for( i_opt = 0; i_opt < i_argc; i_opt++ )
                 {
                     i_data += sizeof (size_t);
@@ -149,16 +141,40 @@ void system_Configure( libvlc_int_t *p_this, int i_argc, const char *const ppsz_
                 wm_data.dwData = 0;
                 wm_data.cbData = i_data;
                 wm_data.lpData = p_data;
-                SendMessage( ipcwindow, WM_COPYDATA, 0, (LPARAM)&wm_data );
+                LRESULT accepted = SendMessage( ipcwindow, WM_COPYDATA, 0,
+                                                (LPARAM)&wm_data );
+                free( p_data );
+
+                if( accepted )
+                {
+                    /* Initialization done.
+                     * Release the mutex to unblock other instances */
+                    ReleaseMutex( hmutex );
+
+                    /* Bye bye */
+                    system_End( );
+                    exit( 0 );
+                }
+
+                /* The 1st instance is quitting. Give it a moment to save
+                 * its settings and release the media library. */
+                msg_Info( p_this, "1st instance is quitting, waiting for it" );
+
+                DWORD pid;
+                if( GetWindowThreadProcessId( ipcwindow, &pid ) )
+                {
+                    HANDLE process = OpenProcess( SYNCHRONIZE, FALSE, pid );
+                    if( process != NULL )
+                    {
+                        WaitForSingleObject( process, 5000 );
+                        CloseHandle( process );
+                    }
+                }
             }
 
-            /* Initialization done.
-             * Release the mutex to unblock other instances */
+            /* Take over, so that the next instances find this one */
+            libvlc_InternalAddIntf( p_this, "win_msg,none" );
             ReleaseMutex( hmutex );
-
-            /* Bye bye */
-            system_End( );
-            exit( 0 );
         }
     }
 #endif

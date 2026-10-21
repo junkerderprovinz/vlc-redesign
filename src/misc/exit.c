@@ -57,6 +57,7 @@ void libvlc_Quit( libvlc_int_t *p_libvlc )
     vlc_exit_t *exit = &libvlc_priv( p_libvlc )->exit;
 
     msg_Dbg( p_libvlc, "exiting" );
+    var_SetBool( p_libvlc, "exiting", true );
     vlc_mutex_lock( &exit->lock );
     if( exit->handler != NULL )
         exit->handler( exit->opaque );

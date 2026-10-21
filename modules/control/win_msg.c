@@ -85,6 +85,11 @@ static LRESULT CALLBACK WMCOPYWNDPROC(HWND hwnd, UINT uMsg,
         if( intf == NULL )
             return 0; /* XXX: is this even possible? */
 
+        /* Files sent now would be lost with the playlist; refusing them
+         * lets the new instance start on its own. */
+        if( var_GetBool( vlc_object_instance(intf), "exiting" ) )
+            return FALSE;
+
         /* Add files to the playlist */
         if( pwm_data->lpData )
         {
@@ -128,6 +133,7 @@ static LRESULT CALLBACK WMCOPYWNDPROC(HWND hwnd, UINT uMsg,
 
             free( ppsz_argv );
         }
+        return TRUE;
     }
 
     return DefWindowProc( hwnd, uMsg, wParam, lParam );
