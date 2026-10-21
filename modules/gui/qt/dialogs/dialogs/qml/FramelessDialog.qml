@@ -62,17 +62,38 @@ Window {
     flags: Qt.Dialog | Qt.FramelessWindowHint
     modality: Qt.ApplicationModal
 
-    width: Math.min(baseWidth, Screen.desktopAvailableWidth - VLCStyle.margin_xlarge)
-    height: Math.min(baseHeight, Screen.desktopAvailableHeight - VLCStyle.margin_xlarge)
+    // Screen describes the screen the dialog is on, centerOnParent() moves it
+    // to the one of the main window
+    readonly property real _availableWidth: Math.min(Screen.width, Screen.desktopAvailableWidth) - VLCStyle.margin_xlarge
+    readonly property real _availableHeight: Math.min(Screen.height, Screen.desktopAvailableHeight) - VLCStyle.margin_xlarge
+
+    // a window that is shown without a size gets a tiny default one on Windows
+    minimumWidth: Math.min(VLCStyle.dp(400, VLCStyle.scale), _availableWidth)
+    minimumHeight: Math.min(VLCStyle.dp(300, VLCStyle.scale), _availableHeight)
+
+    width: Math.max(minimumWidth, Math.min(baseWidth, _availableWidth))
+    height: Math.max(minimumHeight, Math.min(baseHeight, _availableHeight))
 
     color: "transparent"
 
-    function open() {
+    function centerOnParent() {
         const parentWindow = MainCtx.intfMainWindow
-        if (parentWindow) {
-            x = parentWindow.x + (parentWindow.width - width) / 2
-            y = parentWindow.y + (parentWindow.height - height) / 2
-        }
+        if (!parentWindow)
+            return
+
+        const centerX = parentWindow.x + parentWindow.width / 2
+        const centerY = parentWindow.y + parentWindow.height / 2
+
+        x = centerX - width / 2
+        y = centerY - height / 2
+
+        // the dialog may have changed screen, and its size with it
+        x = Math.max(Screen.virtualX, Math.min(centerX - width / 2, Screen.virtualX + Screen.width - width))
+        y = Math.max(Screen.virtualY, Math.min(centerY - height / 2, Screen.virtualY + Screen.height - height))
+    }
+
+    function open() {
+        centerOnParent()
         show()
         requestActivate()
     }

@@ -54,11 +54,8 @@ FramelessDialog {
         if (pageName)
             pageId = pageName
         searchField.text = ""
-        const parent = MainCtx.intfMainWindow
-        if (parent && !visible) {
-            x = parent.x + (parent.width - width) / 2
-            y = parent.y + Math.max(0, (parent.height - height) / 2)
-        }
+        if (!visible)
+            centerOnParent()
         show()
         raise()
         requestActivate()
