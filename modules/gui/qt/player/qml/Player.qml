@@ -1399,6 +1399,14 @@ FocusScope {
         }
     }
 
+    LeaveEventFilter {
+        target: MainCtx.intfMainWindow
+
+        // The bars release their hover lock once the window has handled the
+        // same event, so hide after that.
+        onExited: Qt.callLater(() => playerToolbarVisibilityFSM.mouseExit())
+    }
+
     //filter key events to keep toolbar
     //visible when user navigates within the control bar
     KeyEventFilter {

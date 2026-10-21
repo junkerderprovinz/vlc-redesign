@@ -48,6 +48,7 @@ FSM {
     //incoming signals
     signal askShow()
     signal mouseMove()
+    signal mouseExit()
     signal keyboardMove()
     signal lock()
     signal unlock()
@@ -67,6 +68,7 @@ FSM {
     signalMap: ({
         askShow: fsm.askShow,
         mouseMove: fsm.mouseMove,
+        mouseExit: fsm.mouseExit,
         keyboardMove: fsm.keyboardMove,
         lock: fsm.lock,
         timeout: fsm.timeout,
@@ -133,6 +135,10 @@ FSM {
                             fsm.timeoutDuration = MainCtx.mouseHideTimeout;
                         },
                         target: fsmVideoMode
+                    },
+                    mouseExit: {
+                        guard: () => !Player.isInteractive,
+                        target: fsmHidden
                     },
                     keyboardMove: {
                         guard: () => !Player.isInteractive,

@@ -39,6 +39,7 @@
 
 #include "util/csdmenu.hpp"
 #include "util/item_key_event_filter.hpp"
+#include "util/leave_event_filter.hpp"
 #include "util/imageluminanceextractor.hpp"
 #include "util/keyhelper.hpp"
 #include "style/systempalette.hpp"
@@ -436,6 +437,7 @@ void MainUI::registerQMLTypes()
         qmlRegisterType<ImageLuminanceExtractor>( uri, versionMajor, versionMinor, "ImageLuminanceExtractor");
 
         qmlRegisterType<ItemKeyEventFilter>( uri, versionMajor, versionMinor, "KeyEventFilter" );
+        qmlRegisterType<LeaveEventFilter>( uri, versionMajor, versionMinor, "LeaveEventFilter" );
 
         // WARNING: This type is deprecated, do not use it.
         qmlRegisterType<FlickableScrollHandler>( uri, versionMajor, versionMinor, "VLCFlickableScrollHandler" );

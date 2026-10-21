@@ -335,6 +335,8 @@ libqt_plugin_la_SOURCES = \
 	util/navigation_history.cpp util/navigation_history.hpp \
 	util/item_key_event_filter.cpp \
 	util/item_key_event_filter.hpp \
+	util/leave_event_filter.cpp \
+	util/leave_event_filter.hpp \
 	util/flickable_scroll_handler.cpp \
 	util/flickable_scroll_handler.hpp \
 	util/qt_dirs.cpp util/qt_dirs.hpp \
@@ -527,6 +529,7 @@ nodist_libqt_plugin_la_SOURCES = \
 	util/locallistcacheloader.moc.cpp \
 	util/navigation_history.moc.cpp \
 	util/item_key_event_filter.moc.cpp \
+	util/leave_event_filter.moc.cpp \
 	util/effects_image_provider.moc.cpp \
 	util/flickable_scroll_handler.moc.cpp \
 	util/renderer_manager.moc.cpp \
