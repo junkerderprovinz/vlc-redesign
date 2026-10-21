@@ -19,10 +19,12 @@ import QtQuick
 import QtQuick.Templates as T
 
 import VLC.Style
+import VLC.Widgets as Widgets
 import VLC.Dialogs
 
-// A row of color swatches; `swatches` holds { color, text } entries, an entry
-// without a color is drawn as a rainbow and stands for "any other color".
+// A row of color swatches; `swatches` holds { color, text, custom } entries.
+// A custom entry is drawn as a circle and stands for "any other color", it
+// shows a plus until it has a color.
 Rectangle {
     id: root
 
@@ -72,6 +74,10 @@ Rectangle {
                 Accessible.checked: selected
                 Accessible.name: text
 
+                T.ToolTip.visible: !!modelData.custom && (hovered || visualFocus)
+                T.ToolTip.delay: VLCStyle.delayToolTipAppear
+                T.ToolTip.text: text
+
                 onClicked: root.activated(index)
 
                 background: Rectangle {
@@ -86,20 +92,19 @@ Rectangle {
                         anchors.centerIn: parent
                         width: t.dp(20)
                         height: t.dp(20)
-                        radius: t.dp(1)
-                        opacity: swatch.selected ? 1 : 0.7
+                        radius: swatch.modelData.custom ? width / 2 : t.dp(1)
+                        opacity: (swatch.selected || swatch.hovered) ? 1 : 0.7
                         color: swatch.modelData.color ?? "transparent"
-                        gradient: swatch.modelData.color ? null : rainbow
+                        border.width: swatch.modelData.color ? 0 : t.dp(1.5)
+                        border.color: t.fgA2
 
-                        Gradient {
-                            id: rainbow
+                        Widgets.IconLabel {
+                            anchors.centerIn: parent
 
-                            orientation: Gradient.Horizontal
-                            GradientStop { position: 0.0; color: "#e15032" }
-                            GradientStop { position: 0.25; color: "#c49e23" }
-                            GradientStop { position: 0.5; color: "#19a234" }
-                            GradientStop { position: 0.75; color: "#185dd3" }
-                            GradientStop { position: 1.0; color: "#f052b3" }
+                            visible: !swatch.modelData.color
+                            text: VLCIcons.add
+                            color: t.fgA1
+                            font.pixelSize: t.dp(14)
                         }
                     }
                 }

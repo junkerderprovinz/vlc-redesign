@@ -696,7 +696,7 @@ FocusScope {
             swatches: {
                 const list = presets.map((c) => ({ color: c, text: c }))
                 list.push({ color: presetIndex < 0 ? MainCtx.accentColor.toString() : null,
-                            text: qsTr("Custom color") })
+                            text: qsTr("Custom color"), custom: true })
                 return list
             }
             currentIndex: presetIndex < 0 ? presets.length : presetIndex
@@ -707,6 +707,12 @@ FocusScope {
                 } else if (index < presets.length) {
                     MainCtx.accentColor = presets[index]
                 } else {
+                    // open upwards when the window has no room below the row
+                    const gap = t.dp(6)
+                    const bottom = swatchRow.mapToItem(null, 0, swatchRow.height).y
+                    accentPicker.y = (bottom + gap + accentPicker.height + accentPicker.margins > swatchRow.Window.height)
+                                     ? -accentPicker.height - gap
+                                     : swatchRow.height + gap
                     accentPicker.setColor(MainCtx.accentColor)
                     accentPicker.open()
                 }

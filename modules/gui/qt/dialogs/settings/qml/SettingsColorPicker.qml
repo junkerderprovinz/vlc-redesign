@@ -55,6 +55,7 @@ T.Popup {
     implicitHeight: implicitContentHeight + topPadding + bottomPadding
 
     padding: t.dp(12)
+    margins: t.dp(8)
     modal: false
     focus: true
     closePolicy: T.Popup.CloseOnEscape | T.Popup.CloseOnPressOutside
