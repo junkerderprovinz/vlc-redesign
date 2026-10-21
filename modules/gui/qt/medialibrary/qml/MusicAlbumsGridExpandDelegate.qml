@@ -150,7 +150,6 @@ FocusScope {
                 property alias playActionBtn: _playActionBtn
 
                 focus: true
-                width: VLCStyle.expandCover_music_width
 
                 spacing: VLCStyle.margin_small
 
