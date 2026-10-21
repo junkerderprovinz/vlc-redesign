@@ -260,19 +260,20 @@ FocusScope {
                 focus: true
 
                 // The video sits in a rounded frame of the window color, except between
-                // the bars of the light theme, where it fills the space.
+                // the bars of the light theme, where it fills the space. When the bars
+                // overlay the video, the frame fades in with them over the edges of
+                // the video, so the video keeps its size.
                 readonly property bool framed: !rootPlayer._controlsUnderVideo || windowTheme.tokens.isDark
                 readonly property real frameWidth: framed ? VLCStyle.dp(10, VLCStyle.scale) : 0
+                readonly property bool frameOverVideo: !rootPlayer._controlsUnderVideo
 
                 VideoSurface {
                     id: videoSurface
 
                     anchors.fill: parent
-                    anchors.leftMargin: videoScope.frameWidth
-                    anchors.rightMargin: videoScope.frameWidth
-                    anchors.topMargin: rootPlayer._controlsUnderVideo ? (videoScope.framed ? VLCStyle.dp(1, VLCStyle.scale) : 0)
-                                                                      : videoScope.frameWidth
-                    anchors.bottomMargin: rootPlayer._controlsUnderVideo ? 0 : videoScope.frameWidth
+                    anchors.leftMargin: videoScope.frameOverVideo ? 0 : videoScope.frameWidth
+                    anchors.rightMargin: videoScope.frameOverVideo ? 0 : videoScope.frameWidth
+                    anchors.topMargin: (videoScope.frameOverVideo || !videoScope.framed) ? 0 : VLCStyle.dp(1, VLCStyle.scale)
 
                     // With regard to `ViewBlockingRectangle`, we
                     // do not need to prevent painting anything
@@ -315,12 +316,21 @@ FocusScope {
                     }
                 }
 
+                Item {
+                    id: frameHole
+
+                    anchors.fill: parent
+                    anchors.margins: videoScope.frameWidth
+                }
+
                 VideoFrame {
                     anchors.fill: parent
 
-                    target: videoSurface
+                    target: videoScope.frameOverVideo ? frameHole : videoSurface
                     frameWidth: videoScope.frameWidth
                     color: windowTheme.bg.primary
+
+                    opacity: videoScope.frameOverVideo ? controlBar.opacity : 1
                 }
             }
         }
