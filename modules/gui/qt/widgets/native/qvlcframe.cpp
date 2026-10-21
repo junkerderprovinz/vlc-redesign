@@ -34,8 +34,11 @@ void QVLCTools::saveWidgetPosition(QSettings *settings, QWidget *widget)
     settings->setValue("geometry", widget->saveGeometry());
 }
 
-void QVLCTools::saveWindowPosition(QSettings *settings, QWindow *window)
+void QVLCTools::saveWindowPosition(QSettings *settings, QWindow *window, const QRect &normalGeometry)
 {
+    // a maximized window keeps the geometry it returns to when restored
+    const QRect geometry = normalGeometry.isValid() ? normalGeometry : window->geometry();
+
     //no standard way to do it, mimic what qt is doing internally
     QByteArray array;
     QDataStream serialized(&array, QIODevice::WriteOnly);
@@ -49,8 +52,8 @@ void QVLCTools::saveWindowPosition(QSettings *settings, QWindow *window)
         << window->screen()->name()
         << window->screen()->devicePixelRatio()
         << window->screen()->geometry()
-        << window->position()
-        << window->geometry()
+        << geometry.topLeft()
+        << geometry
         << quint8(window->windowStates() & Qt::WindowMaximized)
         << quint8(window->windowStates() & Qt::WindowFullScreen);
     settings->setValue("geometry", array);

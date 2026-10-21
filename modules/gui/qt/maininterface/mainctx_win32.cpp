@@ -159,6 +159,7 @@ public:
         // the saved geometry was restored while the window had no frame, it
         // is the client area and must not lose the resize borders added below
         const QRect geometry = m_window->geometry();
+        const Qt::WindowStates states = m_window->windowStates();
 
         // CSDWin32EventHandler does not support Qt::FramelessWindowHint:
         m_window->setFlag(Qt::FramelessWindowHint, false);
@@ -167,6 +168,13 @@ public:
         updateCSDSettings();
 
         m_window->setGeometry(geometry);
+
+        // the frame change resizes the hidden window, which Qt reports as a
+        // return to the normal state, dropping a restored maximized state
+        QMetaObject::invokeMethod(m_window, [window = m_window, states]()
+        {
+            window->setWindowStates(states);
+        }, Qt::QueuedConnection);
     }
 
     ~CSDWin32EventHandler()

@@ -86,6 +86,8 @@ protected:
     bool m_hasResizeCursor = false;
 
     QRect m_interfaceGeometry;
+    // the geometry while neither minimized, maximized nor full screen
+    QRect m_normalGeometry;
 
     WheelToVLCConverter m_wheelAccumulator;
 

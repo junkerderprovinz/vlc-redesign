@@ -63,7 +63,8 @@ class QVLCTools
                                            QPoint defPos = QPoint( 0, 0 ) );
 
 
-       static void saveWindowPosition(QSettings *settings, QWindow *window);
+       static void saveWindowPosition(QSettings *settings, QWindow *window,
+                                      const QRect &normalGeometry = QRect());
        static void restoreWindowPosition(QSettings *settings, QWindow *window,
                                           QSize defSize = QSize( 0, 0 ),
                                           QPoint defPos = QPoint( 0, 0 ) );

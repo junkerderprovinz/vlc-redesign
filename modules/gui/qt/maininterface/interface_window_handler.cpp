@@ -72,6 +72,7 @@ InterfaceWindowHandler::InterfaceWindowHandler(qt_intf_t *_p_intf, MainCtx* main
     const QSize screenSize = QGuiApplication::primaryScreen()->availableSize();
     const QSize defaultSize = QSize(1440, 900).boundedTo( screenSize * 0.9 );
     QVLCTools::restoreWindowPosition( getSettings(), m_window, defaultSize );
+    m_normalGeometry = m_window->geometry();
 
     // this needs to be called asynchronously
     // otherwise QQuickWidget won't initialize properly
@@ -178,7 +179,7 @@ InterfaceWindowHandler::~InterfaceWindowHandler()
 {
     m_window->removeEventFilter(this);
     /* Save this size */
-    QVLCTools::saveWindowPosition(getSettings(), m_window);
+    QVLCTools::saveWindowPosition(getSettings(), m_window, m_normalGeometry);
     assert(qApp);
     if (!qApp->property("isDying").toBool())
     {
@@ -317,6 +318,17 @@ bool InterfaceWindowHandler::eventFilter(QObject*, QEvent* event)
         m_mainCtx->onWindowClose(m_window);
         event->ignore();
         return true;
+    }
+    case QEvent::Move:
+    case QEvent::Resize:
+    {
+        // a window being maximized gets its new geometry before its new state
+        QMetaObject::invokeMethod(this, [this]()
+        {
+            if (!(m_window->windowStates() & (Qt::WindowMinimized | Qt::WindowMaximized | Qt::WindowFullScreen)))
+                m_normalGeometry = m_window->geometry();
+        }, Qt::QueuedConnection);
+        break;
     }
 #if QT_VERSION >= QT_VERSION_CHECK(6, 6, 0)
     case QEvent::DevicePixelRatioChange:
