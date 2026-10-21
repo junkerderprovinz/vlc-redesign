@@ -29,7 +29,7 @@ import VLC.Util
 PopupIconToolButton {
     id: root
 
-    popup.width: VLCStyle.dp(256, VLCStyle.scale)
+    popup.width: Math.max(VLCStyle.dp(256, VLCStyle.scale), popup.implicitWidth)
 
     text: qsTr("Playback Speed")
 
