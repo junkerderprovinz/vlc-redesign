@@ -241,5 +241,10 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance,
         free (argv[i]);
 
     (void)hInstance; (void)hPrevInstance; (void)lpCmdLine; (void)nCmdShow;
+
+    /* libvlc is released and everything is saved by now. Skip the DLL exit
+     * handlers: the one libstdc++ adds to the Qt plugin can wait forever on
+     * the winpthreads key lock, leaving a process that cannot be killed. */
+    TerminateProcess(GetCurrentProcess(), 0);
     return 0;
 }
