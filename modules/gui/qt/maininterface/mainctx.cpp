@@ -907,6 +907,10 @@ void MainCtx::onWindowClose( QWindow* )
     PlaylistController* playlistController = p_intf->p_mainPlaylistController;
     PlayerController* playerController = p_intf->p_mainPlayerController;
 
+    /* A file handed over by another instance from now on would restart the
+     * playback stopped below and keep VLC from quitting. */
+    var_SetBool( vlc_object_instance(p_intf), "exiting", true );
+
     if (m_videoSurfaceProvider)
         m_videoSurfaceProvider->onWindowClosed();
     //We need to make sure that noting is playing anymore otherwise the vout will be closed

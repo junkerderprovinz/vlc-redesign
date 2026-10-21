@@ -232,7 +232,7 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
     var_Create( p_libvlc, "snapshot-file", VLC_VAR_STRING );
     var_Create( p_libvlc, "record-file", VLC_VAR_STRING );
 
-    /* set by libvlc_Quit() */
+    /* set by libvlc_Quit(), or earlier by an interface that starts quitting */
     var_Create( p_libvlc, "exiting", VLC_VAR_BOOL );
 
     /* some default internal settings */
