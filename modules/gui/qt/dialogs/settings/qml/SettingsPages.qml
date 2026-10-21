@@ -73,7 +73,9 @@ QtObject {
                     title: qsTr("Appearance"),
                     rows: [
                         row("theme", "", qsTr("Theme")),
-                        row("accent", "qt-accent-color", qsTr("Accent color"))
+                        row("accent", "qt-accent-color", qsTr("Accent color")),
+                        toggle("qt-volume-accent-color", qsTr("Volume in accent color"),
+                               qsTr("Fills the volume slider with the accent color instead of green."))
                     ]
                 },
                 {

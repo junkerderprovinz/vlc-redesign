@@ -264,6 +264,9 @@ T.Pane {
 
                 readonly property color trackColor: theme.tokens.isDark ? theme.tokens.bgB2 : theme.tokens.bgA4
 
+                // an empty map keeps the green to red level of the svg
+                readonly property var levelColor: MainCtx.volumeAccentColor ? ({ "url(#level)": theme.accent }) : ({})
+
                 readonly property string _source: "qrc:///icons/ui/volume-wedge.svg"
 
                 opacity: _player.muted ? 0.5 : 1.0
@@ -292,6 +295,7 @@ T.Pane {
                         sourceSize: Qt.size(width, height)
                         source: SVGColorImage.colorize(wedge._source)
                                              .color1(wedge.trackColor)
+                                             .any(wedge.levelColor)
                                              .uri()
                     }
                 }

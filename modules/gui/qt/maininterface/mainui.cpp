@@ -291,7 +291,14 @@ void MainUI::registerQMLTypes()
         assert(DialogErrorModel::getInstance<false>());
         qmlRegisterSingletonInstance<DialogErrorModel>(uri, versionMajor, versionMinor, "DialogErrorModel", DialogErrorModel::getInstance<false>());
 
-        qmlRegisterSingletonInstance<SettingsBridge>(uri, versionMajor, versionMinor, "SettingsBridge", new SettingsBridge(m_intf, this));
+        SettingsBridge *settingsBridge = new SettingsBridge(m_intf, this);
+        // the volume slider is on screen while the option is edited, so it
+        // should not wait for the settings to be saved
+        connect(settingsBridge, &SettingsBridge::optionChanged, m_mainCtx, [mainCtx = m_mainCtx](const QString &name) {
+            if (name == QLatin1String("qt-volume-accent-color"))
+                mainCtx->reloadPrefs();
+        });
+        qmlRegisterSingletonInstance<SettingsBridge>(uri, versionMajor, versionMinor, "SettingsBridge", settingsBridge);
         qmlRegisterTypesAndRevisions<ConfigOption>(uri, versionMajor);
         qmlRegisterSingletonInstance<EffectsController>(uri, versionMajor, versionMinor, "EffectsController", new EffectsController(m_intf, this));
         qmlRegisterType<FirstRunController>(uri, versionMajor, versionMinor, "FirstRunController");

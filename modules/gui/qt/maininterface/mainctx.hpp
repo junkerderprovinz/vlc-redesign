@@ -125,6 +125,7 @@ class MainCtx : public QObject
     Q_PROPERTY(bool canShowVideoPIP READ canShowVideoPIP CONSTANT FINAL)
     Q_PROPERTY(bool pinVideoControls READ pinVideoControls WRITE setPinVideoControls NOTIFY pinVideoControlsChanged FINAL)
     Q_PROPERTY(float pinOpacity READ pinOpacity WRITE setPinOpacity NOTIFY pinOpacityChanged FINAL)
+    Q_PROPERTY(bool volumeAccentColor READ volumeAccentColor NOTIFY volumeAccentColorChanged FINAL)
     Q_PROPERTY(ControlbarProfileModel* controlbarProfileModel READ controlbarProfileModel CONSTANT FINAL)
     Q_PROPERTY(bool hasAcrylicSurface READ hasAcrylicSurface NOTIFY hasAcrylicSurfaceChanged FINAL)
     Q_PROPERTY(bool smoothScroll READ smoothScroll NOTIFY smoothScrollChanged FINAL)
@@ -269,6 +270,7 @@ public:
 
     inline bool pinVideoControls() const { return m_pinVideoControls; }
     inline float pinOpacity() const { return m_pinOpacity; }
+    inline bool volumeAccentColor() const { return m_volumeAccentColor; }
 
     inline ControlbarProfileModel* controlbarProfileModel() const { return m_controlbarProfileModel; }
     inline QUrl getDialogFilePath() const { return m_dialogFilepath; }
@@ -499,6 +501,8 @@ protected:
     bool                 m_pinVideoControls = false;
     float                m_pinOpacity       = 1.0f;
 
+    bool                 m_volumeAccentColor = false;
+
     bool                 m_useGlobalShortcuts = true;
     QUrl                 m_dialogFilepath; /* Last path used in dialogs */
 
@@ -634,6 +638,8 @@ signals:
 
     void pinVideoControlsChanged();
     void pinOpacityChanged();
+
+    void volumeAccentColorChanged();
 
     void hasAcrylicSurfaceChanged(bool);
 

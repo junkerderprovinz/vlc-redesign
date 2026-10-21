@@ -183,6 +183,7 @@ Rectangle {
 
                     readonly property string _source: "qrc:///icons/ui/volume-wedge.svg"
                     readonly property color trackColor: root.tokens.bgB2
+                    readonly property var levelColor: MainCtx.volumeAccentColor ? ({ "url(#level)": root.tokens.accent }) : ({})
 
                     width: VLCStyle.dp(48, VLCStyle.scale)
                     height: VLCStyle.dp(15, VLCStyle.scale)
@@ -208,6 +209,7 @@ Rectangle {
                             sourceSize: Qt.size(width, height)
                             source: SVGColorImage.colorize(wedge._source)
                                                  .color1(wedge.trackColor)
+                                                 .any(wedge.levelColor)
                                                  .uri()
                         }
                     }
