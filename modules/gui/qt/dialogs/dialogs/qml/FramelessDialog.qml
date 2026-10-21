@@ -87,13 +87,19 @@ Window {
         x = centerX - width / 2
         y = centerY - height / 2
 
-        // the dialog may have changed screen, and its size with it
+        // the dialog may have changed screen; its size is set here and not
+        // bound, so that nothing resizes or shifts it while it is shown
+        width = Math.max(minimumWidth, Math.min(baseWidth, _availableWidth))
+        height = Math.max(minimumHeight, Math.min(baseHeight, _availableHeight))
+
         x = Math.max(Screen.virtualX, Math.min(centerX - width / 2, Screen.virtualX + Screen.width - width))
         y = Math.max(Screen.virtualY, Math.min(centerY - height / 2, Screen.virtualY + Screen.height - height))
     }
 
+    // a dialog that is already shown keeps the place the user moved it to
     function open() {
-        centerOnParent()
+        if (!visible)
+            centerOnParent()
         show()
         requestActivate()
     }
