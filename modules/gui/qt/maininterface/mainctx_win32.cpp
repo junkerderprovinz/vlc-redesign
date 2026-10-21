@@ -43,6 +43,7 @@
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #include <dwmapi.h>
+#include <shellapi.h>
 
 #define WM_APPCOMMAND 0x0319
 
@@ -104,6 +105,10 @@ using namespace vlc::playlist;
 #define WM_NCUAHDRAWFRAME 0x00AF
 #endif
 
+#ifndef ABM_GETAUTOHIDEBAREX
+#define ABM_GETAUTOHIDEBAREX 0x0000000b
+#endif
+
 namespace  {
 
 HWND WinId( const QWindow *window )
@@ -122,6 +127,20 @@ void setSystemBorderVisible(HWND hwnd, bool visible)
                                    : 0xFFFFFFFE /* DWMWA_COLOR_NONE */;
     // the attribute does not exist before Windows 11, the call fails there
     DwmSetWindowAttribute(hwnd, 34 /* DWMWA_BORDER_COLOR */, &color, sizeof(color));
+}
+
+bool hasAutoHideTaskbar(HWND hwnd, UINT edge)
+{
+    MONITORINFO info {};
+    info.cbSize = sizeof(info);
+    if (!GetMonitorInfo(MonitorFromWindow(hwnd, MONITOR_DEFAULTTONEAREST), &info))
+        return false;
+
+    APPBARDATA data {};
+    data.cbSize = sizeof(data);
+    data.uEdge = edge;
+    data.rc = info.rcMonitor;
+    return SHAppBarMessage(ABM_GETAUTOHIDEBAREX, &data) != 0;
 }
 
 class CSDWin32EventHandler : public QObject, public QAbstractNativeEventFilter
@@ -249,6 +268,18 @@ public:
                 const int rbw = resizeBorderWidth(m_window);
                 clientRect->left += rbw;
                 clientRect->right -= rbw;
+
+                // An auto-hide taskbar does not come up over a window that
+                // covers the whole monitor, and Qt takes such a window for
+                // a full screen one. Leave it one pixel.
+                if (hasAutoHideTaskbar(msg->hwnd, ABE_BOTTOM))
+                    clientRect->bottom -= 1;
+                else if (hasAutoHideTaskbar(msg->hwnd, ABE_TOP))
+                    clientRect->top += 1;
+                else if (hasAutoHideTaskbar(msg->hwnd, ABE_LEFT))
+                    clientRect->left += 1;
+                else if (hasAutoHideTaskbar(msg->hwnd, ABE_RIGHT))
+                    clientRect->right -= 1;
                 nonClientAreaExists = true;
             }
             else if (m_platformHandlesResize && !IsZoomed(msg->hwnd))

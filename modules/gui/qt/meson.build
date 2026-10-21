@@ -1180,6 +1180,7 @@ if qt6_dep.found()
         qt_extra_deps += [
             cc.find_library('dwmapi'),
             cc.find_library('comctl32'),
+            cc.find_library('shell32'),
         ]
     endif
 
