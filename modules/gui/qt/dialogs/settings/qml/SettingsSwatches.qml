@@ -18,6 +18,7 @@
 import QtQuick
 import QtQuick.Templates as T
 
+import VLC.Style
 import VLC.Dialogs
 
 // A row of color swatches; `swatches` holds { color, text } entries, an entry

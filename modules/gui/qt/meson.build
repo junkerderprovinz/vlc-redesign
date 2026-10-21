@@ -676,9 +676,6 @@ qml_modules += {
         'dialogs/settings/qml/SettingsSlider.qml',
         'dialogs/settings/qml/SettingsSwatches.qml'
     ),
-    'singletons': files(
-        'dialogs/settings/qml/SettingsTheme.qml',
-    ),
 }
 
 qml_maininterface_extra_files = []
@@ -908,6 +905,7 @@ qml_modules += {
     'outdir' : 'VLC/Style',
     'singletons': files(
         'style/AcrylicController.qml',
+        'style/SettingsTheme.qml',
         'style/VLCStyle.qml',
     ),
 }
