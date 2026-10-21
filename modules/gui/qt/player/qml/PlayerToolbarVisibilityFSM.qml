@@ -49,6 +49,9 @@ FSM {
     signal askShow()
     signal mouseMove()
     signal mouseExit()
+    // sent when the player view, a video or the window shows up, which hides
+    // the toolbars without waiting for the pointer to move
+    signal restartAutoHide(bool pointerInside)
     signal keyboardMove()
     signal lock()
     signal unlock()
@@ -69,6 +72,7 @@ FSM {
         askShow: fsm.askShow,
         mouseMove: fsm.mouseMove,
         mouseExit: fsm.mouseExit,
+        restartAutoHide: fsm.restartAutoHide,
         keyboardMove: fsm.keyboardMove,
         lock: fsm.lock,
         timeout: fsm.timeout,
@@ -140,6 +144,16 @@ FSM {
                         guard: () => !Player.isInteractive,
                         target: fsmHidden
                     },
+                    restartAutoHide: [{
+                        guard: (pointerInside) => !Player.isInteractive && !pointerInside,
+                        target: fsmHidden
+                    }, {
+                        guard: () => !Player.isInteractive,
+                        action: () => {
+                            fsm.timeoutDuration = MainCtx.mouseHideTimeout
+                        },
+                        target: fsmVideoMode
+                    }],
                     keyboardMove: {
                         guard: () => !Player.isInteractive,
                         action: () => { 

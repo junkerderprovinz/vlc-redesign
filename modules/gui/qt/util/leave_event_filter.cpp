@@ -18,7 +18,9 @@
 #include "leave_event_filter.hpp"
 
 #include <QApplication>
+#include <QCursor>
 #include <QEvent>
+#include <QWindow>
 
 LeaveEventFilter::~LeaveEventFilter()
 {
@@ -40,6 +42,15 @@ void LeaveEventFilter::setTarget(QObject *target)
         m_target->installEventFilter(this);
 
     emit targetChanged();
+}
+
+bool LeaveEventFilter::containsCursor() const
+{
+    const auto window = qobject_cast<QWindow *>(m_target.data());
+    if (!window)
+        return false;
+
+    return window->geometry().contains(QCursor::pos(window->screen()));
 }
 
 bool LeaveEventFilter::eventFilter(QObject *, QEvent *event)

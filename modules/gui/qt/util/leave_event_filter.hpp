@@ -34,6 +34,9 @@
  *  }
  *
  * Leave events caused by an opening popup menu are ignored.
+ *
+ * containsCursor() tells where the pointer is when no event has been
+ * received yet, for instance right after the window was shown.
  */
 class LeaveEventFilter : public QObject
 {
@@ -46,6 +49,8 @@ public:
 
     QObject * target() const { return m_target; }
     void setTarget(QObject *target);
+
+    Q_INVOKABLE bool containsCursor() const;
 
 signals:
     void targetChanged();

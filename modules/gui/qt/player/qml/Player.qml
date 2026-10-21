@@ -111,6 +111,10 @@ FocusScope {
         }
     }
 
+    function restartAutoHide() {
+        playerToolbarVisibilityFSM.restartAutoHide(windowLeaveFilter.containsCursor())
+    }
+
     // Private
 
     function _onNavigationCancel() {
@@ -136,6 +140,8 @@ FocusScope {
     PlayerToolbarVisibilityFSM {
         id: playerToolbarVisibilityFSM
 
+        onStartedChanged: rootPlayer.restartAutoHide()
+
         onForceUnlock:{
             controlBar.forceUnlock()
 
@@ -156,9 +162,21 @@ FocusScope {
         function onHasEmbededVideoChanged() {
             playlistVisibility.updateVideoEmbed()
             playerToolbarVisibilityFSM.updateVideoEmbed()
+            rootPlayer.restartAutoHide()
         }
         function onAskShow() {
             playerToolbarVisibilityFSM.askShow()
+        }
+    }
+
+    Connections {
+        target: MainCtx.intfMainWindow
+
+        // shown, restored, or out of fullscreen
+        function onVisibilityChanged() {
+            const visibility = MainCtx.intfMainWindow.visibility
+            if (visibility !== Window.Hidden && visibility !== Window.Minimized)
+                rootPlayer.restartAutoHide()
         }
     }
 
@@ -1400,6 +1418,8 @@ FocusScope {
     }
 
     LeaveEventFilter {
+        id: windowLeaveFilter
+
         target: MainCtx.intfMainWindow
 
         // The bars release their hover lock once the window has handled the
