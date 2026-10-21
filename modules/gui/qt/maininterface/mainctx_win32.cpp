@@ -137,11 +137,17 @@ public:
     {
         assert(m_mainCtx);
 
+        // the saved geometry was restored while the window had no frame, it
+        // is the client area and must not lose the resize borders added below
+        const QRect geometry = m_window->geometry();
+
         // CSDWin32EventHandler does not support Qt::FramelessWindowHint:
         m_window->setFlag(Qt::FramelessWindowHint, false);
 
         QApplication::instance()->installNativeEventFilter(this);
         updateCSDSettings();
+
+        m_window->setGeometry(geometry);
     }
 
     ~CSDWin32EventHandler()
