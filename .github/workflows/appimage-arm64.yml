@@ -1,0 +1,195 @@
+name: AppImage arm64
+
+# Builds the aarch64 AppImage with extras/package/appimage on GitHub's arm64
+# runners, because emulating arm64 on the x86_64 build host is many times
+# slower, then plays a video with it on each distribution it promises to run
+# on.
+
+on:
+  push:
+    branches: [ci-linux-arm64]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04-arm
+    # A run without the Qt cache builds Qt before VLC.
+    timeout-minutes: 300
+    env:
+      DATA: ${{ github.workspace }}/data
+      CPUS: 4
+      MEMORY: 14g
+      SCRIPT: data/vlc/extras/package/appimage/build-appimage-compat.sh
+    steps:
+      # The script builds the checkout it finds in $DATA/vlc.
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          path: data/vlc
+          persist-credentials: false
+
+      # Each cache is keyed on the part of the script that fills it, so a
+      # change elsewhere in the script keeps it.
+      - name: Compute cache keys
+        id: keys
+        run: |
+          part() { sed -n "/^$1\(() {\|=(\)\$/,/^[})]\$/p" "$SCRIPT"; }
+          qt=$({ grep '^QT_VERSION=' "$SCRIPT"; part qt_build_packages; part build_qt; part qt_module; } | sha256sum | cut -c 1-16)
+          deps=$({ part build_deps; part fetch; part meson_dep; part autotools_dep; } | sha256sum | cut -c 1-16)
+          echo "qt=qt-$(uname -m)-$qt" >> "$GITHUB_OUTPUT"
+          echo "deps=deps-$(uname -m)-$deps" >> "$GITHUB_OUTPUT"
+
+      - name: Restore Qt
+        id: qt
+        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: data/qt
+          key: ${{ steps.keys.outputs.qt }}
+
+      - name: Restore the libraries built from source
+        id: deps
+        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: |
+            data/deps
+            data/src
+          key: ${{ steps.keys.outputs.deps }}
+
+      - name: Restore ccache
+        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: data/ccache
+          key: ccache-${{ runner.arch }}-${{ github.sha }}
+          restore-keys: ccache-${{ runner.arch }}-
+
+      - name: Install the packages, Qt and the libraries built from source
+        id: prepare
+        run: |
+          "$SCRIPT" --prepare
+
+      # Saved before VLC is built, so a failure there does not cost the next
+      # run the Qt build.
+      - name: Save Qt
+        if: steps.qt.outputs.cache-hit != 'true'
+        uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: data/qt
+          key: ${{ steps.keys.outputs.qt }}
+
+      - name: Save the libraries built from source
+        if: steps.deps.outputs.cache-hit != 'true'
+        uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: |
+            data/deps
+            data/src
+          key: ${{ steps.keys.outputs.deps }}
+
+      - name: Build the AppImage
+        run: |
+          "$SCRIPT" 2>&1 | tee build.log
+          {
+            echo '```'
+            grep -E '^(building [0-9a-f]+$|libraries taken from the host|newest)' build.log
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      # A failed build still leaves most objects in the cache for the next try.
+      - name: Save ccache
+        if: always() && steps.prepare.outcome == 'success'
+        uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: data/ccache
+          key: ccache-${{ runner.arch }}-${{ github.sha }}
+
+      - name: Name the AppImage for the release
+        run: |
+          mkdir dist
+          cp data/out/VLC_Redesign-*-aarch64.AppImage dist/vlc-redesign-linux-arm64.AppImage
+          cd dist
+          sha256sum vlc-redesign-linux-arm64.AppImage | tee vlc-redesign-linux-arm64.AppImage.sha256
+
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: vlc-redesign-linux-arm64
+          path: dist/
+          if-no-files-found: error
+          # The AppImage is a compressed squashfs already.
+          compression-level: 0
+
+  video:
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 15
+    steps:
+      - name: Make a test video
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq --no-install-recommends ffmpeg > /dev/null
+          mkdir media
+          ffmpeg -loglevel error -f lavfi -i testsrc2=size=1280x720:rate=25 \
+            -f lavfi -i sine=frequency=440 -t 30 \
+            -c:v libx264 -pix_fmt yuv420p -c:a aac media/test.mp4
+
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: test-video
+          path: media/test.mp4
+          retention-days: 1
+
+  test:
+    needs: [build, video]
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { name: ubuntu-22.04, image: "ubuntu:22.04" }
+          - { name: ubuntu-24.04, image: "ubuntu:24.04" }
+          - { name: debian-12, image: "debian:12" }
+          - { name: debian-13, image: "debian:13" }
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          sparse-checkout: extras/package/appimage
+          persist-credentials: false
+
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: vlc-redesign-linux-arm64
+          path: work
+
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: test-video
+          path: media
+
+      - name: Play the test video on ${{ matrix.name }}
+        env:
+          NAME: test-arm64-${{ matrix.name }}
+          IMAGE: ${{ matrix.image }}
+        run: |
+          # Artifacts lose the executable bit.
+          chmod +x work/vlc-redesign-linux-arm64.AppImage
+          mkdir out
+          docker run --rm --cpus 4 --memory 8g \
+            -v "$PWD/extras/package/appimage:/tools:ro" \
+            -v "$PWD/work:/work:ro" -v "$PWD/media:/media:ro" -v "$PWD/out:/out" \
+            "$IMAGE" /tools/test-appimage-debian.sh \
+            "$NAME" /work/vlc-redesign-linux-arm64.AppImage /media/test.mp4
+
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: always()
+        with:
+          name: test-arm64-${{ matrix.name }}
+          path: out/
