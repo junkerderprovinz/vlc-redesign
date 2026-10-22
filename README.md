@@ -136,7 +136,7 @@ Everything VLC 4 can do is still reachable, though some of it has moved to a dif
 - The normal zip uses `%APPDATA%\vlc`, the same folder an installed VLC 3 uses. If you want to keep both, take the portable one.
 - The build is not signed, so SmartScreen may warn on the first start. "More info" then "Run anyway" gets past it.
 
-**Linux (x64):** download the AppImage, make it executable and run it:
+**Linux (x64):** download the AppImage, make it executable and run it. It runs on Ubuntu 22.04, Debian 12 and anything newer (glibc 2.35 or later).
 
 ```sh
 chmod +x vlc-redesign-linux-amd64.AppImage
