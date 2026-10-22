@@ -32,10 +32,10 @@ done
 vlc=$!
 
 # There is no window manager to place the window, so it is made to fill the
-# screen once it shows up.
-win=$(timeout 60 xdotool search --sync --onlyvisible --class vlc 2> /dev/null | head -n 1) || true
-if [ -n "$win" ]; then
-	xdotool windowmove "$win" 0 0 windowsize "$win" 1920 1080
+# screen once it shows up. Qt sets its own size right after mapping it.
+if timeout 60 xdotool search --sync --onlyvisible --class vlc > /dev/null 2>&1; then
+	sleep 1
+	xdotool search --onlyvisible --class vlc windowmove %@ 0 0 windowsize %@ 1920 1080
 fi
 sleep "$seconds"
 
