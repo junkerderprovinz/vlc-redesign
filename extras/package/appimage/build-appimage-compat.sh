@@ -177,6 +177,9 @@ install_tools() {
 install_qt() {
 	if [ "$arch" = aarch64 ]; then
 		build_qt
+		# The same qt.conf aqt writes. Without it Qt takes its prefix from the
+		# QtCore that qmake loads, which during deployment is the bundled copy.
+		printf '[Paths]\nPrefix=..\n' > "$qtdir/bin/qt.conf"
 		return
 	fi
 	[ -x "$qtdir/bin/qmake" ] && return
