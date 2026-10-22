@@ -10,8 +10,9 @@ RELEASE = "https://github.com/junkerderprovinz/vlc-redesign/releases/latest/down
 
 BUTTONS = {
     "windows": RELEASE + "vlc-redesign-windows-amd64.zip",
-    "windows-portable": RELEASE + "vlc-redesign-windows-amd64-portable.zip",
+    "windows-arm": RELEASE + "vlc-redesign-windows-arm64.zip",
     "linux": RELEASE + "vlc-redesign-linux-amd64.AppImage",
+    "linux-arm": RELEASE + "vlc-redesign-linux-arm64.AppImage",
     # A release's "Source code (zip)" is the whole repository at that tag, and
     # GitHub gives the newest one no fixed address, so this leads to the release
     # that lists it.
