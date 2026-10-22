@@ -31,16 +31,14 @@ done
 	"$video" > "$out.log" 2>&1 &
 vlc=$!
 
-# There is no window manager to place the window, so it is made to fill the
-# screen once it shows up. Qt sets its own size right after mapping it.
-if timeout 60 xdotool search --sync --onlyvisible --class vlc > /dev/null 2>&1; then
-	sleep 1
-	xdotool search --onlyvisible --class vlc windowmove %@ 0 0 windowsize %@ 1920 1080
-fi
 sleep "$seconds"
 
+# There is no window manager to place the window, so it is made to fill the
+# screen. Done this late, Qt has settled its own geometry and keeps ours.
+xdotool search --onlyvisible --class vlc windowmove %@ 0 0 windowsize %@ 1920 1080 || true
+
 # The player hides its controls until the pointer moves.
-xdotool mousemove 900 600 sleep 0.3 mousemove 960 540 sleep 1
+xdotool sleep 1 mousemove 900 600 sleep 0.3 mousemove 960 540 sleep 1
 import -window root "$out.png"
 
 status=0
