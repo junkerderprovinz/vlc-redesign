@@ -1,0 +1,77 @@
+name: Windows ARM64 package
+
+# The Windows ARM64 build is cross-compiled on x86_64 Linux, where its plugin
+# cache cannot be made: plugins/plugins.dat comes from running the ARM64
+# vlc-cache-gen.exe. This job takes the zip committed on this branch, adds the
+# cache, starts VLC once and keeps the finished zip and a screenshot.
+#
+# A new build replaces the zip in the branch's single commit (amend and force
+# push), so the branch never carries more than one package.
+
+on:
+  push:
+    branches: [ci-windows-arm64]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  ZIP: vlc-4.0.0-dev-winarm64.zip
+
+jobs:
+  package:
+    runs-on: windows-11-arm
+    timeout-minutes: 30
+    steps:
+      - name: Check out
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      # 7-Zip restores the exact file times from the zip's extended fields,
+      # and plugins.dat stores those times.
+      - name: Unpack
+        run: 7z x -bso0 $env:ZIP -ostage
+
+      - name: Generate plugins.dat
+        run: |
+          & stage\vlc-4.0.0-dev\vlc-cache-gen.exe stage\vlc-4.0.0-dev\plugins
+          if (-not (Test-Path stage\vlc-4.0.0-dev\plugins\plugins.dat)) {
+            throw 'vlc-cache-gen.exe wrote no plugins.dat'
+          }
+
+      - name: Add plugins.dat to the zip
+        run: |
+          New-Item -ItemType Directory out | Out-Null
+          Copy-Item $env:ZIP out\
+          Push-Location stage
+          7z a -bso0 -tzip "..\out\$env:ZIP" vlc-4.0.0-dev\plugins\plugins.dat
+          Pop-Location
+
+      # Unpacked the way most people do it, with the time zone the package's
+      # DOS times were written for, so a stale cache entry fails the run.
+      - name: Start VLC
+        run: |
+          Set-TimeZone -Id 'W. Europe Standard Time'
+          Expand-Archive "out\$env:ZIP" test
+          ci\windows-arm64\start-vlc.ps1 -VlcDir test\vlc-4.0.0-dev `
+            -Video ci\windows-arm64\test.mp4 `
+            -Screenshot out\test-windows-arm64.png -Log out\vlc.log
+
+      - name: Upload the zip
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: vlc-windows-arm64
+          path: out/${{ env.ZIP }}
+          if-no-files-found: error
+          # The zip is already compressed.
+          compression-level: 0
+
+      - name: Upload the screenshot and log
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: test-windows-arm64
+          path: |
+            out/test-windows-arm64.png
+            out/vlc.log
+          if-no-files-found: warn
