@@ -156,7 +156,7 @@ The design is Juxtopposed's "VLC Redesign" Figma community file, licensed under 
 
 VLC is made by [VideoLAN](https://www.videolan.org) and its contributors and is licensed under the GPL, version 2 or later; see [COPYING](COPYING). The font is [Inter](https://rsms.me/inter/) under the SIL Open Font License 1.1. VideoLAN's own README for VLC is in the [upstream repository](https://code.videolan.org/videolan/vlc).
 
-VLC and the cone logo are trademarks of VideoLAN. This project has no connection to VideoLAN. Whether the VLC team is interested in the design is being asked in [videolan/vlc#30241](https://code.videolan.org/videolan/vlc/-/issues/30241).
+VLC and the cone logo are trademarks of VideoLAN. This project has no connection to VideoLAN.
 
 <br>
 
