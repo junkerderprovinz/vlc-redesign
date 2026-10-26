@@ -7,7 +7,7 @@
 
 use std::{
     ffi::{c_char, c_int, c_void},
-    marker::FnPtr,
+    ops::FnPtr,
 };
 use vlcrs_core::plugin::{vlc_activate, vlc_deactivate};
 
@@ -44,13 +44,13 @@ pub fn load_manifest<Activate, Deactivate>(
         (*context).command_cursor += 1;
 
         if opcode == ModuleProperties::MODULE_CB_OPEN {
-            let _name = args.arg::<*const c_char>();
-            let func = args.arg::<*mut c_void>();
+            let _name = args.next_arg::<*const c_char>();
+            let func = args.next_arg::<*mut c_void>();
             assert_ne!(func, std::ptr::null_mut());
             (*context).open_cb = unsafe { Some(std::mem::transmute_copy(&func)) };
         } else if opcode == ModuleProperties::MODULE_CB_CLOSE {
-            let _name = args.arg::<*const c_char>();
-            let func = args.arg::<*mut c_void>();
+            let _name = args.next_arg::<*const c_char>();
+            let func = args.next_arg::<*mut c_void>();
             assert_ne!(func, std::ptr::null_mut());
             (*context).close_cb = unsafe { Some(std::mem::transmute_copy(&func)) };
         }

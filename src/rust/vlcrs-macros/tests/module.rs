@@ -2,9 +2,7 @@
 // Copyright (C) 2024      Alexandre Janniaux <ajanni@videolabs.io>
 //
 
-#![feature(c_variadic)]
-#![feature(extern_types)]
-#![feature(fn_ptr_trait)]
+#![feature(fn_static)]
 
 mod common;
 use common::TestContext;
