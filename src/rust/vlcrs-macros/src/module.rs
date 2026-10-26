@@ -5,8 +5,8 @@ use proc_macro2::{Span, TokenStream as TokenStream2};
 use quote::{quote, quote_spanned, ToTokens};
 use syn::{
     braced, bracketed, parenthesized, parse::Parse, parse_macro_input, punctuated::Punctuated,
-    spanned::Spanned, Attribute, Error, ExprRange, Ident, Lit, LitByteStr, LitInt, LitStr,
-    MetaNameValue, RangeLimits, Token,
+    spanned::Spanned, Attribute, Error, Expr, ExprLit, ExprRange, Ident, Lit, LitByteStr, LitInt,
+    LitStr, Meta, MetaNameValue, RangeLimits, Token,
 };
 
 const VLC_API_VERSION_STRING: &str = "4.0.6";
@@ -110,7 +110,9 @@ impl Parse for ModuleInfo {
 
                     let inner;
                     bracketed!(inner in input);
-                    shortcuts = Some(inner.parse_terminated(<LitStr as syn::parse::Parse>::parse)?);
+                    shortcuts = Some(
+                        inner.parse_terminated(<LitStr as syn::parse::Parse>::parse, Token![,])?,
+                    );
                 }
                 "shortname" => {
                     input.parse::<Token![:]>()?;
@@ -132,9 +134,9 @@ impl Parse for ModuleInfo {
                     use_local_args = true;
 
                     if let [attr] = &local_attrs[..] {
-                        match attr.path.get_ident() {
+                        match attr.path().get_ident() {
                             Some(ident) if ident == "prefix" => {
-                                prefix = Some(attr.parse_meta()?.try_into()?);
+                                prefix = Some(attr.meta.clone().try_into()?);
                             }
                             Some(ident) => {
                                 return Err(Error::new_spanned(
@@ -166,7 +168,8 @@ impl Parse for ModuleInfo {
 
                     let inner;
                     bracketed!(inner in input);
-                    let parsed_submodules = inner.parse_terminated(SubmoduleInfo::parse)?;
+                    let parsed_submodules =
+                        inner.parse_terminated(SubmoduleInfo::parse, Token![,])?;
 
                     for submodule in &parsed_submodules {
                         if submodule.submodule.submodules.is_some() {
@@ -243,7 +246,7 @@ impl Parse for ParametersInfo {
         let content;
         braced!(content in input);
         Ok(ParametersInfo {
-            params: content.parse_terminated(ParameterInfo::parse)?,
+            params: content.parse_terminated(ParameterInfo::parse, Token![,])?,
         })
     }
 }
@@ -261,7 +264,7 @@ impl Parse for SubmoduleInfo {
 impl ParameterInfo {
     fn has_local_attr(&self, name: &str) -> bool {
         for attr in &self.local_attrs {
-            if attr.path.is_ident(name) {
+            if attr.path().is_ident(name) {
                 return true;
             }
         }
@@ -269,26 +272,23 @@ impl ParameterInfo {
     }
 }
 
-impl TryFrom<syn::Meta> for PrefixInfo {
+impl TryFrom<Meta> for PrefixInfo {
     type Error = syn::Error;
 
-    fn try_from(value: syn::Meta) -> Result<Self, Self::Error> {
+    fn try_from(value: Meta) -> Result<Self, Self::Error> {
         let name_value: MetaNameValue = match value {
-            syn::Meta::Path(_) | syn::Meta::List(_) => {
+            Meta::Path(_) | Meta::List(_) => {
                 return Err(Error::new_spanned(value, "expected name-value arguments"))
             }
-            syn::Meta::NameValue(nv) => nv,
+            Meta::NameValue(nv) => nv,
         };
 
-        let lit_str = match name_value.lit {
-            Lit::Str(lit_str) => lit_str,
-            Lit::ByteStr(_)
-            | Lit::Byte(_)
-            | Lit::Char(_)
-            | Lit::Int(_)
-            | Lit::Float(_)
-            | Lit::Bool(_)
-            | Lit::Verbatim(_) => return Err(Error::new_spanned(name_value.lit, "expected a str")),
+        let lit_str = match name_value.value {
+            Expr::Lit(ExprLit {
+                lit: Lit::Str(lit_str),
+                ..
+            }) => lit_str,
+            value => return Err(Error::new_spanned(value, "expected a str")),
         };
 
         Ok(PrefixInfo { prefix: lit_str })
@@ -357,7 +357,7 @@ impl Parse for ParameterInfo {
 
         for attr in &global_attrs {
             // Replace with let_chains when stable
-            if attr.path.is_ident("section") {
+            if attr.path().is_ident("section") {
                 section = Some(attr.parse_args::<SectionInfo>()?);
             } else {
                 return Err(Error::new_spanned(
@@ -369,11 +369,11 @@ impl Parse for ParameterInfo {
 
         for attr in &local_attrs {
             // Replace with let_chains when stable
-            match attr.path.get_ident() {
+            match attr.path().get_ident() {
                 Some(ident) if LOCAL_ACCEPTED.contains(&ident.to_string().as_str()) => {
                     if ident == "prefix" {
-                        prefix = Some(attr.parse_meta()?.try_into()?);
-                    } else if ident != "deprecated" && !attr.tokens.is_empty() {
+                        prefix = Some(attr.meta.clone().try_into()?);
+                    } else if ident != "deprecated" && !matches!(attr.meta, Meta::Path(_)) {
                         return Err(Error::new_spanned(
                             attr,
                             format!("`#[{ident}]` doesn't take any argument"),
@@ -436,7 +436,7 @@ impl Parse for ParameterInfo {
                                 "only half-open ranges (ie. 5..=10) are supported here",
                             ));
                         }
-                        if range.from.is_none() || range.to.is_none() {
+                        if range.start.is_none() || range.end.is_none() {
                             return Err(Error::new_spanned(
                                 range,
                                 "only half-open ranges (ie. -200..=100) are supported here",
@@ -729,13 +729,7 @@ fn generate_module_code(module_info: &ModuleInfo) -> TokenStream2 {
             } else if param.type_ == "str" {
                 let value = match param.default_ {
                     Lit::Str(ref default_) => tt_c_str!(default_.span() => default_.value()),
-                    Lit::ByteStr(_)
-                    | Lit::Byte(_)
-                    | Lit::Char(_)
-                    | Lit::Int(_)
-                    | Lit::Float(_)
-                    | Lit::Bool(_)
-                    | Lit::Verbatim(_) => unreachable!(),
+                    _ => unreachable!(),
                 };
 
                 let item_type = if has_font {
@@ -841,13 +835,13 @@ fn generate_module_code(module_info: &ModuleInfo) -> TokenStream2 {
                 })
             } else if let Some(range) = &param.range {
                 if let Some(range_type) = range_type {
-                    let from = match &range.from {
+                    let from = match &range.start {
                         Some(from) => quote_spanned! {from.span()=>
                             ::std::convert::Into::<#range_type>::into(#from)
                         },
                         None => unreachable!(),
                     };
-                    let to = match &range.to {
+                    let to = match &range.end {
                         Some(to) => quote_spanned! {to.span()=>
                             ::std::convert::Into::<#range_type>::into(#to)
                         },
