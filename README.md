@@ -19,14 +19,19 @@ VLC 4 with the interface <a href="https://www.youtube.com/watch?v=ERFeOgqk324">J
 
 <!-- download-buttons: written by scripts/gen_download_buttons.py -->
 <p align="center">
-  <a href="https://github.com/junkerderprovinz/vlc-redesign/releases/latest"><img src="https://raw.githubusercontent.com/junkerderprovinz/vlc-redesign/main/.github/assets/download-buttons/buttons.svg?v=5159165ea80d#svgView(viewBox(0,0,841.9,245.3))" alt="Download the source archive" width="160" height="46.618"></a>
+  <img src="https://raw.githubusercontent.com/junkerderprovinz/vlc-redesign/main/.github/assets/download-buttons/buttons.svg?v=1f283d4381ba#svgView(viewBox(0,0,841.9,245.3))" alt="Server" width="160" height="46.618">
+</p>
+<p align="center">
+  <a href="https://github.com/junkerderprovinz/vlc-redesign/releases/latest"><img src="https://raw.githubusercontent.com/junkerderprovinz/vlc-redesign/main/.github/assets/download-buttons/buttons.svg?v=1f283d4381ba#svgView(viewBox(866,0,841.9,245.3))" alt="Download the source archive" width="160" height="46.618"></a>
 </p>
 <br>
 <p align="center">
-  <a href="https://github.com/junkerderprovinz/vlc-redesign/releases/latest/download/vlc-redesign-windows-amd64.zip"><img src="https://raw.githubusercontent.com/junkerderprovinz/vlc-redesign/main/.github/assets/download-buttons/buttons.svg?v=5159165ea80d#svgView(viewBox(866,0,841.9,245.3))" alt="Download for Windows" width="160" height="46.618"></a><a href="https://github.com/junkerderprovinz/vlc-redesign/releases/latest/download/vlc-redesign-windows-arm64.zip"><img src="https://raw.githubusercontent.com/junkerderprovinz/vlc-redesign/main/.github/assets/download-buttons/buttons.svg?v=5159165ea80d#svgView(viewBox(1732,0,457.783,245.3))" alt="Download for Windows on ARM" width="87" height="46.618"></a>
+  <img src="https://raw.githubusercontent.com/junkerderprovinz/vlc-redesign/main/.github/assets/download-buttons/buttons.svg?v=1f283d4381ba#svgView(viewBox(1732,0,841.9,245.3))" alt="Desktop" width="160" height="46.618">
+</p>
+<p align="center">
+  <a href="https://github.com/junkerderprovinz/vlc-redesign/releases/latest/download/vlc-redesign-windows-amd64.zip"><img src="https://raw.githubusercontent.com/junkerderprovinz/vlc-redesign/main/.github/assets/download-buttons/buttons.svg?v=1f283d4381ba#svgView(viewBox(2598,0,841.9,245.3))" alt="Download for Windows" width="160" height="46.618"></a><a href="https://github.com/junkerderprovinz/vlc-redesign/releases/latest/download/vlc-redesign-windows-arm64.zip"><img src="https://raw.githubusercontent.com/junkerderprovinz/vlc-redesign/main/.github/assets/download-buttons/buttons.svg?v=1f283d4381ba#svgView(viewBox(3464,0,457.783,245.3))" alt="Download for Windows on ARM" width="87" height="46.618"></a>
   &nbsp;
-  <a href="https://github.com/junkerderprovinz/vlc-redesign/releases/latest/download/vlc-redesign-linux-amd64.AppImage"><img src="https://raw.githubusercontent.com/junkerderprovinz/vlc-redesign/main/.github/assets/download-buttons/buttons.svg?v=5159165ea80d#svgView(viewBox(2214,0,841.9,245.3))" alt="Download for Linux" width="160" height="46.618"></a><a href="https://github.com/junkerderprovinz/vlc-redesign/releases/latest/download/vlc-redesign-linux-arm64.AppImage"><img src="https://raw.githubusercontent.com/junkerderprovinz/vlc-redesign/main/.github/assets/download-buttons/buttons.svg?v=5159165ea80d#svgView(viewBox(3080,0,457.783,245.3))" alt="Download for Linux on ARM" width="87" height="46.618"></a>
-  <br><sub>Always downloads the latest build</sub>
+  <a href="https://github.com/junkerderprovinz/vlc-redesign/releases/latest/download/vlc-redesign-linux-amd64.AppImage"><img src="https://raw.githubusercontent.com/junkerderprovinz/vlc-redesign/main/.github/assets/download-buttons/buttons.svg?v=1f283d4381ba#svgView(viewBox(3946,0,841.9,245.3))" alt="Download for Linux" width="160" height="46.618"></a><a href="https://github.com/junkerderprovinz/vlc-redesign/releases/latest/download/vlc-redesign-linux-arm64.AppImage"><img src="https://raw.githubusercontent.com/junkerderprovinz/vlc-redesign/main/.github/assets/download-buttons/buttons.svg?v=1f283d4381ba#svgView(viewBox(4812,0,457.783,245.3))" alt="Download for Linux on ARM" width="87" height="46.618"></a>
 </p>
 <!-- /download-buttons -->
 
@@ -42,11 +47,11 @@ If it has earned a place on your server or computer, toss a coin to your knight:
 
 <!-- give-buttons: written by scripts/gen_download_buttons.py -->
 <p align="center">
-  <a href="https://buymeacoffee.com/junkerderprovinz"><img src="https://raw.githubusercontent.com/junkerderprovinz/vlc-redesign/main/.github/assets/download-buttons/buttons.svg?v=5159165ea80d#svgView(viewBox(3562,0,841.9,245.3))" alt="Buy me a coffee" width="160" height="46.618"></a>
+  <a href="https://buymeacoffee.com/junkerderprovinz"><img src="https://raw.githubusercontent.com/junkerderprovinz/vlc-redesign/main/.github/assets/download-buttons/buttons.svg?v=1f283d4381ba#svgView(viewBox(5294,0,841.9,245.3))" alt="Buy me a coffee" width="160" height="46.618"></a>
   &nbsp;
-  <a href="https://www.paypal.com/donate/?hosted_button_id=76FVV52TKXTUS"><img src="https://raw.githubusercontent.com/junkerderprovinz/vlc-redesign/main/.github/assets/download-buttons/buttons.svg?v=5159165ea80d#svgView(viewBox(4428,0,841.9,245.3))" alt="PayPal" width="160" height="46.618"></a>
+  <a href="https://www.paypal.com/donate/?hosted_button_id=76FVV52TKXTUS"><img src="https://raw.githubusercontent.com/junkerderprovinz/vlc-redesign/main/.github/assets/download-buttons/buttons.svg?v=1f283d4381ba#svgView(viewBox(6160,0,841.9,245.3))" alt="PayPal" width="160" height="46.618"></a>
   &nbsp;
-  <a href="https://junkerderprovinz.github.io/junkerderprovinz/"><img src="https://raw.githubusercontent.com/junkerderprovinz/vlc-redesign/main/.github/assets/download-buttons/buttons.svg?v=5159165ea80d#svgView(viewBox(5294,0,841.9,245.3))" alt="Donate with crypto" width="160" height="46.618"></a>
+  <a href="https://junkerderprovinz.github.io/junkerderprovinz/"><img src="https://raw.githubusercontent.com/junkerderprovinz/vlc-redesign/main/.github/assets/download-buttons/buttons.svg?v=1f283d4381ba#svgView(viewBox(7026,0,841.9,245.3))" alt="Donate with crypto" width="160" height="46.618"></a>
 </p>
 <!-- /give-buttons -->
 
@@ -178,10 +183,10 @@ If it has earned a place on your server or computer, toss a coin to your knight:
 
 <!-- give-buttons: written by scripts/gen_download_buttons.py -->
 <p align="center">
-  <a href="https://buymeacoffee.com/junkerderprovinz"><img src="https://raw.githubusercontent.com/junkerderprovinz/vlc-redesign/main/.github/assets/download-buttons/buttons.svg?v=5159165ea80d#svgView(viewBox(3562,0,841.9,245.3))" alt="Buy me a coffee" width="160" height="46.618"></a>
+  <a href="https://buymeacoffee.com/junkerderprovinz"><img src="https://raw.githubusercontent.com/junkerderprovinz/vlc-redesign/main/.github/assets/download-buttons/buttons.svg?v=1f283d4381ba#svgView(viewBox(5294,0,841.9,245.3))" alt="Buy me a coffee" width="160" height="46.618"></a>
   &nbsp;
-  <a href="https://www.paypal.com/donate/?hosted_button_id=76FVV52TKXTUS"><img src="https://raw.githubusercontent.com/junkerderprovinz/vlc-redesign/main/.github/assets/download-buttons/buttons.svg?v=5159165ea80d#svgView(viewBox(4428,0,841.9,245.3))" alt="PayPal" width="160" height="46.618"></a>
+  <a href="https://www.paypal.com/donate/?hosted_button_id=76FVV52TKXTUS"><img src="https://raw.githubusercontent.com/junkerderprovinz/vlc-redesign/main/.github/assets/download-buttons/buttons.svg?v=1f283d4381ba#svgView(viewBox(6160,0,841.9,245.3))" alt="PayPal" width="160" height="46.618"></a>
   &nbsp;
-  <a href="https://junkerderprovinz.github.io/junkerderprovinz/"><img src="https://raw.githubusercontent.com/junkerderprovinz/vlc-redesign/main/.github/assets/download-buttons/buttons.svg?v=5159165ea80d#svgView(viewBox(5294,0,841.9,245.3))" alt="Donate with crypto" width="160" height="46.618"></a>
+  <a href="https://junkerderprovinz.github.io/junkerderprovinz/"><img src="https://raw.githubusercontent.com/junkerderprovinz/vlc-redesign/main/.github/assets/download-buttons/buttons.svg?v=1f283d4381ba#svgView(viewBox(7026,0,841.9,245.3))" alt="Donate with crypto" width="160" height="46.618"></a>
 </p>
 <!-- /give-buttons -->
