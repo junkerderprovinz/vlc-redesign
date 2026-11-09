@@ -8,22 +8,24 @@ README.md.
 The buttons come in the same five groups, in this order: the server (the
 Unraid template, the container, the source and the manual), the desktop apps,
 the phone apps, the browser extensions and the house's companion apps. What a
-repository does not ship is left out. Each group opens with its title, drawn
-in a button's shape and size but without a link, and fills a row of four
-places before it starts the next. A blank line stands between two groups, so
-the gap between groups is about twice the gap between rows.
+repository does not ship is left out. Each group opens with its title, a band
+across the column with the group's icon and word, and fills a row of four
+places before it starts the next. The bands are drawn by
+.github/assets/gen-section-headers.mjs from download-buttons/groups.json, which
+this file writes, so run that one after this. A blank line stands between two
+groups, so the gap between groups is about twice the gap between rows.
 
 A button carries one line, its name, as the apps' buttons do at rest. Only a
 listing still to come adds a second line saying so.
 Windows on ARM and the portable build are segments of the Windows button, and
-Linux on ARM one of the Linux button, so the desktop row keeps to the four
-places a row has.
+the ARM builds of Linux and the Flatpak segments of theirs.
 
 Size and corner radius are the Buy Me a Coffee button's (841.9 by 245.3, rx
 38.2), so every button on the page has the same shape.
 
 The logos are the platforms' own marks from Font Awesome Free (CC BY 4.0 for the
-icons), Vivaldi's from Simple Icons, F-Droid's from its 2015 logo in
+icons), Vivaldi's and Flatpak's from Simple Icons (Flatpak's mark is CC BY 3.0,
+flatpak.org/press), F-Droid's from its 2015 logo in
 gitlab.com/fdroid/artwork (CC BY-SA 3.0 or GPL-3.0-or-later) with the eyes,
 ring and F cut out, and Unraid's from Dashboard Icons (Apache-2.0); see
 scripts/brand-paths/. The companions carry their own
@@ -43,6 +45,7 @@ import glob
 import hashlib
 import http.client
 import io
+import json
 import math
 import os
 import re
@@ -113,7 +116,7 @@ KINDS = {
     # button's #fd0, and white on yellow fails contrast, so the ink is dark.
     "docs":             (0, "book", "#fd0", "#0d0c23", "Docs", "online manual", "Read the documentation"),
     "windows":          (1, "windows", *WINDOWS, "Windows", "x64", "Download for Windows"),
-    "windows-arm":      (1, None, *WINDOWS, "Windows", "ARM64", "Download for Windows on ARM"),
+    "windows-arm":      (1, None, *WINDOWS, "Windows", "ARM", "Download for Windows on ARM"),
     "windows-portable": (1, None, *WINDOWS, "Windows", "Portable", "Download the portable Windows app"),
     "windows-script":   (1, "windows", *WINDOWS, "Windows", "start script", "Download the Windows start script"),
     # Space grey, since black vanishes against GitHub's dark theme.
@@ -122,7 +125,10 @@ KINDS = {
     "macos-split":      (1, "apple", "#6e6e73", "#ffffff", "macOS", "Intel, ARM", "Download for macOS on Intel or Apple silicon"),
     # Tux yellow, with dark ink for contrast.
     "linux":            (1, "linux", "#fcc624", "#1b1b1b", "Linux", "x64", "Download for Linux"),
-    "linux-arm":        (1, None, "#fcc624", "#1b1b1b", "Linux", "ARM64", "Download for Linux on ARM"),
+    "linux-arm":        (1, None, "#fcc624", "#1b1b1b", "Linux", "ARM", "Download for Linux on ARM"),
+    # Flatpak's own blue, where white holds 3.3:1, about as much as on Unraid's orange.
+    "flatpak":          (1, "flatpak", "#4a90d9", "#ffffff", "Flatpak", "x64", "Download the Flatpak"),
+    "flatpak-arm":      (1, None, "#4a90d9", "#ffffff", "Flatpak", "ARM", "Download the Flatpak for ARM"),
     "linux-script":     (1, "linux", "#fcc624", "#1b1b1b", "Linux", "start script", "Download the Linux start script"),
     "google-play":      (2, "google-play", "#01875f", "#ffffff", "Google Play", "Google Play", "Get it on Google Play"),
     "f-droid":          (2, "f-droid", "#1976d2", "#ffffff", "F-Droid", "F-Droid", "Get it on F-Droid"),
@@ -146,7 +152,7 @@ KINDS = {
     "bombvault-widget": (COMPANIONS, "bombvault-widget", "#4e5051", "#ffffff", "Widget", "Unraid plugin", "Get the BombVault Widget for the Unraid dashboard"),
 }
 # Joined to the button they belong to, in this order, rather than standing alone.
-SEGMENTS = {"windows": ("windows-arm", "windows-portable"), "linux": ("linux-arm",)}
+SEGMENTS = {"windows": ("windows-arm", "windows-portable"), "linux": ("linux-arm",), "flatpak": ("flatpak-arm",)}
 # A store listing that does not exist yet is drawn without a link, with "Soon"
 # under its name, or nobody could tell why the button leads nowhere.
 SOON = {
@@ -160,7 +166,6 @@ SOON_LINE = "Soon"
 
 # Each group's title: its icon, drawn in strokes on a 24 unit grid, and its word.
 # The phone group says Android unless the App Store is in it.
-TITLE_BG, TITLE_INK = "#1f2328", "#ffffff"
 TITLES = {
     0: ("Server", '<rect x="3" y="3.5" width="18" height="7" rx="2"/><rect x="3" y="13.5" width="18" height="7" rx="2"/><path d="M7 7h.01M7 17h.01M11 7h6M11 17h6"/>'),
     1: ("Desktop", '<rect x="3" y="4" width="18" height="12" rx="2"/><path d="M1.5 20h21M8 16l-1 4M16 16l1 4"/>'),
@@ -169,10 +174,6 @@ TITLES = {
     COMPANIONS: ("Works with", '<path d="M10 14a4.5 4.5 0 0 0 6.4 0l3.2-3.2a4.5 4.5 0 0 0-6.4-6.4L11.6 6"/><path d="M14 10a4.5 4.5 0 0 0-6.4 0l-3.2 3.2a4.5 4.5 0 0 0 6.4 6.4l1.6-1.6"/>'),
 }
 PHONES = "Phone"
-# The icon fills the square the brand marks are drawn into, a little smaller,
-# since a line icon reaches its box's edge where a mark keeps a margin.
-TITLE_ICON = 124.0
-TITLE_STROKE = 1.9
 # Links that may lead away from the repository.
 STORES = ("play.google.com", "f-droid.org", "apps.apple.com","chromewebstore.google.com", "addons.mozilla.org", "microsoftedge.microsoft.com",
           "unraid.net", "mos-official.net", "github.com/junkerderprovinz/zimaos-apps", "github.com/junkerderprovinz/umbrel-apps",
@@ -263,11 +264,6 @@ NAME_AND_SOON = """  <text x="{head_x}" y="108" font-family="{font}" font-size="
 SEGMENT_FACE = """  <rect width="{divider}" height="{h}" fill="#000" fill-opacity="0.28"/>
   <text x="{mid}" y="151" text-anchor="middle" font-family="{font}" font-size="72" font-weight="700" fill="{ink}">{sub_text}</text>"""
 
-TITLE_FACE = """  <g transform="translate({gx} {gy}) scale({scale})" fill="none" stroke="{ink}" stroke-width="{stroke}" stroke-linecap="round" stroke-linejoin="round">
-    {icon}
-  </g>
-"""
-
 # Every button on the page shows one file, buttons.svg, through its own
 # #svgView fragment. The shine's clock starts when an <img> gets its file, and
 # separate files arrive at separate moments (Firefox also reuses a cached image
@@ -290,6 +286,8 @@ GIVE = [
     ("crypto", "https://junkerderprovinz.github.io/junkerderprovinz/", "Donate with crypto"),
 ]
 README = os.path.join(HERE, "..", "README.md")
+GROUPS = os.path.join(OUT, "groups.json")
+BANDS = ".github/assets/sections"
 ROW_OPEN = "<!-- download-buttons: written by scripts/gen_download_buttons.py -->"
 ROW_CLOSE = "<!-- /download-buttons -->"
 GIVE_OPEN = "<!-- give-buttons: written by scripts/gen_download_buttons.py -->"
@@ -315,15 +313,13 @@ class Part:
 
 
 class Title:
-    """A group's title: a button's shape and size, an icon and a word, no link."""
+    """A group's title, a band outside the sprite."""
 
-    title, soon, mark, href, corners, width = True, False, None, None, "all", W
-    bg, ink, px = TITLE_BG, TITLE_INK, RENDER_PX
+    title = True
 
     def __init__(self, group, word):
-        self.group, self.head, self.alt = group, word, word
-        self.icon = TITLES[group][1]
-        self.kind = "title-" + word.lower().replace(" ", "-")
+        self.group, self.word, self.icon = group, word, TITLES[group][1]
+        self.id = "group-" + word.lower().replace(" ", "-")
 
 
 def rows():
@@ -367,7 +363,11 @@ def rows():
 
 
 def split(items):
-    """A group as rows of at most PLACES, each filled before the next begins."""
+    """A group as rows of at most PLACES, each filled before the next begins.
+
+    A plain button left alone below a full row takes the last one of that row
+    with it. One with segments is wide enough to stand alone and stays.
+    """
     out, used = [[]], 0.0
     for parts in items:
         size = 1 + (len(parts) - 1) / 2
@@ -376,6 +376,8 @@ def split(items):
             used = 0.0
         out[-1].append(parts)
         used += size
+    if len(out) > 1 and len(out[-1]) == 1 and len(out[-1][0]) == 1 and len(out[-2]) > 1:
+        out[-1].insert(0, out[-2].pop())
     return out
 
 
@@ -423,10 +425,7 @@ def button(part, delay, cycle):
     """One part's own SVG document, its band starting after `delay`."""
     common = dict(font=FONT, ink=part.ink, head=part.head, sub_text=part.sub if part.soon else "")
     words = (NAME_AND_SOON if part.soon else NAME).format(head_x=TEXT_X, sub_x=TEXT_X + 2, **common)
-    if part.title:
-        face = TITLE_FACE.format(gx=num(GX + (GLYPH - TITLE_ICON) / 2), gy=num((H - TITLE_ICON) / 2), scale=num(TITLE_ICON / 24),
-                                 stroke=TITLE_STROKE, icon=part.icon, ink=part.ink) + words
-    elif part.mark:
+    if part.mark:
         markup, scale, dx, dy = brand(part.mark, part.ink)
         face = MARK.format(gx=round(GX + dx, 2), gy=round(GY + dy, 2), scale=round(scale, 5), paths=markup, ink=part.ink) + words
     else:
@@ -552,6 +551,11 @@ def row(items, nl, url):
     spaces in, because that is the gap GAP_PX was measured on. The parts of one
     button share a line with nothing between them."""
     lines = ['<p align="center">']
+    if isinstance(items, Title):
+        lines.append('  <picture><source media="(prefers-color-scheme: dark)" srcset="%s/%s-dark.svg"><img src="%s/%s.svg" alt="%s" width="100%%"></picture>'
+                     % (BANDS, items.id, BANDS, items.id, escape(items.word)))
+        lines.append("</p>")
+        return nl.join(lines) + nl
     for index, parts in enumerate(items):
         if index:
             lines.append("  &nbsp;")
@@ -583,7 +587,7 @@ def write_readme(text, downloads, groups, apps, donations, url):
             text = text[:start] + opener + nl + body + text[end:]
     io.open(README, "w", encoding="utf-8", newline="").write(text)
     print("README.md  download rows of %s, donation rows of %d"
-          % ("+".join(str(sum(len(item) for item in r)) for r in downloads), len(GIVE)))
+          % ("+".join(str(sum(len(item) for item in r)) for r in downloads if not isinstance(r, Title)), len(GIVE)))
 
 
 ANIMATION = re.compile(r"animation: pass (\d+(?:\.\d+)?)s linear (\d+(?:\.\d+)?)s infinite backwards;")
@@ -639,7 +643,8 @@ def main():
     gives = give_buttons()
     readme = read_readme()
 
-    downloads = [layout(items, GAP_PX) for items in table]
+    # A title is no button, so the shine skips it.
+    downloads = [layout([] if items[0][0].title else items, GAP_PX) for items in table]
     donation = layout([[SimpleNamespace(px=GIVE_RENDER_PX)] for _ in GIVE], GAP_PX)
     order = downloads + [donation]
     if readme.find(GIVE_OPEN) < readme.find(ROW_OPEN):
@@ -674,7 +679,12 @@ def main():
             print("removed", os.path.normpath(old))
 
     place = iter(xs)
-    table_out = [[[(p.href, p.alt, next(place), p.width, H, p.px) for p in item] for item in items] for items in table]
+    table_out = [items[0][0] if items[0][0].title else [[(p.href, p.alt, next(place), p.width, H, p.px) for p in item] for item in items]
+                 for items in table]
+    titles = [items[0][0] for items in table if items[0][0].title]
+    io.open(GROUPS, "w", encoding="utf-8", newline="\n").write(
+        json.dumps([{"id": t.id, "word": t.word, "icon": t.icon} for t in titles], indent=2) + "\n")
+    print("wrote", os.path.normpath(GROUPS), len(titles), "titles")
     # The app's own section has its heading, so its rows come without the title.
     apps = [out for items, out in zip(table, table_out) if items[0][0].group == APP_ROW and not items[0][0].title]
     donations = [[[(href, alt, xs[len(parts) + i], gives[i][1], gives[i][2], GIVE_RENDER_PX)]

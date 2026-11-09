@@ -19,19 +19,19 @@ VLC 4 with the interface <a href="https://www.youtube.com/watch?v=ERFeOgqk324">J
 
 <!-- download-buttons: written by scripts/gen_download_buttons.py -->
 <p align="center">
-  <img src="https://raw.githubusercontent.com/junkerderprovinz/vlc-redesign/main/.github/assets/download-buttons/buttons.svg?v=1f283d4381ba#svgView(viewBox(0,0,841.9,245.3))" alt="Server" width="160" height="46.618">
+  <picture><source media="(prefers-color-scheme: dark)" srcset=".github/assets/sections/group-server-dark.svg"><img src=".github/assets/sections/group-server.svg" alt="Server" width="100%"></picture>
 </p>
 <p align="center">
-  <a href="https://github.com/junkerderprovinz/vlc-redesign/releases/latest"><img src="https://raw.githubusercontent.com/junkerderprovinz/vlc-redesign/main/.github/assets/download-buttons/buttons.svg?v=1f283d4381ba#svgView(viewBox(866,0,841.9,245.3))" alt="Download the source archive" width="160" height="46.618"></a>
+  <a href="https://github.com/junkerderprovinz/vlc-redesign/releases/latest"><img src="https://raw.githubusercontent.com/junkerderprovinz/vlc-redesign/main/.github/assets/download-buttons/buttons.svg?v=23dafdae06fb#svgView(viewBox(0,0,841.9,245.3))" alt="Download the source archive" width="160" height="46.618"></a>
 </p>
 <br>
 <p align="center">
-  <img src="https://raw.githubusercontent.com/junkerderprovinz/vlc-redesign/main/.github/assets/download-buttons/buttons.svg?v=1f283d4381ba#svgView(viewBox(1732,0,841.9,245.3))" alt="Desktop" width="160" height="46.618">
+  <picture><source media="(prefers-color-scheme: dark)" srcset=".github/assets/sections/group-desktop-dark.svg"><img src=".github/assets/sections/group-desktop.svg" alt="Desktop" width="100%"></picture>
 </p>
 <p align="center">
-  <a href="https://github.com/junkerderprovinz/vlc-redesign/releases/latest/download/vlc-redesign-windows-amd64.zip"><img src="https://raw.githubusercontent.com/junkerderprovinz/vlc-redesign/main/.github/assets/download-buttons/buttons.svg?v=1f283d4381ba#svgView(viewBox(2598,0,841.9,245.3))" alt="Download for Windows" width="160" height="46.618"></a><a href="https://github.com/junkerderprovinz/vlc-redesign/releases/latest/download/vlc-redesign-windows-arm64.zip"><img src="https://raw.githubusercontent.com/junkerderprovinz/vlc-redesign/main/.github/assets/download-buttons/buttons.svg?v=1f283d4381ba#svgView(viewBox(3464,0,457.783,245.3))" alt="Download for Windows on ARM" width="87" height="46.618"></a>
+  <a href="https://github.com/junkerderprovinz/vlc-redesign/releases/latest/download/vlc-redesign-windows-amd64.zip"><img src="https://raw.githubusercontent.com/junkerderprovinz/vlc-redesign/main/.github/assets/download-buttons/buttons.svg?v=23dafdae06fb#svgView(viewBox(866,0,841.9,245.3))" alt="Download for Windows" width="160" height="46.618"></a><a href="https://github.com/junkerderprovinz/vlc-redesign/releases/latest/download/vlc-redesign-windows-arm64.zip"><img src="https://raw.githubusercontent.com/junkerderprovinz/vlc-redesign/main/.github/assets/download-buttons/buttons.svg?v=23dafdae06fb#svgView(viewBox(1732,0,457.783,245.3))" alt="Download for Windows on ARM" width="87" height="46.618"></a>
   &nbsp;
-  <a href="https://github.com/junkerderprovinz/vlc-redesign/releases/latest/download/vlc-redesign-linux-amd64.AppImage"><img src="https://raw.githubusercontent.com/junkerderprovinz/vlc-redesign/main/.github/assets/download-buttons/buttons.svg?v=1f283d4381ba#svgView(viewBox(3946,0,841.9,245.3))" alt="Download for Linux" width="160" height="46.618"></a><a href="https://github.com/junkerderprovinz/vlc-redesign/releases/latest/download/vlc-redesign-linux-arm64.AppImage"><img src="https://raw.githubusercontent.com/junkerderprovinz/vlc-redesign/main/.github/assets/download-buttons/buttons.svg?v=1f283d4381ba#svgView(viewBox(4812,0,457.783,245.3))" alt="Download for Linux on ARM" width="87" height="46.618"></a>
+  <a href="https://github.com/junkerderprovinz/vlc-redesign/releases/latest/download/vlc-redesign-linux-amd64.AppImage"><img src="https://raw.githubusercontent.com/junkerderprovinz/vlc-redesign/main/.github/assets/download-buttons/buttons.svg?v=23dafdae06fb#svgView(viewBox(2214,0,841.9,245.3))" alt="Download for Linux" width="160" height="46.618"></a><a href="https://github.com/junkerderprovinz/vlc-redesign/releases/latest/download/vlc-redesign-linux-arm64.AppImage"><img src="https://raw.githubusercontent.com/junkerderprovinz/vlc-redesign/main/.github/assets/download-buttons/buttons.svg?v=23dafdae06fb#svgView(viewBox(3080,0,457.783,245.3))" alt="Download for Linux on ARM" width="87" height="46.618"></a>
 </p>
 <!-- /download-buttons -->
 
@@ -47,17 +47,17 @@ If it has earned a place on your server or computer, toss a coin to your knight:
 
 <!-- give-buttons: written by scripts/gen_download_buttons.py -->
 <p align="center">
-  <a href="https://buymeacoffee.com/junkerderprovinz"><img src="https://raw.githubusercontent.com/junkerderprovinz/vlc-redesign/main/.github/assets/download-buttons/buttons.svg?v=1f283d4381ba#svgView(viewBox(5294,0,841.9,245.3))" alt="Buy me a coffee" width="160" height="46.618"></a>
+  <a href="https://buymeacoffee.com/junkerderprovinz"><img src="https://raw.githubusercontent.com/junkerderprovinz/vlc-redesign/main/.github/assets/download-buttons/buttons.svg?v=23dafdae06fb#svgView(viewBox(3562,0,841.9,245.3))" alt="Buy me a coffee" width="160" height="46.618"></a>
   &nbsp;
-  <a href="https://www.paypal.com/donate/?hosted_button_id=76FVV52TKXTUS"><img src="https://raw.githubusercontent.com/junkerderprovinz/vlc-redesign/main/.github/assets/download-buttons/buttons.svg?v=1f283d4381ba#svgView(viewBox(6160,0,841.9,245.3))" alt="PayPal" width="160" height="46.618"></a>
+  <a href="https://www.paypal.com/donate/?hosted_button_id=76FVV52TKXTUS"><img src="https://raw.githubusercontent.com/junkerderprovinz/vlc-redesign/main/.github/assets/download-buttons/buttons.svg?v=23dafdae06fb#svgView(viewBox(4428,0,841.9,245.3))" alt="PayPal" width="160" height="46.618"></a>
   &nbsp;
-  <a href="https://junkerderprovinz.github.io/junkerderprovinz/"><img src="https://raw.githubusercontent.com/junkerderprovinz/vlc-redesign/main/.github/assets/download-buttons/buttons.svg?v=1f283d4381ba#svgView(viewBox(7026,0,841.9,245.3))" alt="Donate with crypto" width="160" height="46.618"></a>
+  <a href="https://junkerderprovinz.github.io/junkerderprovinz/"><img src="https://raw.githubusercontent.com/junkerderprovinz/vlc-redesign/main/.github/assets/download-buttons/buttons.svg?v=23dafdae06fb#svgView(viewBox(5294,0,841.9,245.3))" alt="Donate with crypto" width="160" height="46.618"></a>
 </p>
 <!-- /give-buttons -->
 
 <br>
 
-## Table of Contents
+<p><a id="table-of-contents" href="#table-of-contents"><picture><source media="(prefers-color-scheme: dark)" srcset=".github/assets/sections/table-of-contents-dark.svg"><img src=".github/assets/sections/table-of-contents.svg" alt="Table of Contents" width="100%"></picture></a></p>
 
 1. [What it looks like](#1-what-it-looks-like)
 2. [What it does](#2-what-it-does)
@@ -68,7 +68,7 @@ If it has earned a place on your server or computer, toss a coin to your knight:
 
 <br>
 
-## 1. What it looks like
+<p><a id="1-what-it-looks-like" href="#1-what-it-looks-like"><picture><source media="(prefers-color-scheme: dark)" srcset=".github/assets/sections/1-what-it-looks-like-dark.svg"><img src=".github/assets/sections/1-what-it-looks-like.svg" alt="1. What it looks like" width="100%"></picture></a></p>
 
 The videos and music in these pictures are the demo artwork from Juxtopposed's design file, and the player shows Big Buck Bunny.
 
@@ -121,7 +121,7 @@ The videos and music in these pictures are the demo artwork from Juxtopposed's d
 
 <br>
 
-## 2. What it does
+<p><a id="2-what-it-does" href="#2-what-it-does"><picture><source media="(prefers-color-scheme: dark)" srcset=".github/assets/sections/2-what-it-does-dark.svg"><img src=".github/assets/sections/2-what-it-does.svg" alt="2. What it does" width="100%"></picture></a></p>
 
 - A library with home, videos, music, network and playlists, in grid or list view, with sorting and search
 - A player whose controls and window frame stay hidden until the pointer is over the window
@@ -135,7 +135,7 @@ Everything VLC 4 can do is still reachable, though some of it has moved to a dif
 
 <br>
 
-## 3. Getting started
+<p><a id="3-getting-started" href="#3-getting-started"><picture><source media="(prefers-color-scheme: dark)" srcset=".github/assets/sections/3-getting-started-dark.svg"><img src=".github/assets/sections/3-getting-started.svg" alt="3. Getting started" width="100%"></picture></a></p>
 
 **Windows (x64 or ARM64):** download the zip for your machine, unpack it anywhere and start `vlc.exe`. Nothing gets installed.
 
@@ -155,7 +155,7 @@ This is built on VLC 4, which VideoLAN has not released yet, so expect the rough
 
 <br>
 
-## 4. Credits
+<p><a id="4-credits" href="#4-credits"><picture><source media="(prefers-color-scheme: dark)" srcset=".github/assets/sections/4-credits-dark.svg"><img src=".github/assets/sections/4-credits.svg" alt="4. Credits" width="100%"></picture></a></p>
 
 The design is Juxtopposed's "VLC Redesign" Figma community file, licensed under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). The video [I Redesigned VLC After 25 Years](https://www.youtube.com/watch?v=ERFeOgqk324) explains the thinking behind it. The icons and the demo artwork in the screenshots come from the same file. The player screenshot shows [Big Buck Bunny](https://peach.blender.org/) by the Blender Foundation, licensed under [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/). Where the file has no frame for a state, such as some advanced settings, I followed its patterns.
 
@@ -165,7 +165,7 @@ VLC and the cone logo are trademarks of VideoLAN. This project has no connection
 
 <br>
 
-## 5. How AI is used here
+<p><a id="5-how-ai-is-used-here" href="#5-how-ai-is-used-here"><picture><source media="(prefers-color-scheme: dark)" srcset=".github/assets/sections/5-how-ai-is-used-here-dark.svg"><img src=".github/assets/sections/5-how-ai-is-used-here.svg" alt="5. How AI is used here" width="100%"></picture></a></p>
 
 One knight builds this, and AI is one of the tools I work with, the same way I work with an editor or a compiler. It helps me write code and documentation and it checks my work, and that saves me a good many evenings. It does not make the decisions, though. I read and understand everything before it ships, and if something here breaks, that is on me and not on the tool.
 
@@ -173,7 +173,7 @@ You do not have to take my word for it. The code is open and every release note 
 
 <br>
 
-## 6. Support this project
+<p><a id="6-support-this-project" href="#6-support-this-project"><picture><source media="(prefers-color-scheme: dark)" srcset=".github/assets/sections/6-support-this-project-dark.svg"><img src=".github/assets/sections/6-support-this-project.svg" alt="6. Support this project" width="100%"></picture></a></p>
 
 Questions, bugs, ideas or feature requests? Please [open a GitHub issue](https://github.com/junkerderprovinz/vlc-redesign/issues).
 
@@ -183,10 +183,10 @@ If it has earned a place on your server or computer, toss a coin to your knight:
 
 <!-- give-buttons: written by scripts/gen_download_buttons.py -->
 <p align="center">
-  <a href="https://buymeacoffee.com/junkerderprovinz"><img src="https://raw.githubusercontent.com/junkerderprovinz/vlc-redesign/main/.github/assets/download-buttons/buttons.svg?v=1f283d4381ba#svgView(viewBox(5294,0,841.9,245.3))" alt="Buy me a coffee" width="160" height="46.618"></a>
+  <a href="https://buymeacoffee.com/junkerderprovinz"><img src="https://raw.githubusercontent.com/junkerderprovinz/vlc-redesign/main/.github/assets/download-buttons/buttons.svg?v=23dafdae06fb#svgView(viewBox(3562,0,841.9,245.3))" alt="Buy me a coffee" width="160" height="46.618"></a>
   &nbsp;
-  <a href="https://www.paypal.com/donate/?hosted_button_id=76FVV52TKXTUS"><img src="https://raw.githubusercontent.com/junkerderprovinz/vlc-redesign/main/.github/assets/download-buttons/buttons.svg?v=1f283d4381ba#svgView(viewBox(6160,0,841.9,245.3))" alt="PayPal" width="160" height="46.618"></a>
+  <a href="https://www.paypal.com/donate/?hosted_button_id=76FVV52TKXTUS"><img src="https://raw.githubusercontent.com/junkerderprovinz/vlc-redesign/main/.github/assets/download-buttons/buttons.svg?v=23dafdae06fb#svgView(viewBox(4428,0,841.9,245.3))" alt="PayPal" width="160" height="46.618"></a>
   &nbsp;
-  <a href="https://junkerderprovinz.github.io/junkerderprovinz/"><img src="https://raw.githubusercontent.com/junkerderprovinz/vlc-redesign/main/.github/assets/download-buttons/buttons.svg?v=1f283d4381ba#svgView(viewBox(7026,0,841.9,245.3))" alt="Donate with crypto" width="160" height="46.618"></a>
+  <a href="https://junkerderprovinz.github.io/junkerderprovinz/"><img src="https://raw.githubusercontent.com/junkerderprovinz/vlc-redesign/main/.github/assets/download-buttons/buttons.svg?v=23dafdae06fb#svgView(viewBox(5294,0,841.9,245.3))" alt="Donate with crypto" width="160" height="46.618"></a>
 </p>
 <!-- /give-buttons -->
